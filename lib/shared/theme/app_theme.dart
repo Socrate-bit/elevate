@@ -2,21 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppColors {
-  // Theme-invariant accent colors
-  static const orange = Color(0xFFFF6B00);
-  static const orangeLight = Color(0xFFFFF0E6);
-  static const blue = Color(0xFF007AFF);
+  /// Brand accent — replace per-project. Default is a neutral indigo/blue.
+  static const brand = Color(0xFF4F46E5);
+
+  /// Backwards-compat alias used by a few older callsites.
+  static const orange = brand;
+
   static const success = Color(0xFF4CAF50);
   static const error = Color(0xFFFF5252);
 
-  // Instance properties (theme-sensitive)
+  // Theme-sensitive instance properties
   final Color background;
   final Color card;
   final Color textPrimary;
   final Color textSecondary;
   final Color separator;
   final Color navBackground;
-  final Color purpleDeep;
+  final Color primary;
+  final Color frozen;
 
   const AppColors._({
     required this.background,
@@ -25,17 +28,19 @@ class AppColors {
     required this.textSecondary,
     required this.separator,
     required this.navBackground,
-    required this.purpleDeep,
+    required this.primary,
+    required this.frozen,
   });
 
   static const _light = AppColors._(
     background: Color(0xFFF2F2F7),
     card: Colors.white,
-    textPrimary: Color.fromARGB(255, 0, 0, 0),
-    textSecondary: Color.fromARGB(255, 102, 102, 105),
+    textPrimary: Color(0xFF1C1C1E),
+    textSecondary: Color(0xFF666669),
     separator: Color(0xFFE5E5EA),
     navBackground: Colors.white,
-    purpleDeep: Color.fromARGB(255, 159, 124, 255),
+    primary: brand,
+    frozen: Color(0xFF4299E1),
   );
 
   static const _dark = AppColors._(
@@ -45,7 +50,8 @@ class AppColors {
     textSecondary: Color(0xFF8E8E93),
     separator: Color(0xFF38383A),
     navBackground: Color(0xFF1C1C1E),
-    purpleDeep: Color.fromARGB(255, 159, 124, 255),
+    primary: brand,
+    frozen: Color(0xFF4299E1),
   );
 
   static AppColors of(BuildContext context) {
@@ -64,7 +70,7 @@ class AppTheme {
       useMaterial3: true,
       scaffoldBackgroundColor: bg,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.orange,
+        seedColor: AppColors.brand,
         brightness: Brightness.light,
         surface: bg,
       ),
@@ -139,7 +145,7 @@ class AppTheme {
       useMaterial3: true,
       scaffoldBackgroundColor: darkBg,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.orange,
+        seedColor: AppColors.brand,
         brightness: Brightness.dark,
         surface: darkBg,
       ),
@@ -186,7 +192,6 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: darkText,
         ),
-
         bodyMedium: TextStyle(fontSize: 15.sp, color: darkText),
         bodySmall: TextStyle(fontSize: 13.sp, color: darkSecondary),
       ),

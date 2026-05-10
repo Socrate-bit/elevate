@@ -4,14 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:liquid_glass_bar/liquid_glass_bar.dart';
 import 'theme/app_theme.dart';
 import 'utils/haptic_utils.dart';
-import 'package:elevate/features_levio/alarms/cubit/alarm_cubit.dart';
-import 'package:elevate/features_levio/alarms/screens/alarm_form_screen.dart';
+import 'package:elevate/features/alarms/cubit/alarm_cubit.dart';
+import 'package:elevate/features/alarms/screens/alarm_form_screen.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
-import '../features_levio/home/screens/home_screen.dart';
-import '../features_levio/insights/screens/insights_screen.dart';
-import '../features_levio/settings/screens/settings_screen.dart';
-import '../features_levio/subscription/services/analytics_service.dart';
+import '../features/home/screens/home_screen.dart';
+import '../features/insights/screens/insights_screen.dart';
+import '../features/settings/screens/settings_screen.dart';
+import '../features/subscription/services/analytics_service.dart';
 
 class BottomNavShell extends StatefulWidget {
   final int initialIndex;
@@ -62,7 +62,7 @@ class BottomNavShellState extends State<BottomNavShell> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final c = AppColors.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -79,7 +79,7 @@ class BottomNavShellState extends State<BottomNavShell> {
                 currentIndex: _index,
                 onTap: withHapticValue(_selectTab)!,
                 style: LiquidGlassBarStyle(
-                  activeColor: AppColors.orange,
+                  activeColor: c.primary,
                   inactiveColor: c.textSecondary,
                   borderRadius: 28.r,
                   height: 52.h,
@@ -144,17 +144,18 @@ class _AddAlarmCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return GestureDetector(
       onTap: withMediumHaptic(onTap),
       child: Container(
         width: 64.w,
         height: 64.h,
-        decoration: const BoxDecoration(
-          color: AppColors.orange,
+        decoration: BoxDecoration(
+          color: c.primary,
           shape: BoxShape.circle,
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
-              color: Color(0x40895EFF),
+              color: Color(0x40000000),
               blurRadius: 12,
               offset: Offset(0, 4),
             ),
