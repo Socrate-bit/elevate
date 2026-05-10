@@ -66,5 +66,13 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+    <!-- rest of your configuration -->
+    <key>com.posthog.posthog.PROJECT_TOKEN</key>
+    <string>phc_xELETM4GHobi9xQwUDA4JTPawfwGk6L3qT4CugatjbhS</string>
+    <key>com.posthog.posthog.POSTHOG_HOST</key>
+    <string>https://us.i.posthog.com</string>
+    <!-- com.posthog.posthog.CAPTURE_APPLICATION_LIFECYCLE_EVENTS is enabled by default since version 5.23.0 -->
+    <key>com.posthog.posthog.DEBUG</key>
+    <true/>
 </dict>
 </plist>
