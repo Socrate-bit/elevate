@@ -71,12 +71,12 @@ class _AppGateWrapperState extends State<AppGateWrapper> {
                   body: Center(child: CircularProgressIndicator()),
                 );
               }
-              // Only show alarm spinner when we actually triggered a sync.
-              if (sub.hasAccess && alarm.isLoading) {
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              }
+              // // Only show alarm spinner when we actually triggered a sync.
+              // if (sub.hasAccess && alarm.isLoading) {
+              //   return const Scaffold(
+              //     body: Center(child: CircularProgressIndicator()),
+              //   );
+              // }
               if (sub.hasAccess) {
                 alarmCubit.restoreSubscriptionDisabled();
                 return const BottomNavShell();

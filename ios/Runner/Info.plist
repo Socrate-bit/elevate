@@ -73,6 +73,6 @@
     <string>https://us.i.posthog.com</string>
     <!-- com.posthog.posthog.CAPTURE_APPLICATION_LIFECYCLE_EVENTS is enabled by default since version 5.23.0 -->
     <key>com.posthog.posthog.DEBUG</key>
-    <true/>
+    <false/>
 </dict>
 </plist>
