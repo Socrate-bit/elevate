@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
-import '../../../levio/missions/models/mission.dart';
-import '../../../levio/missions/screens/mission_confirm_screen.dart';
+import '../../missions/models/mission.dart';
+import '../../missions/screens/mission_confirm_screen.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/chat_cubit.dart';

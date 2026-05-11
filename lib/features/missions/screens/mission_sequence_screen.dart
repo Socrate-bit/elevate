@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../levio/missions/models/mission.dart';
-import '../../../levio/missions/models/mission_config.dart';
+import '../models/mission.dart';
+import '../models/mission_config.dart';
 import '../widgets/mission_complete_screen.dart';
 import 'math_mission_screen.dart';
 import 'mission_start_screen.dart';

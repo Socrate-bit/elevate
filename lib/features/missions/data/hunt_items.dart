@@ -1,4 +1,4 @@
-import '../../../levio/missions/models/mission.dart';
+import '../models/mission.dart';
 
 /// Data for object hunt missions: items the user can be asked to photograph.
 

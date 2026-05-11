@@ -8,7 +8,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
-import '../../../levio/missions/models/mission.dart';
+import '../models/mission.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../data/affirmations.dart';

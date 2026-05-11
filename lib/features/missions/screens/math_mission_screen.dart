@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
-import '../../../levio/missions/models/mission_config.dart';
+import '../models/mission_config.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../widgets/levio_brand_header.dart';
 import '../widgets/mission_complete_screen.dart';
