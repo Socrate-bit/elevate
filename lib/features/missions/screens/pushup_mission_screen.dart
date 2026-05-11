@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../levio/missions/models/mission.dart';
+import '../models/mission.dart';
 import '../cubit/pushup_cubit.dart';
 import '../widgets/rep_exercise_view.dart';
 
