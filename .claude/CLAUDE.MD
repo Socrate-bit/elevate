@@ -1,3 +1,4 @@
+## Conventions
 ### Architecture & State Management
 - **Folder Organization**: Feature-first structure. Subfolders: `service/`, `cubit/`, `screen/`, `widget/`
 - **State Management**: Cubit (not full Bloc) — no events, just methods. Use Cubit for **all** state and logic.
