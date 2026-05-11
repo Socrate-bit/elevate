@@ -8,18 +8,23 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
-import '../services/chat_conversation.dart';
 import '../services/chat_message.dart';
 import '../services/voice_service.dart';
 import '../widgets/chat_composer.dart';
 import '../widgets/chat_form_card.dart';
 import '../widgets/message_bubble.dart';
 
-/// Active conversation: greeting hero when empty, message list otherwise,
-/// composer at the bottom. Pops back to the history screen.
+/// Active conversation rendered inside the bottom-nav shell.
+/// Top bar: list icon (open history) left, `+` icon (new chat) right.
 class ChatScreen extends StatefulWidget {
-  final ChatConversation conversation;
-  const ChatScreen({super.key, required this.conversation});
+  final VoidCallback onOpenHistory;
+  final VoidCallback onNewChat;
+
+  const ChatScreen({
+    super.key,
+    required this.onOpenHistory,
+    required this.onNewChat,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -46,6 +51,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
+    // Reserve space for the bottom nav so the composer/messages don't overlap.
+    final navReserved = MediaQuery.viewPaddingOf(context).bottom + 84.h;
 
     return BlocConsumer<ChatCubit, ChatState>(
       listenWhen: (a, b) => a.messages.length != b.messages.length,
@@ -57,8 +64,8 @@ class _ChatScreenState extends State<ChatScreen> {
           backgroundColor: c.background,
           appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new, size: 20.sp),
-              onPressed: withHaptic(() => Navigator.pop(context)),
+              icon: Icon(Icons.format_list_bulleted_rounded, size: 22.sp),
+              onPressed: withHaptic(widget.onOpenHistory),
             ),
             centerTitle: true,
             title: Text(
@@ -69,37 +76,42 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: c.textPrimary,
               ),
             ),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.add_rounded, size: 26.sp),
+                tooltip: l10n.chatNewConversation,
+                onPressed: withMediumHaptic(widget.onNewChat),
+              ),
+            ],
           ),
-          body: SafeArea(
-            top: false,
-            child: Column(
-              children: [
-                Expanded(
-                  child: state.messages.isEmpty && !state.isLoading
-                      ? _GreetingHero()
-                      : state.isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : _MessagesList(
-                              scrollController: _scrollController,
-                              messages: state.messages,
-                              isSending: state.isSending,
-                            ),
+          body: Column(
+            children: [
+              Expanded(
+                child: state.messages.isEmpty && !state.isLoading
+                    ? _GreetingHero()
+                    : state.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : _MessagesList(
+                            scrollController: _scrollController,
+                            messages: state.messages,
+                            isSending: state.isSending,
+                            bottomPadding: navReserved + 80.h,
+                          ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, navReserved),
+                child: ChatComposer(
+                  controller: _composer,
+                  hint: state.isListening
+                      ? l10n.chatVoiceListening
+                      : l10n.chatComposerHint,
+                  isSending: state.isSending,
+                  isListening: state.isListening,
+                  onSend: () => _send(context),
+                  onMicTap: () => _toggleMic(context),
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 12.h),
-                  child: ChatComposer(
-                    controller: _composer,
-                    hint: state.isListening
-                        ? l10n.chatVoiceListening
-                        : l10n.chatComposerHint,
-                    isSending: state.isSending,
-                    isListening: state.isListening,
-                    onSend: () => _send(context),
-                    onMicTap: () => _toggleMic(context),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -176,11 +188,13 @@ class _MessagesList extends StatelessWidget {
   final ScrollController scrollController;
   final List<ChatMessage> messages;
   final bool isSending;
+  final double bottomPadding;
 
   const _MessagesList({
     required this.scrollController,
     required this.messages,
     required this.isSending,
+    required this.bottomPadding,
   });
 
   @override
@@ -188,7 +202,7 @@ class _MessagesList extends StatelessWidget {
     final itemCount = messages.length + (isSending ? 1 : 0);
     return ListView.builder(
       controller: scrollController,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, bottomPadding),
       itemCount: itemCount,
       itemBuilder: (ctx, i) {
         if (isSending && i == messages.length) {
