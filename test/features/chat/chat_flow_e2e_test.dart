@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:elevate/features/chat/cubit/chat_cubit.dart';
 import 'package:elevate/features/chat/cubit/chat_list_cubit.dart';
 import 'package:elevate/features/chat/cubit/chat_list_state.dart';
-import 'package:elevate/features/chat/screens/chat_history_screen.dart';
 import 'package:elevate/features/chat/screens/chat_screen.dart';
 import 'package:elevate/features/chat/services/chat_conversation.dart';
 import 'package:elevate/features/chat/services/chat_firestore_service.dart';
@@ -11,6 +10,7 @@ import 'package:elevate/features/chat/services/chat_form.dart';
 import 'package:elevate/features/chat/services/chat_message.dart';
 import 'package:elevate/features/chat/services/gemini_service.dart';
 import 'package:elevate/features/chat/services/voice_service.dart';
+import 'package:elevate/features/chat/widgets/chat_history_sheet.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import 'package:elevate/shared/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -133,7 +133,7 @@ void main() {
 
   testWidgets(
     'E2E: send text → bubbles render → form arrives via stream → '
-    'tap option records selection',
+    'tap option records selection and sends choice to AI',
     (tester) async {
       final replies = <GeminiReply>[
         GeminiReply.text('Hi there!'),
@@ -156,10 +156,12 @@ void main() {
       await tester.pumpWidget(appHarness(
         BlocProvider<ChatCubit>.value(
           value: cubit,
-          child: ChatScreen(conversation: _conv('c1')),
+          child: ChatScreen(
+            onOpenHistory: () {},
+            onNewChat: () {},
+          ),
         ),
       ));
-      // Flip isLoading false by pushing an initial empty snapshot.
       messages.add([]);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
@@ -177,19 +179,16 @@ void main() {
       // User bubble appears optimistically.
       expect(find.text('hello'), findsOneWidget);
 
-      // Simulate Firestore pushing the persisted user + model messages back
-      // via the watchMessages stream (what would happen in production).
+      // Firestore stream replays the persisted user + model messages.
       messages.add([
         _msg('u1', role: ChatRole.user, text: 'hello'),
         _msg('m1', role: ChatRole.model, text: 'Hi there!'),
       ]);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-
       expect(find.text('Hi there!'), findsOneWidget);
 
-      // Simulate the next model turn delivering a form card (as if Gemini
-      // had returned `present_choices`).
+      // Simulate a follow-up turn where the model returned a form.
       messages.add([
         _msg('u1', role: ChatRole.user, text: 'hello'),
         _msg('m1', role: ChatRole.model, text: 'Hi there!'),
@@ -204,18 +203,21 @@ void main() {
       ]);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
-
       expect(find.text('Pick a color'), findsOneWidget);
       expect(find.text('Red'), findsOneWidget);
       expect(find.text('Blue'), findsOneWidget);
 
-      // Tap the option — should record the selection.
+      // Scroll the form card into the viewport (the bottom nav reserve adds
+      // padding that can push the last item below the visible area).
+      await tester.ensureVisible(find.text('Red'));
+      await tester.pump();
+
+      // Tap the option — selection persisted AND chosen label sent to AI.
       await tester.tap(find.text('Red'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 200));
 
       verify(() => repo.updateMessageForm('c1', 'form1', 0)).called(1);
-      // Plus a user-side save for the chosen label.
       verify(() => gemini.send(
             history: any(named: 'history'),
             userText: 'Red',
@@ -226,8 +228,8 @@ void main() {
   );
 
   testWidgets(
-    'E2E history: list renders, search filters conversations, '
-    'createConversation persists',
+    'E2E history sheet: list renders, search filters by title, '
+    'tap closes sheet with the picked conversation',
     (tester) async {
       final list = ChatListCubit(
         repository: repo,
@@ -238,15 +240,31 @@ void main() {
         _conv('b', title: 'Bananas'),
       ]));
 
+      ChatConversation? picked;
       await tester.pumpWidget(appHarness(
         BlocProvider<ChatListCubit>.value(
           value: list,
-          child: const ChatHistoryScreen(),
+          child: Builder(
+            builder: (ctx) => Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    picked = await showChatHistorySheet(ctx);
+                  },
+                  child: const Text('Open'),
+                ),
+              ),
+            ),
+          ),
         ),
       ));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      // Sheet visible with both items.
       expect(find.text('Apples'), findsOneWidget);
       expect(find.text('Bananas'), findsOneWidget);
 
@@ -256,18 +274,15 @@ void main() {
       expect(find.text('Apples'), findsOneWidget);
       expect(find.text('Bananas'), findsNothing);
 
-      // Clear search restores the full list.
+      // Clear filter.
       await tester.enterText(find.byType(TextField), '');
       await tester.pump();
       expect(find.text('Bananas'), findsOneWidget);
 
-      // Add-FAB renders; invoke createConversation directly to verify the
-      // cubit's persistence path without triggering navigation to a screen
-      // that would build a real Firestore-backed ChatCubit.
-      expect(find.byIcon(Icons.add_rounded), findsOneWidget);
-      await list.createConversation();
-      verify(() => repo.saveConversation(any())).called(1);
-      expect(list.state.conversations.first.id, 'brand-new');
+      // Pick a conversation → sheet closes, future resolves.
+      await tester.tap(find.text('Bananas'));
+      await tester.pumpAndSettle();
+      expect(picked?.id, 'b');
 
       await list.close();
     },
