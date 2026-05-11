@@ -1657,6 +1657,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Great job! Keep it up.'**
   String get missionCompleteMessage;
+
+  /// No description provided for @missionPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Missions'**
+  String get missionPickerTitle;
+
+  /// No description provided for @missionPickerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a mission and start now'**
+  String get missionPickerSubtitle;
 }
 
 class _AppLocalizationsDelegate
