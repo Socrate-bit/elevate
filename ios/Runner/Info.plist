@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The app uses the microphone to transcribe your speech and let you talk directly to the AI chat.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>The app uses the speechrecognition to transcribe your speech and let you talk directly to the AI chat.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -66,13 +70,11 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-    <!-- rest of your configuration -->
-    <key>com.posthog.posthog.PROJECT_TOKEN</key>
-    <string>phc_xELETM4GHobi9xQwUDA4JTPawfwGk6L3qT4CugatjbhS</string>
-    <key>com.posthog.posthog.POSTHOG_HOST</key>
-    <string>https://us.i.posthog.com</string>
-    <!-- com.posthog.posthog.CAPTURE_APPLICATION_LIFECYCLE_EVENTS is enabled by default since version 5.23.0 -->
-    <key>com.posthog.posthog.DEBUG</key>
-    <false/>
+	<key>com.posthog.posthog.DEBUG</key>
+	<false/>
+	<key>com.posthog.posthog.POSTHOG_HOST</key>
+	<string>https://us.i.posthog.com</string>
+	<key>com.posthog.posthog.PROJECT_TOKEN</key>
+	<string>phc_xELETM4GHobi9xQwUDA4JTPawfwGk6L3qT4CugatjbhS</string>
 </dict>
 </plist>
