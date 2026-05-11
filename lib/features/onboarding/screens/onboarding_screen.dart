@@ -132,52 +132,92 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     cubit.finishOnboarding();
   }
 
-  Widget _buildPage(int index) {
+  /// Reads a TimeOfDay from surveyAnswers under [key] (format `HH:MM`).
+  TimeOfDay _readTime(OnboardingState state, String key, TimeOfDay fallback) {
+    final raw = state.surveyAnswers[key];
+    if (raw == null) return fallback;
+    final parts = raw.split(':');
+    if (parts.length != 2) return fallback;
+    final h = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    if (h == null || m == null) return fallback;
+    return TimeOfDay(hour: h, minute: m);
+  }
+
+  String _formatTime(TimeOfDay t) =>
+      '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+
+  DateTime _readDate(OnboardingState state, String key, DateTime fallback) {
+    final raw = state.surveyAnswers[key];
+    if (raw == null) return fallback;
+    return DateTime.tryParse(raw) ?? fallback;
+  }
+
+  String _formatDate(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+
+  Widget _buildPage(int index, OnboardingState state, OnboardingCubit cubit) {
     final l10n = AppLocalizations.of(context)!;
     return switch (index) {
       // 1: Age range
       0 => SurveyStep(
           question: l10n.onboardingAgeRangeQuestion,
-          questionKey: 'age_range',
           options: _ageRangeOptions,
+          selectedOption: state.surveyAnswers['age_range'],
+          onSelected: (v) => cubit.answerSurvey('age_range', v),
         ),
       // 2: Gender
       1 => SurveyStep(
           question: l10n.onboardingGenderQuestion,
-          questionKey: 'gender',
           options: _genderOptions,
+          selectedOption: state.surveyAnswers['gender'],
+          onSelected: (v) => cubit.answerSurvey('gender', v),
         ),
       // 3: Where do you come from
       2 => SurveyStep(
           question: l10n.onboardingOriginQuestion,
-          questionKey: 'origin',
           options: _originOptions,
+          selectedOption: state.surveyAnswers['origin'],
+          onSelected: (v) => cubit.answerSurvey('origin', v),
         ),
       // 4–6: Placeholder surveys
       3 => SurveyStep(
           question: _surveyQuestions[0].$2,
-          questionKey: _surveyQuestions[0].$1,
+          options: const ['Option A', 'Option B', 'Option C'],
+          selectedOption: state.surveyAnswers[_surveyQuestions[0].$1],
+          onSelected: (v) => cubit.answerSurvey(_surveyQuestions[0].$1, v),
         ),
       4 => SurveyStep(
           question: _surveyQuestions[1].$2,
-          questionKey: _surveyQuestions[1].$1,
+          options: const ['Option A', 'Option B', 'Option C'],
+          selectedOption: state.surveyAnswers[_surveyQuestions[1].$1],
+          onSelected: (v) => cubit.answerSurvey(_surveyQuestions[1].$1, v),
         ),
       5 => SurveyStep(
           question: _surveyQuestions[2].$2,
-          questionKey: _surveyQuestions[2].$1,
+          options: const ['Option A', 'Option B', 'Option C'],
+          selectedOption: state.surveyAnswers[_surveyQuestions[2].$1],
+          onSelected: (v) => cubit.answerSurvey(_surveyQuestions[2].$1, v),
         ),
       // 7: Time picker
       6 => TimePickerStep(
           title: l10n.onboardingTimePickerTitle,
           subtitle: l10n.onboardingTimePickerSubtitle,
-          answerKey: 'preferred_time',
+          time: _readTime(
+              state, 'preferred_time', const TimeOfDay(hour: 7, minute: 0)),
+          onTimeChanged: (t) =>
+              cubit.answerSurvey('preferred_time', _formatTime(t)),
         ),
-      // 8: Date picker (birth date)
+      // 8: Date picker
       7 => DatePickerStep(
           title: l10n.onboardingDatePickerTitle,
           subtitle: l10n.onboardingDatePickerSubtitle,
-          answerKey: 'birth_date',
-          initialDate: DateTime(DateTime.now().year - 25),
+          date: _readDate(
+              state, 'birth_date', DateTime(DateTime.now().year - 25)),
+          onDateChanged: (d) =>
+              cubit.answerSurvey('birth_date', _formatDate(d)),
         ),
       // 9: Info
       8 => InfoStep(
@@ -247,7 +287,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     controller: _pageController,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: _totalPages - 1,
-                    itemBuilder: (_, i) => _buildPage(i),
+                    itemBuilder: (_, i) => _buildPage(i, state, cubit),
                   ),
                 ),
                 if (!ownsNav)
