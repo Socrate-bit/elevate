@@ -16,14 +16,17 @@ import '../widgets/message_bubble.dart';
 
 /// Active conversation rendered inside the bottom-nav shell.
 /// Top bar: list icon (open history) left, `+` icon (new chat) right.
+/// [initialMessage], when provided, is sent as the first user turn automatically.
 class ChatScreen extends StatefulWidget {
   final VoidCallback onOpenHistory;
   final VoidCallback onNewChat;
+  final String? initialMessage;
 
   const ChatScreen({
     super.key,
     required this.onOpenHistory,
     required this.onNewChat,
+    this.initialMessage,
   });
 
   @override
@@ -38,6 +41,13 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _composer.addListener(() => setState(() {}));
+    // Send the first message that was typed in the pre-chat view.
+    final pending = widget.initialMessage;
+    if (pending != null && pending.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.read<ChatCubit>().sendText(pending);
+      });
+    }
   }
 
   @override
