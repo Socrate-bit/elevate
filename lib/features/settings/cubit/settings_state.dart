@@ -6,7 +6,7 @@ class SettingsState extends Equatable {
   final ThemeMode themeMode;
 
   const SettingsState({
-    this.themeMode = ThemeMode.system,
+    this.themeMode = ThemeMode.light,
   });
 
   SettingsState copyWith({ThemeMode? themeMode}) {

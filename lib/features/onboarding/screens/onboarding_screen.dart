@@ -9,6 +9,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../../subscription/cubit/subscription_cubit.dart';
 import '../cubit/onboarding_cubit.dart';
 import '../cubit/onboarding_state.dart';
+import '../widgets/date_picker_step.dart';
 import '../widgets/info_step.dart';
 import '../widgets/loading_step.dart';
 import '../widgets/notification_step.dart';
@@ -18,28 +19,47 @@ import '../widgets/referral_step.dart';
 import '../widgets/sign_in_step.dart';
 import '../widgets/signature_step.dart';
 import '../widgets/survey_step.dart';
+import '../widgets/time_picker_step.dart';
 import '../widgets/trial_reminder_step.dart';
 import '../widgets/welcome_step.dart';
 
-/// Onboarding flow page indices (Welcome is page 0; the rest live in a PageView).
+/// Onboarding flow page indices.
+///
+/// Welcome is page 0; the rest live inside a PageView (pageIndex = page − 1).
 ///
 ///  0: Welcome
-///  1–3: Survey × 3 (placeholder questions)
-///  4: Info (placeholder)
-///  5: Notification permission (owns nav)
-///  6: Rating (triggers in-app review on Continue)
-///  7: Signature (owns nav)
-///  8: Loading (auto-advances)
-///  9: Sign-in (owns nav)
-/// 10: Referral
-/// 11: Paywall (owns nav)
-/// 12: Trial reminder (FINAL — calls completeOnboarding + finishOnboarding)
-const _totalPages = 13;
+///  1: Age range
+///  2: Gender
+///  3: Where do you come from
+///  4–6: Survey × 3 (placeholder questions)
+///  7: Time picker (generic)
+///  8: Date picker (generic — birth date)
+///  9: Info (placeholder)
+/// 10: Notification permission (owns nav)
+/// 11: Rating (triggers in-app review on Continue)
+/// 12: Signature (owns nav)
+/// 13: Loading (animated, auto-advances)
+/// 14: Sign-in (owns nav)
+/// 15: Referral
+/// 16: Paywall (owns nav)
+/// 17: Trial reminder (FINAL — calls completeOnboarding + finishOnboarding)
+const _totalPages = 18;
 
 const _surveyQuestions = [
   ('survey_q1', 'Question 1?'),
   ('survey_q2', 'Question 2?'),
   ('survey_q3', 'Question 3?'),
+];
+
+const _ageRangeOptions = ['Under 18', '18–24', '25–34', '35–44', '45–54', '55+'];
+const _genderOptions = ['Female', 'Male', 'Non-binary', 'Prefer not to say'];
+const _originOptions = [
+  'North America',
+  'South America',
+  'Europe',
+  'Africa',
+  'Asia',
+  'Oceania',
 ];
 
 class OnboardingScreen extends StatefulWidget {
@@ -88,11 +108,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     OnboardingCubit cubit,
   ) async {
     // Rating page: trigger in-app review.
-    if (_currentPage == 6) {
+    if (_currentPage == 11) {
       InAppReview.instance.requestReview();
     }
     // Referral page: validate any entered code before advancing.
-    if (_currentPage == 10) {
+    if (_currentPage == 15) {
       final code = state.referralCode.trim();
       FocusScope.of(context).unfocus();
       if (code.isNotEmpty &&
@@ -115,30 +135,71 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _buildPage(int index) {
     final l10n = AppLocalizations.of(context)!;
     return switch (index) {
+      // 1: Age range
       0 => SurveyStep(
+          question: l10n.onboardingAgeRangeQuestion,
+          questionKey: 'age_range',
+          options: _ageRangeOptions,
+        ),
+      // 2: Gender
+      1 => SurveyStep(
+          question: l10n.onboardingGenderQuestion,
+          questionKey: 'gender',
+          options: _genderOptions,
+        ),
+      // 3: Where do you come from
+      2 => SurveyStep(
+          question: l10n.onboardingOriginQuestion,
+          questionKey: 'origin',
+          options: _originOptions,
+        ),
+      // 4–6: Placeholder surveys
+      3 => SurveyStep(
           question: _surveyQuestions[0].$2,
           questionKey: _surveyQuestions[0].$1,
         ),
-      1 => SurveyStep(
+      4 => SurveyStep(
           question: _surveyQuestions[1].$2,
           questionKey: _surveyQuestions[1].$1,
         ),
-      2 => SurveyStep(
+      5 => SurveyStep(
           question: _surveyQuestions[2].$2,
           questionKey: _surveyQuestions[2].$1,
         ),
-      3 => InfoStep(
+      // 7: Time picker
+      6 => TimePickerStep(
+          title: l10n.onboardingTimePickerTitle,
+          subtitle: l10n.onboardingTimePickerSubtitle,
+          answerKey: 'preferred_time',
+        ),
+      // 8: Date picker (birth date)
+      7 => DatePickerStep(
+          title: l10n.onboardingDatePickerTitle,
+          subtitle: l10n.onboardingDatePickerSubtitle,
+          answerKey: 'birth_date',
+          initialDate: DateTime(DateTime.now().year - 25),
+        ),
+      // 9: Info
+      8 => InfoStep(
           title: l10n.onboardingInfoTitle,
           body: l10n.onboardingInfoBody,
         ),
-      4 => NotificationStep(onContinue: _next),
-      5 => const RatingStep(),
-      6 => SignatureStep(onContinue: _next),
-      7 => LoadingStep(onComplete: _next),
-      8 => SignInStep(onContinue: _next),
-      9 => const ReferralStep(),
-      10 => PaywallStep(onContinue: _next),
-      11 => TrialReminderStep(onContinue: _completeFlow),
+      // 10: Notification
+      9 => NotificationStep(onContinue: _next),
+      // 11: Rating
+      10 => const RatingStep(),
+      // 12: Signature
+      11 => SignatureStep(onContinue: _next),
+      // 13: Loading
+      12 => LoadingStep(onComplete: _next),
+      // 14: Sign-in
+      13 => SignInStep(onContinue: _next),
+      // 15: Referral
+      14 => const ReferralStep(),
+      // 16: Paywall
+      15 => PaywallStep(onContinue: _next),
+      // 17: Trial reminder (final)
+      16 => TrialReminderStep(onContinue: _completeFlow),
       _ => const SizedBox.shrink(),
     };
   }
@@ -167,7 +228,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         }
 
         // Pages whose body owns its primary action button.
-        const ownsNavPages = {5, 7, 8, 9, 11, 12};
+        // (currentPage indices, NOT PageView indices.)
+        const ownsNavPages = {10, 12, 13, 14, 16, 17};
         final ownsNav = ownsNavPages.contains(_currentPage);
 
         return Scaffold(
