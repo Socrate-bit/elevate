@@ -1334,6 +1334,12 @@ abstract class AppLocalizations {
   /// **'How can I help you tonight?'**
   String get chatGreeting;
 
+  /// No description provided for @chatStartChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Start chat'**
+  String get chatStartChat;
+
   /// No description provided for @chatComposerHint.
   ///
   /// In en, this message translates to:

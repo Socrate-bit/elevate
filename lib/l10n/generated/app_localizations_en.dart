@@ -650,6 +650,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatGreeting => 'How can I help you tonight?';
 
   @override
+  String get chatStartChat => 'Start chat';
+
+  @override
   String get chatComposerHint => 'Message';
 
   @override

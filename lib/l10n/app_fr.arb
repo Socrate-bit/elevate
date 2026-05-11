@@ -240,6 +240,7 @@
   "chatHistoryEmpty": "Aucune conversation",
   "chatHistoryEmptyHint": "Touchez + pour démarrer une discussion.",
   "chatGreeting": "Comment puis-je vous aider ce soir ?",
+  "chatStartChat": "Commencer la discussion",
   "chatComposerHint": "Message",
   "chatSend": "Envoyer",
   "chatNewConversation": "Nouveau chat",

@@ -14,17 +14,15 @@ import '../widgets/chat_composer.dart';
 import '../widgets/chat_form_card.dart';
 import '../widgets/message_bubble.dart';
 
-/// Active conversation rendered inside the bottom-nav shell.
-/// Top bar: list icon (open history) left, `+` icon (new chat) right.
+/// Active conversation, pushed full-screen above the bottom-nav shell.
+/// Top bar: back arrow (return to shell) left, `+` icon (new chat) right.
 /// [initialMessage], when provided, is sent as the first user turn automatically.
 class ChatScreen extends StatefulWidget {
-  final VoidCallback onOpenHistory;
   final VoidCallback onNewChat;
   final String? initialMessage;
 
   const ChatScreen({
     super.key,
-    required this.onOpenHistory,
     required this.onNewChat,
     this.initialMessage,
   });
@@ -61,8 +59,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    // Reserve space for the bottom nav so the composer/messages don't overlap.
-    final navReserved = MediaQuery.viewPaddingOf(context).bottom + 84.h;
+    // Bottom safe-area inset; chat is pushed full-screen so no nav bar to reserve for.
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
 
     return BlocConsumer<ChatCubit, ChatState>(
       listenWhen: (a, b) => a.messages.length != b.messages.length,
@@ -74,8 +72,9 @@ class _ChatScreenState extends State<ChatScreen> {
           backgroundColor: c.background,
           appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.format_list_bulleted_rounded, size: 22.sp),
-              onPressed: withHaptic(widget.onOpenHistory),
+              icon: Icon(Icons.arrow_back_ios_rounded,
+                  size: 20.sp, color: c.textPrimary),
+              onPressed: withHaptic(() => Navigator.of(context).pop()),
             ),
             centerTitle: true,
             title: Text(
@@ -105,11 +104,11 @@ class _ChatScreenState extends State<ChatScreen> {
                             scrollController: _scrollController,
                             messages: state.messages,
                             isSending: state.isSending,
-                            bottomPadding: navReserved + 80.h,
+                            bottomPadding: bottomInset + 80.h,
                           ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, navReserved),
+                padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, bottomInset),
                 child: ChatComposer(
                   controller: _composer,
                   hint: state.isListening

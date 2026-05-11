@@ -157,7 +157,6 @@ void main() {
         BlocProvider<ChatCubit>.value(
           value: cubit,
           child: ChatScreen(
-            onOpenHistory: () {},
             onNewChat: () {},
           ),
         ),

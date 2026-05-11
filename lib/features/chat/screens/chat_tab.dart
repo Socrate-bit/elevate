@@ -8,16 +8,16 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_list_cubit.dart';
-import '../widgets/chat_composer.dart';
 import '../widgets/chat_history_sheet.dart';
 import 'chat_screen.dart';
 
 /// Bottom-nav tab that hosts the chat experience.
 ///
-/// - No conversation is created eagerly — the greeting appears immediately.
-/// - A conversation is only created when the user sends the first message.
-/// - "New chat" (+ icon) resets to the greeting without touching Firestore.
-/// - History (list icon) opens the modal sheet; picking a conversation loads it.
+/// - The tab itself shows a landing page (greeting + "Start chat" button).
+/// - "Start chat" creates a conversation and pushes [ChatScreen] full-screen
+///   above the shell (no bottom nav visible).
+/// - History (list icon) opens the modal sheet; picking a conversation pushes
+///   [ChatScreen] for it.
 class ChatTab extends StatefulWidget {
   const ChatTab({super.key});
 
@@ -26,13 +26,7 @@ class ChatTab extends StatefulWidget {
 }
 
 class _ChatTabState extends State<ChatTab> with AutomaticKeepAliveClientMixin {
-  /// Non-null once a conversation is active (selected from history or after
-  /// the first message creates one).
-  String? _currentId;
-
-  /// Text entered in the pre-chat composer that should be sent as soon as the
-  /// newly-created conversation's ChatCubit is ready.
-  String? _pendingMessage;
+  bool _starting = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -40,110 +34,76 @@ class _ChatTabState extends State<ChatTab> with AutomaticKeepAliveClientMixin {
   Future<void> _openHistory() async {
     final picked = await showChatHistorySheet(context);
     if (!mounted || picked == null) return;
-    setState(() {
-      _currentId = picked.id;
-      _pendingMessage = null;
-    });
+    _openChat(picked.id);
   }
 
-  /// Resets to the empty greeting without creating anything.
-  void _newChat() {
-    setState(() {
-      _currentId = null;
-      _pendingMessage = null;
-    });
-  }
-
-  /// Called by the pre-chat composer on first send.
-  /// Creates the conversation, then hands [text] off to ChatScreen.
-  Future<void> _handleFirstSend(String text) async {
-    if (text.trim().isEmpty) return;
+  Future<void> _startChat() async {
+    if (_starting) return;
+    setState(() => _starting = true);
     try {
       final conv = await context.read<ChatListCubit>().createConversation();
       if (!mounted) return;
-      setState(() {
-        _currentId = conv.id;
-        _pendingMessage = text.trim();
-      });
+      setState(() => _starting = false);
+      _openChat(conv.id);
     } catch (e) {
       debugPrint('[ChatTab] createConversation failed: $e');
+      if (mounted) setState(() => _starting = false);
     }
+  }
+
+  void _openChat(String conversationId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => ChatCubit(conversationId: conversationId),
+          child: ChatScreen(onNewChat: _replaceWithNewChat),
+        ),
+      ),
+    );
+  }
+
+  /// Called from the chat page's `+` button: drop the current chat and start
+  /// a new one.
+  Future<void> _replaceWithNewChat() async {
+    Navigator.of(context).pop();
+    await _startChat();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final id = _currentId;
-
-    if (id == null) {
-      // No active conversation — show the greeting and let the user start typing.
-      return _PreChatView(
-        onOpenHistory: _openHistory,
-        onNewChat: _newChat,
-        onSend: _handleFirstSend,
-      );
-    }
-
-    // Active conversation — re-create ChatCubit when the id changes.
-    return BlocProvider(
-      key: ValueKey(id),
-      create: (_) => ChatCubit(conversationId: id),
-      child: ChatScreen(
-        onOpenHistory: _openHistory,
-        onNewChat: _newChat,
-        initialMessage: _pendingMessage,
-      ),
+    return _PreChatView(
+      onOpenHistory: _openHistory,
+      onStartChat: _startChat,
+      isStarting: _starting,
     );
   }
 }
 
-/// Greeting screen shown before any conversation exists.
-/// Looks identical to ChatScreen's empty state with a working composer.
-class _PreChatView extends StatefulWidget {
+/// Landing screen shown inside the chat tab.
+/// Greeting + "Start chat" button.
+class _PreChatView extends StatelessWidget {
   final VoidCallback onOpenHistory;
-  final VoidCallback onNewChat;
-  final Future<void> Function(String text) onSend;
+  final VoidCallback onStartChat;
+  final bool isStarting;
 
   const _PreChatView({
     required this.onOpenHistory,
-    required this.onNewChat,
-    required this.onSend,
+    required this.onStartChat,
+    required this.isStarting,
   });
-
-  @override
-  State<_PreChatView> createState() => _PreChatViewState();
-}
-
-class _PreChatViewState extends State<_PreChatView> {
-  final _composer = TextEditingController();
-  bool _sending = false;
-
-  @override
-  void dispose() {
-    _composer.dispose();
-    super.dispose();
-  }
-
-  Future<void> _send() async {
-    final text = _composer.text.trim();
-    if (text.isEmpty || _sending) return;
-    setState(() => _sending = true);
-    await widget.onSend(text);
-    if (mounted) setState(() => _sending = false);
-  }
 
   @override
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final navReserved = MediaQuery.viewPaddingOf(context).bottom + 84.h;
 
     return Scaffold(
       backgroundColor: c.background,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.format_list_bulleted_rounded, size: 22.sp),
-          onPressed: withHaptic(widget.onOpenHistory),
+          onPressed: withHaptic(onOpenHistory),
         ),
         centerTitle: true,
         title: Text(
@@ -154,55 +114,61 @@ class _PreChatViewState extends State<_PreChatView> {
             color: c.textPrimary,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add_rounded, size: 26.sp),
-            tooltip: l10n.chatNewConversation,
-            onPressed: widget.onNewChat,
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32.w),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.auto_awesome, size: 36.sp, color: c.primary),
-                    SizedBox(height: 16.h),
-                    Text(
-                      l10n.chatGreeting,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 22.sp,
-                        fontWeight: FontWeight.w500,
-                        color: c.textPrimary,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 32.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, size: 36.sp, color: c.primary),
+              SizedBox(height: 16.h),
+              Text(
+                l10n.chatGreeting,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w500,
+                  color: c.textPrimary,
+                  height: 1.3,
                 ),
               ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, navReserved),
-            child: ValueListenableBuilder<TextEditingValue>(
-              valueListenable: _composer,
-              builder: (context, value, _) => ChatComposer(
-                controller: _composer,
-                hint: l10n.chatComposerHint,
-                isSending: _sending,
-                isListening: false,
-                onSend: _send,
-                onMicTap: () {},
+              SizedBox(height: 32.h),
+              SizedBox(
+                height: 52.h,
+                child: ElevatedButton(
+                  onPressed: isStarting ? null : withHaptic(onStartChat),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: c.primary,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 32.w),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(26.r),
+                    ),
+                  ),
+                  child: isStarting
+                      ? SizedBox(
+                          width: 20.w,
+                          height: 20.w,
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          l10n.chatStartChat,
+                          style: TextStyle(
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

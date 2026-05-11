@@ -240,6 +240,7 @@
   "chatHistoryEmpty": "No conversations yet",
   "chatHistoryEmptyHint": "Tap + to start a new chat.",
   "chatGreeting": "How can I help you tonight?",
+  "chatStartChat": "Start chat",
   "chatComposerHint": "Message",
   "chatSend": "Send",
   "chatNewConversation": "New chat",
