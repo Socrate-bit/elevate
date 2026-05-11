@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
+import '../../../levio/missions/models/mission.dart';
+import '../../../levio/missions/screens/mission_confirm_screen.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/chat_cubit.dart';
@@ -12,6 +14,7 @@ import '../services/chat_message.dart';
 import '../services/voice_service.dart';
 import '../widgets/chat_composer.dart';
 import '../widgets/chat_form_card.dart';
+import '../widgets/chat_mission_card.dart';
 import '../widgets/message_bubble.dart';
 
 /// Active conversation, pushed full-screen above the bottom-nav shell.
@@ -223,6 +226,25 @@ class _MessagesList extends StatelessWidget {
             form: m.form!,
             onAnswer: (idx) =>
                 context.read<ChatCubit>().answerForm(m.id, idx),
+          );
+        }
+        if (m.missionSuggestion != null && m.role == ChatRole.model) {
+          return ChatMissionCard(
+            suggestion: m.missionSuggestion!,
+            onAccept: () async {
+              await context.read<ChatCubit>().acceptMissionSuggestion(m.id);
+              if (!context.mounted) return;
+              final missionType =
+                  missionTypeFromString(m.missionSuggestion!.missionType);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      MissionConfirmScreen(missionType: missionType),
+                ),
+              );
+            },
+            onDecline: () =>
+                context.read<ChatCubit>().declineMissionSuggestion(m.id),
           );
         }
         return MessageBubble(message: m);
