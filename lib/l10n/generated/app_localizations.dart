@@ -1435,6 +1435,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{n} days ago'**
   String chatRelativeDaysAgo(int n);
+
+  /// No description provided for @chatMissionStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Mission'**
+  String get chatMissionStart;
+
+  /// No description provided for @chatMissionDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get chatMissionDecline;
+
+  /// No description provided for @chatMissionAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Mission started'**
+  String get chatMissionAccepted;
+
+  /// No description provided for @chatMissionDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe later'**
+  String get chatMissionDeclined;
+
+  /// No description provided for @chatMissionSetUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up this mission'**
+  String get chatMissionSetUp;
+
+  /// No description provided for @dismissMissionTimeToWakeUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to wake up!'**
+  String get dismissMissionTimeToWakeUp;
+
+  /// No description provided for @dismissMissionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mission {n} of {total}: {name}'**
+  String dismissMissionLabel(int n, int total, String name);
+
+  /// No description provided for @dismissStartMission.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Mission'**
+  String get dismissStartMission;
+
+  /// No description provided for @dismissMathProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem {n} of {total}'**
+  String dismissMathProgress(int n, int total);
+
+  /// No description provided for @dismissMathWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong, try again'**
+  String get dismissMathWrong;
+
+  /// No description provided for @dismissMathConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get dismissMathConfirm;
+
+  /// No description provided for @dismissShakePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Shake your phone!'**
+  String get dismissShakePrompt;
+
+  /// No description provided for @dismissSpeechTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again: {score}%'**
+  String dismissSpeechTryAgain(int score);
+
+  /// No description provided for @dismissSpeechProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Affirmation {n} of {total}'**
+  String dismissSpeechProgress(int n, int total);
+
+  /// No description provided for @dismissSpeechSay.
+  ///
+  /// In en, this message translates to:
+  /// **'Say this aloud:'**
+  String get dismissSpeechSay;
+
+  /// No description provided for @dismissSpeechListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening…'**
+  String get dismissSpeechListening;
+
+  /// No description provided for @dismissSpeechTapToSpeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to speak'**
+  String get dismissSpeechTapToSpeak;
+
+  /// No description provided for @dismissSpeechMicUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone unavailable'**
+  String get dismissSpeechMicUnavailable;
+
+  /// No description provided for @dismissPhotoPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Find: {target}'**
+  String dismissPhotoPrompt(String target);
+
+  /// No description provided for @dismissPhotoNotDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t detect {target}'**
+  String dismissPhotoNotDetected(String target);
+
+  /// No description provided for @dismissPhotoError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String dismissPhotoError(String error);
+
+  /// No description provided for @dismissPhotoChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for {target}…'**
+  String dismissPhotoChecking(String target);
+
+  /// No description provided for @dismissPhotoStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting camera…'**
+  String get dismissPhotoStarting;
+
+  /// No description provided for @dismissPhotoPickingTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Picking your target…'**
+  String get dismissPhotoPickingTarget;
+
+  /// No description provided for @dismissFeedbackMoveIntoFrame.
+  ///
+  /// In en, this message translates to:
+  /// **'Move into frame'**
+  String get dismissFeedbackMoveIntoFrame;
+
+  /// No description provided for @dismissFeedbackKeepGoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going!'**
+  String get dismissFeedbackKeepGoing;
+
+  /// No description provided for @dismissFeedbackPushupPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Get in push-up position'**
+  String get dismissFeedbackPushupPosition;
+
+  /// No description provided for @dismissFeedbackStartPushups.
+  ///
+  /// In en, this message translates to:
+  /// **'Start push-ups'**
+  String get dismissFeedbackStartPushups;
+
+  /// No description provided for @dismissFeedbackPushupGoDeeper.
+  ///
+  /// In en, this message translates to:
+  /// **'Go deeper'**
+  String get dismissFeedbackPushupGoDeeper;
+
+  /// No description provided for @dismissFeedbackSquatPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep knees over ankles'**
+  String get dismissFeedbackSquatPosition;
+
+  /// No description provided for @dismissFeedbackStartSquats.
+  ///
+  /// In en, this message translates to:
+  /// **'Start squats'**
+  String get dismissFeedbackStartSquats;
+
+  /// No description provided for @dismissFeedbackSquatGoDeeper.
+  ///
+  /// In en, this message translates to:
+  /// **'Squat deeper'**
+  String get dismissFeedbackSquatGoDeeper;
+
+  /// No description provided for @dismissRepStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting camera…'**
+  String get dismissRepStarting;
+
+  /// No description provided for @dismissRepPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Do {count} {name}'**
+  String dismissRepPrompt(int count, String name);
+
+  /// No description provided for @dismissRepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'of {target}'**
+  String dismissRepOf(int target);
+
+  /// No description provided for @missionComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Mission Complete!'**
+  String get missionComplete;
+
+  /// No description provided for @missionCompleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Great job! Keep it up.'**
+  String get missionCompleteMessage;
 }
 
 class _AppLocalizationsDelegate

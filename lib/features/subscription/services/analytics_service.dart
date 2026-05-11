@@ -72,4 +72,6 @@ class AnalyticsService {
   static const chatMessageSent = 'chat_message_sent';
   static const chatVoiceUsed = 'chat_voice_used';
   static const chatFormAnswered = 'chat_form_answered';
+  static const chatMissionAccepted = 'chat_mission_accepted';
+  static const chatMissionDeclined = 'chat_mission_declined';
 }

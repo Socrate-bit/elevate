@@ -23,6 +23,12 @@ abstract interface class ChatRepository {
     String messageId,
     int selectedIndex,
   );
+
+  Future<void> updateMessageMissionSuggestion(
+    String conversationId,
+    String messageId,
+    bool accepted,
+  );
 }
 
 /// Firestore-backed [ChatRepository].
@@ -105,5 +111,15 @@ class ChatFirestoreService implements ChatRepository {
   ) =>
       _messages(conversationId).doc(messageId).update({
         'form.selectedIndex': selectedIndex,
+      });
+
+  @override
+  Future<void> updateMessageMissionSuggestion(
+    String conversationId,
+    String messageId,
+    bool accepted,
+  ) =>
+      _messages(conversationId).doc(messageId).update({
+        'missionSuggestion.accepted': accepted,
       });
 }

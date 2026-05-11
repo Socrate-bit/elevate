@@ -707,4 +707,135 @@ class AppLocalizationsEn extends AppLocalizations {
   String chatRelativeDaysAgo(int n) {
     return '$n days ago';
   }
+
+  @override
+  String get chatMissionStart => 'Start Mission';
+
+  @override
+  String get chatMissionDecline => 'Not now';
+
+  @override
+  String get chatMissionAccepted => 'Mission started';
+
+  @override
+  String get chatMissionDeclined => 'Maybe later';
+
+  @override
+  String get chatMissionSetUp => 'Set up this mission';
+
+  @override
+  String get dismissMissionTimeToWakeUp => 'Time to wake up!';
+
+  @override
+  String dismissMissionLabel(int n, int total, String name) {
+    return 'Mission $n of $total: $name';
+  }
+
+  @override
+  String get dismissStartMission => 'Start Mission';
+
+  @override
+  String dismissMathProgress(int n, int total) {
+    return 'Problem $n of $total';
+  }
+
+  @override
+  String get dismissMathWrong => 'Wrong, try again';
+
+  @override
+  String get dismissMathConfirm => 'Check';
+
+  @override
+  String get dismissShakePrompt => 'Shake your phone!';
+
+  @override
+  String dismissSpeechTryAgain(int score) {
+    return 'Try again: $score%';
+  }
+
+  @override
+  String dismissSpeechProgress(int n, int total) {
+    return 'Affirmation $n of $total';
+  }
+
+  @override
+  String get dismissSpeechSay => 'Say this aloud:';
+
+  @override
+  String get dismissSpeechListening => 'Listening…';
+
+  @override
+  String get dismissSpeechTapToSpeak => 'Tap to speak';
+
+  @override
+  String get dismissSpeechMicUnavailable => 'Microphone unavailable';
+
+  @override
+  String dismissPhotoPrompt(String target) {
+    return 'Find: $target';
+  }
+
+  @override
+  String dismissPhotoNotDetected(String target) {
+    return 'Couldn\'t detect $target';
+  }
+
+  @override
+  String dismissPhotoError(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String dismissPhotoChecking(String target) {
+    return 'Checking for $target…';
+  }
+
+  @override
+  String get dismissPhotoStarting => 'Starting camera…';
+
+  @override
+  String get dismissPhotoPickingTarget => 'Picking your target…';
+
+  @override
+  String get dismissFeedbackMoveIntoFrame => 'Move into frame';
+
+  @override
+  String get dismissFeedbackKeepGoing => 'Keep going!';
+
+  @override
+  String get dismissFeedbackPushupPosition => 'Get in push-up position';
+
+  @override
+  String get dismissFeedbackStartPushups => 'Start push-ups';
+
+  @override
+  String get dismissFeedbackPushupGoDeeper => 'Go deeper';
+
+  @override
+  String get dismissFeedbackSquatPosition => 'Keep knees over ankles';
+
+  @override
+  String get dismissFeedbackStartSquats => 'Start squats';
+
+  @override
+  String get dismissFeedbackSquatGoDeeper => 'Squat deeper';
+
+  @override
+  String get dismissRepStarting => 'Starting camera…';
+
+  @override
+  String dismissRepPrompt(int count, String name) {
+    return 'Do $count $name';
+  }
+
+  @override
+  String dismissRepOf(int target) {
+    return 'of $target';
+  }
+
+  @override
+  String get missionComplete => 'Mission Complete!';
+
+  @override
+  String get missionCompleteMessage => 'Great job! Keep it up.';
 }

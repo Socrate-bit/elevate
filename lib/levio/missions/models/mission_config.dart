@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-import '../../alarms/cubit/alarm_state.dart';
 import 'mission.dart';
+
+enum MathDifficulty { easy, medium, hard }
 
 /// Per-mission configuration stored on an alarm.
 class MissionConfig extends Equatable {
