@@ -309,5 +309,10 @@
   "missionComplete": "Mission accomplie !",
   "missionCompleteMessage": "Excellent travail ! Continuez.",
   "missionPickerTitle": "Missions",
-  "missionPickerSubtitle": "Choisissez une mission et commencez"
+  "missionPickerSubtitle": "Choisissez une mission et commencez",
+  "missionPickerAll": "Tout",
+  "missionPickerTrending": "Tendances",
+  "missionPickerHunts": "Chasses",
+  "missionPickerPhysical": "Physique",
+  "missionPickerPreview": "Aperçu"
 }

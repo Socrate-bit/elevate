@@ -844,4 +844,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get missionPickerSubtitle => 'Pick a mission and start now';
+
+  @override
+  String get missionPickerAll => 'All';
+
+  @override
+  String get missionPickerTrending => 'Trending';
+
+  @override
+  String get missionPickerHunts => 'Hunts';
+
+  @override
+  String get missionPickerPhysical => 'Physical';
+
+  @override
+  String get missionPickerPreview => 'Preview';
 }

@@ -309,5 +309,10 @@
   "missionComplete": "Mission Complete!",
   "missionCompleteMessage": "Great job! Keep it up.",
   "missionPickerTitle": "Missions",
-  "missionPickerSubtitle": "Pick a mission and start now"
+  "missionPickerSubtitle": "Pick a mission and start now",
+  "missionPickerAll": "All",
+  "missionPickerTrending": "Trending",
+  "missionPickerHunts": "Hunts",
+  "missionPickerPhysical": "Physical",
+  "missionPickerPreview": "Preview"
 }

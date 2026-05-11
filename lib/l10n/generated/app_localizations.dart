@@ -1669,6 +1669,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick a mission and start now'**
   String get missionPickerSubtitle;
+
+  /// No description provided for @missionPickerAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get missionPickerAll;
+
+  /// No description provided for @missionPickerTrending.
+  ///
+  /// In en, this message translates to:
+  /// **'Trending'**
+  String get missionPickerTrending;
+
+  /// No description provided for @missionPickerHunts.
+  ///
+  /// In en, this message translates to:
+  /// **'Hunts'**
+  String get missionPickerHunts;
+
+  /// No description provided for @missionPickerPhysical.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical'**
+  String get missionPickerPhysical;
+
+  /// No description provided for @missionPickerPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get missionPickerPreview;
 }
 
 class _AppLocalizationsDelegate

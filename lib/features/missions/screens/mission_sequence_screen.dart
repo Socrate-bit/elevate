@@ -51,7 +51,7 @@ class _MissionSequenceScreenState extends State<MissionSequenceScreen> {
     if (cachedTarget != null) config = config.copyWith(selectedItems: [cachedTarget]);
 
     final missionIndex = _currentIndex;
-    final screen = _buildMissionScreen(
+    final screen = buildMissionScreen(
       config: config,
       onComplete: _onMissionComplete,
       onPhotoTargetChosen: (target) => _photoTargets[missionIndex] = target,
@@ -84,10 +84,12 @@ class _MissionSequenceScreenState extends State<MissionSequenceScreen> {
 }
 
 /// Routes a [MissionConfig] to the appropriate standalone mission screen.
-Widget _buildMissionScreen({
+/// Public so the picker can launch individual missions in preview mode.
+Widget buildMissionScreen({
   required MissionConfig config,
   VoidCallback? onComplete,
   ValueChanged<String>? onPhotoTargetChosen,
+  bool isPreview = false,
 }) {
   final type = config.type;
   switch (type) {
@@ -95,28 +97,33 @@ Widget _buildMissionScreen({
       return PushUpMissionScreen(
         repCount: config.repCount ?? 5,
         onComplete: onComplete,
+        isPreview: isPreview,
       );
     case MissionType.squats:
       return SquatMissionScreen(
         repCount: config.repCount ?? 10,
         onComplete: onComplete,
+        isPreview: isPreview,
       );
     case MissionType.shakePhone:
       return ShakeMissionScreen(
         target: config.repCount ?? 15,
         onComplete: onComplete,
+        isPreview: isPreview,
       );
     case MissionType.math:
       return MathMissionScreen(
         difficulty: config.mathDifficulty ?? MathDifficulty.easy,
         problemCount: config.mathProblemCount ?? 3,
         onComplete: onComplete,
+        isPreview: isPreview,
       );
     case MissionType.affirmation:
       return SpeechMissionScreen(
         selectedAffirmations: config.selectedAffirmations,
         affirmationCount: config.affirmationCount ?? 1,
         onComplete: onComplete,
+        isPreview: isPreview,
       );
     case MissionType.skyPhoto:
     case MissionType.makeBed:
@@ -129,10 +136,10 @@ Widget _buildMissionScreen({
         selectedItems: config.selectedItems,
         onComplete: onComplete,
         onTargetChosen: onPhotoTargetChosen,
+        isPreview: isPreview,
       );
     case MissionType.none:
     case MissionType.random:
-      // random should have been resolved; none is a no-op
       onComplete?.call();
       return const SizedBox.shrink();
   }
