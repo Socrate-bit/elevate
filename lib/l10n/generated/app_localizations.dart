@@ -128,6 +128,12 @@ abstract class AppLocalizations {
   /// **'Insights'**
   String get navInsights;
 
+  /// No description provided for @navChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get navChat;
+
   /// No description provided for @navSettings.
   ///
   /// In en, this message translates to:
@@ -1285,6 +1291,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not check code. Try again.'**
   String get referralError;
+
+  /// No description provided for @chatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get chatTitle;
+
+  /// No description provided for @chatModelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini'**
+  String get chatModelName;
+
+  /// No description provided for @chatHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversations'**
+  String get chatHistoryTitle;
+
+  /// No description provided for @chatHistorySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get chatHistorySearchHint;
+
+  /// No description provided for @chatHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversations yet'**
+  String get chatHistoryEmpty;
+
+  /// No description provided for @chatHistoryEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to start a new chat.'**
+  String get chatHistoryEmptyHint;
+
+  /// No description provided for @chatGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'How can I help you tonight?'**
+  String get chatGreeting;
+
+  /// No description provided for @chatComposerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get chatComposerHint;
+
+  /// No description provided for @chatSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get chatSend;
+
+  /// No description provided for @chatNewConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'New chat'**
+  String get chatNewConversation;
+
+  /// No description provided for @chatUntitledConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'New conversation'**
+  String get chatUntitledConversation;
+
+  /// No description provided for @chatVoiceListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening…'**
+  String get chatVoiceListening;
+
+  /// No description provided for @chatVoiceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice input is unavailable.'**
+  String get chatVoiceUnavailable;
+
+  /// No description provided for @chatVoicePermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone permission denied.'**
+  String get chatVoicePermissionDenied;
+
+  /// No description provided for @chatSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t send message. Please try again.'**
+  String get chatSendFailed;
+
+  /// No description provided for @chatDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get chatDelete;
+
+  /// No description provided for @chatDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this conversation?'**
+  String get chatDeleteConfirm;
+
+  /// No description provided for @chatDeleteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get chatDeleteCancel;
+
+  /// No description provided for @chatRelativeJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get chatRelativeJustNow;
+
+  /// No description provided for @chatRelativeSecondsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} seconds ago'**
+  String chatRelativeSecondsAgo(int n);
+
+  /// No description provided for @chatRelativeMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} minutes ago'**
+  String chatRelativeMinutesAgo(int n);
+
+  /// No description provided for @chatRelativeHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} hours ago'**
+  String chatRelativeHoursAgo(int n);
+
+  /// No description provided for @chatRelativeDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} days ago'**
+  String chatRelativeDaysAgo(int n);
 }
 
 class _AppLocalizationsDelegate

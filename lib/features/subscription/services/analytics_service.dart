@@ -65,4 +65,11 @@ class AnalyticsService {
   // Settings
   static const settingsNotificationsToggled = 'settings_notifications_toggled';
   static const settingsDarkModeToggled = 'settings_dark_mode_toggled';
+
+  // Chat
+  static const chatConversationCreated = 'chat_conversation_created';
+  static const chatConversationDeleted = 'chat_conversation_deleted';
+  static const chatMessageSent = 'chat_message_sent';
+  static const chatVoiceUsed = 'chat_voice_used';
+  static const chatFormAnswered = 'chat_form_answered';
 }

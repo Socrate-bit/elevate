@@ -24,6 +24,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navInsights => 'Stats';
 
   @override
+  String get navChat => 'Chat';
+
+  @override
   String get navSettings => 'Réglages';
 
   @override
@@ -629,4 +632,81 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get referralError => 'Impossible de vérifier le code. Réessayez.';
+
+  @override
+  String get chatTitle => 'Chat';
+
+  @override
+  String get chatModelName => 'Gemini';
+
+  @override
+  String get chatHistoryTitle => 'Conversations';
+
+  @override
+  String get chatHistorySearchHint => 'Rechercher';
+
+  @override
+  String get chatHistoryEmpty => 'Aucune conversation';
+
+  @override
+  String get chatHistoryEmptyHint => 'Touchez + pour démarrer une discussion.';
+
+  @override
+  String get chatGreeting => 'Comment puis-je vous aider ce soir ?';
+
+  @override
+  String get chatComposerHint => 'Message';
+
+  @override
+  String get chatSend => 'Envoyer';
+
+  @override
+  String get chatNewConversation => 'Nouveau chat';
+
+  @override
+  String get chatUntitledConversation => 'Nouvelle conversation';
+
+  @override
+  String get chatVoiceListening => 'À l\'écoute…';
+
+  @override
+  String get chatVoiceUnavailable => 'La saisie vocale est indisponible.';
+
+  @override
+  String get chatVoicePermissionDenied => 'Permission du microphone refusée.';
+
+  @override
+  String get chatSendFailed => 'Impossible d\'envoyer le message. Réessayez.';
+
+  @override
+  String get chatDelete => 'Supprimer';
+
+  @override
+  String get chatDeleteConfirm => 'Supprimer cette conversation ?';
+
+  @override
+  String get chatDeleteCancel => 'Annuler';
+
+  @override
+  String get chatRelativeJustNow => 'à l\'instant';
+
+  @override
+  String chatRelativeSecondsAgo(int n) {
+    return 'il y a $n secondes';
+  }
+
+  @override
+  String chatRelativeMinutesAgo(int n) {
+    return 'il y a $n minutes';
+  }
+
+  @override
+  String chatRelativeHoursAgo(int n) {
+    return 'il y a $n heures';
+  }
+
+  @override
+  String chatRelativeDaysAgo(int n) {
+    return 'il y a $n jours';
+  }
 }

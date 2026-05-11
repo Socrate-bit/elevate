@@ -8,6 +8,7 @@ import 'package:elevate/features/alarms/cubit/alarm_cubit.dart';
 import 'package:elevate/features/alarms/screens/alarm_form_screen.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
+import '../features/chat/screens/chat_history_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/insights/screens/insights_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
@@ -33,7 +34,7 @@ class BottomNavShellState extends State<BottomNavShell> {
     _index = widget.initialIndex;
   }
 
-  static const _tabNames = ['home', 'insights', 'settings'];
+  static const _tabNames = ['home', 'insights', 'chat', 'settings'];
 
   void _selectTab(int index) {
     if (index == _index) return;
@@ -58,7 +59,12 @@ class BottomNavShellState extends State<BottomNavShell> {
     );
   }
 
-  static const _tabs = [HomeScreen(), InsightsScreen(), SettingsScreen()];
+  static const _tabs = [
+    HomeScreen(),
+    InsightsScreen(),
+    ChatHistoryScreen(),
+    SettingsScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +122,10 @@ class BottomNavShellState extends State<BottomNavShell> {
                   LiquidGlassBarItem(
                     iconData: Icons.bar_chart_rounded,
                     label: l10n.navInsights,
+                  ),
+                  LiquidGlassBarItem(
+                    iconData: Icons.chat_bubble_outline_rounded,
+                    label: l10n.navChat,
                   ),
                   LiquidGlassBarItem(
                     iconData: Icons.settings_rounded,

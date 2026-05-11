@@ -54,6 +54,16 @@ dependencies:
   superwallkit_flutter: ^2.4.11
   posthog_flutter: ^5.2.0
 
+  ## FEATURES
+  firebase_ai: ^3.11.0
+  #camera: ^0.12.0+1
+  #google_mlkit_pose_detection: ^0.14.1
+  speech_to_text: ^7.3.0
+  #shake: ^3.0.0
+  #audioplayers: ^6.6.0
+  #file_picker: ^11.0.2
+  #path_provider: ^2.1.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -24,6 +24,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navInsights => 'Insights';
 
   @override
+  String get navChat => 'Chat';
+
+  @override
   String get navSettings => 'Settings';
 
   @override
@@ -624,4 +627,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get referralError => 'Could not check code. Try again.';
+
+  @override
+  String get chatTitle => 'Chat';
+
+  @override
+  String get chatModelName => 'Gemini';
+
+  @override
+  String get chatHistoryTitle => 'Conversations';
+
+  @override
+  String get chatHistorySearchHint => 'Search';
+
+  @override
+  String get chatHistoryEmpty => 'No conversations yet';
+
+  @override
+  String get chatHistoryEmptyHint => 'Tap + to start a new chat.';
+
+  @override
+  String get chatGreeting => 'How can I help you tonight?';
+
+  @override
+  String get chatComposerHint => 'Message';
+
+  @override
+  String get chatSend => 'Send';
+
+  @override
+  String get chatNewConversation => 'New chat';
+
+  @override
+  String get chatUntitledConversation => 'New conversation';
+
+  @override
+  String get chatVoiceListening => 'Listening…';
+
+  @override
+  String get chatVoiceUnavailable => 'Voice input is unavailable.';
+
+  @override
+  String get chatVoicePermissionDenied => 'Microphone permission denied.';
+
+  @override
+  String get chatSendFailed => 'Couldn\'t send message. Please try again.';
+
+  @override
+  String get chatDelete => 'Delete';
+
+  @override
+  String get chatDeleteConfirm => 'Delete this conversation?';
+
+  @override
+  String get chatDeleteCancel => 'Cancel';
+
+  @override
+  String get chatRelativeJustNow => 'just now';
+
+  @override
+  String chatRelativeSecondsAgo(int n) {
+    return '$n seconds ago';
+  }
+
+  @override
+  String chatRelativeMinutesAgo(int n) {
+    return '$n minutes ago';
+  }
+
+  @override
+  String chatRelativeHoursAgo(int n) {
+    return '$n hours ago';
+  }
+
+  @override
+  String chatRelativeDaysAgo(int n) {
+    return '$n days ago';
+  }
 }

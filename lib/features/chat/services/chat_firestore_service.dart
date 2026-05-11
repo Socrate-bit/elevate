@@ -1,0 +1,109 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../auth/auth_service.dart';
+import 'chat_conversation.dart';
+import 'chat_message.dart';
+
+/// Repository surface for chat persistence. Cubits depend on this so tests
+/// can substitute an in-memory implementation. The Firestore-backed impl
+/// lives in [ChatFirestoreService].
+abstract interface class ChatRepository {
+  Stream<List<ChatConversation>> watchConversations();
+  Stream<List<ChatMessage>> watchMessages(String conversationId);
+  Future<void> saveConversation(ChatConversation c);
+  Future<void> updateConversation(
+    String id, {
+    String? title,
+    DateTime? lastMessageAt,
+  });
+  Future<void> deleteConversation(String id);
+  Future<void> saveMessage(ChatMessage m);
+  Future<void> updateMessageForm(
+    String conversationId,
+    String messageId,
+    int selectedIndex,
+  );
+}
+
+/// Firestore-backed [ChatRepository].
+/// Layout:  users/{uid}/conversations/{cid}  +  .../messages/{mid}
+class ChatFirestoreService implements ChatRepository {
+  const ChatFirestoreService();
+
+  /// Default singleton used by production code.
+  static const ChatRepository instance = ChatFirestoreService();
+
+  CollectionReference<Map<String, dynamic>> _conversations() =>
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(AuthService.uid)
+          .collection('conversations');
+
+  CollectionReference<Map<String, dynamic>> _messages(String cid) =>
+      _conversations().doc(cid).collection('messages');
+
+  @override
+  Stream<List<ChatConversation>> watchConversations() {
+    return _conversations()
+        .orderBy('lastMessageAtMs', descending: true)
+        .snapshots()
+        .map(
+          (snap) => snap.docs
+              .map((d) => ChatConversation.fromMap(d.id, d.data()))
+              .toList(),
+        );
+  }
+
+  @override
+  Stream<List<ChatMessage>> watchMessages(String conversationId) {
+    return _messages(conversationId)
+        .orderBy('createdAtMs')
+        .snapshots()
+        .map(
+          (snap) => snap.docs
+              .map((d) => ChatMessage.fromMap(d.id, conversationId, d.data()))
+              .toList(),
+        );
+  }
+
+  @override
+  Future<void> saveConversation(ChatConversation c) =>
+      _conversations().doc(c.id).set(c.toMap());
+
+  @override
+  Future<void> updateConversation(
+    String id, {
+    String? title,
+    DateTime? lastMessageAt,
+  }) {
+    final patch = <String, dynamic>{};
+    if (title != null) patch['title'] = title;
+    if (lastMessageAt != null) {
+      patch['lastMessageAtMs'] = lastMessageAt.millisecondsSinceEpoch;
+    }
+    return _conversations().doc(id).update(patch);
+  }
+
+  @override
+  Future<void> deleteConversation(String id) async {
+    final messages = await _messages(id).get();
+    for (final doc in messages.docs) {
+      await doc.reference.delete();
+    }
+    await _conversations().doc(id).delete();
+  }
+
+  @override
+  Future<void> saveMessage(ChatMessage m) =>
+      _messages(m.conversationId).doc(m.id).set(m.toMap());
+
+  @override
+  Future<void> updateMessageForm(
+    String conversationId,
+    String messageId,
+    int selectedIndex,
+  ) =>
+      _messages(conversationId).doc(messageId).update({
+        'form.selectedIndex': selectedIndex,
+      });
+}
