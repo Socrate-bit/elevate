@@ -156,7 +156,15 @@
 
   "onboardingAgeRangeQuestion": "What's your age range?",
   "onboardingGenderQuestion": "How do you identify?",
-  "onboardingOriginQuestion": "Where are you from?",
+
+  "onboardingWhereHeard": "Where did you hear about us?",
+  "onboardingYouTube": "YouTube",
+  "onboardingFacebook": "Facebook",
+  "onboardingTwitter": "X (Twitter)",
+  "onboardingReddit": "Reddit",
+  "onboardingAppStore": "App Store",
+  "onboardingFriendFamily": "Friend or family",
+  "onboardingOther": "Other",
 
   "onboardingTimePickerTitle": "Pick a time",
   "onboardingTimePickerSubtitle": "Replace with your prompt.",

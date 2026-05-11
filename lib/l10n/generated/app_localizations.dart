@@ -902,11 +902,53 @@ abstract class AppLocalizations {
   /// **'How do you identify?'**
   String get onboardingGenderQuestion;
 
-  /// No description provided for @onboardingOriginQuestion.
+  /// No description provided for @onboardingWhereHeard.
   ///
   /// In en, this message translates to:
-  /// **'Where are you from?'**
-  String get onboardingOriginQuestion;
+  /// **'Where did you hear about us?'**
+  String get onboardingWhereHeard;
+
+  /// No description provided for @onboardingYouTube.
+  ///
+  /// In en, this message translates to:
+  /// **'YouTube'**
+  String get onboardingYouTube;
+
+  /// No description provided for @onboardingFacebook.
+  ///
+  /// In en, this message translates to:
+  /// **'Facebook'**
+  String get onboardingFacebook;
+
+  /// No description provided for @onboardingTwitter.
+  ///
+  /// In en, this message translates to:
+  /// **'X (Twitter)'**
+  String get onboardingTwitter;
+
+  /// No description provided for @onboardingReddit.
+  ///
+  /// In en, this message translates to:
+  /// **'Reddit'**
+  String get onboardingReddit;
+
+  /// No description provided for @onboardingAppStore.
+  ///
+  /// In en, this message translates to:
+  /// **'App Store'**
+  String get onboardingAppStore;
+
+  /// No description provided for @onboardingFriendFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend or family'**
+  String get onboardingFriendFamily;
+
+  /// No description provided for @onboardingOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get onboardingOther;
 
   /// No description provided for @onboardingTimePickerTitle.
   ///
