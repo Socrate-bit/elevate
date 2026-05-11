@@ -156,7 +156,15 @@
 
   "onboardingAgeRangeQuestion": "Quelle est votre tranche d'âge ?",
   "onboardingGenderQuestion": "Comment vous identifiez-vous ?",
-  "onboardingOriginQuestion": "D'où venez-vous ?",
+
+  "onboardingWhereHeard": "Comment avez-vous découvert l'app ?",
+  "onboardingYouTube": "YouTube",
+  "onboardingFacebook": "Facebook",
+  "onboardingTwitter": "X (Twitter)",
+  "onboardingReddit": "Reddit",
+  "onboardingAppStore": "App Store",
+  "onboardingFriendFamily": "Famille ou ami",
+  "onboardingOther": "Autre",
 
   "onboardingTimePickerTitle": "Choisissez une heure",
   "onboardingTimePickerSubtitle": "Remplacez par votre question.",

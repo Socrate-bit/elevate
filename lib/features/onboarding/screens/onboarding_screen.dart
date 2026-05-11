@@ -30,7 +30,7 @@ import '../widgets/welcome_step.dart';
 ///  0: Welcome
 ///  1: Age range
 ///  2: Gender
-///  3: Where do you come from
+///  3: Where heard about us
 ///  4–6: Survey × 3 (placeholder questions)
 ///  7: Time picker (generic)
 ///  8: Day picker (which weekdays — generic Mon–Sun multi-toggle)
@@ -53,13 +53,15 @@ const _surveyQuestions = [
 
 const _ageRangeOptions = ['Under 18', '18–24', '25–34', '35–44', '45–54', '55+'];
 const _genderOptions = ['Female', 'Male', 'Non-binary', 'Prefer not to say'];
-const _originOptions = [
-  'North America',
-  'South America',
-  'Europe',
-  'Africa',
-  'Asia',
-  'Oceania',
+
+const _heardFromIcons = [
+  Icons.play_circle_filled,
+  Icons.facebook,
+  Icons.close, // X (Twitter) approximation
+  Icons.reddit,
+  Icons.storefront,
+  Icons.people,
+  Icons.chat_bubble,
 ];
 
 class OnboardingScreen extends StatefulWidget {
@@ -177,12 +179,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           selectedOption: state.surveyAnswers['gender'],
           onSelected: (v) => cubit.answerSurvey('gender', v),
         ),
-      // 3: Where do you come from
+      // 3: Where heard about us
       2 => SurveyStep(
-          question: l10n.onboardingOriginQuestion,
-          options: _originOptions,
-          selectedOption: state.surveyAnswers['origin'],
-          onSelected: (v) => cubit.answerSurvey('origin', v),
+          question: l10n.onboardingWhereHeard,
+          options: [
+            l10n.onboardingYouTube,
+            l10n.onboardingFacebook,
+            l10n.onboardingTwitter,
+            l10n.onboardingReddit,
+            l10n.onboardingAppStore,
+            l10n.onboardingFriendFamily,
+            l10n.onboardingOther,
+          ],
+          icons: _heardFromIcons,
+          selectedOption: state.surveyAnswers['heardFrom'],
+          onSelected: (v) => cubit.answerSurvey('heardFrom', v),
         ),
       // 4–6: Placeholder surveys
       3 => SurveyStep(

@@ -426,7 +426,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get onboardingGenderQuestion => 'Comment vous identifiez-vous ?';
 
   @override
-  String get onboardingOriginQuestion => 'D\'où venez-vous ?';
+  String get onboardingWhereHeard => 'Comment avez-vous découvert l\'app ?';
+
+  @override
+  String get onboardingYouTube => 'YouTube';
+
+  @override
+  String get onboardingFacebook => 'Facebook';
+
+  @override
+  String get onboardingTwitter => 'X (Twitter)';
+
+  @override
+  String get onboardingReddit => 'Reddit';
+
+  @override
+  String get onboardingAppStore => 'App Store';
+
+  @override
+  String get onboardingFriendFamily => 'Famille ou ami';
+
+  @override
+  String get onboardingOther => 'Autre';
 
   @override
   String get onboardingTimePickerTitle => 'Choisissez une heure';
