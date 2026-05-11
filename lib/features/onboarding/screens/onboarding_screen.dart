@@ -9,7 +9,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../../subscription/cubit/subscription_cubit.dart';
 import '../cubit/onboarding_cubit.dart';
 import '../cubit/onboarding_state.dart';
-import '../widgets/date_picker_step.dart';
+import '../widgets/day_picker_step.dart';
 import '../widgets/info_step.dart';
 import '../widgets/loading_step.dart';
 import '../widgets/notification_step.dart';
@@ -33,7 +33,7 @@ import '../widgets/welcome_step.dart';
 ///  3: Where do you come from
 ///  4–6: Survey × 3 (placeholder questions)
 ///  7: Time picker (generic)
-///  8: Date picker (generic — birth date)
+///  8: Day picker (which weekdays — generic Mon–Sun multi-toggle)
 ///  9: Info (placeholder)
 /// 10: Notification permission (owns nav)
 /// 11: Rating (triggers in-app review on Continue)
@@ -147,16 +147,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   String _formatTime(TimeOfDay t) =>
       '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
 
-  DateTime _readDate(OnboardingState state, String key, DateTime fallback) {
+  /// Reads a 7-element bool list (Sun..Sat) from surveyAnswers under [key]
+  /// (format: 7-char string of `0`/`1`).
+  List<bool> _readDays(OnboardingState state, String key) {
     final raw = state.surveyAnswers[key];
-    if (raw == null) return fallback;
-    return DateTime.tryParse(raw) ?? fallback;
+    if (raw == null || raw.length != 7) {
+      return const [false, true, true, true, true, true, false];
+    }
+    return [for (var i = 0; i < 7; i++) raw[i] == '1'];
   }
 
-  String _formatDate(DateTime d) =>
-      '${d.year.toString().padLeft(4, '0')}-'
-      '${d.month.toString().padLeft(2, '0')}-'
-      '${d.day.toString().padLeft(2, '0')}';
+  String _formatDays(List<bool> days) =>
+      days.map((b) => b ? '1' : '0').join();
 
   Widget _buildPage(int index, OnboardingState state, OnboardingCubit cubit) {
     final l10n = AppLocalizations.of(context)!;
@@ -210,14 +212,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           onTimeChanged: (t) =>
               cubit.answerSurvey('preferred_time', _formatTime(t)),
         ),
-      // 8: Date picker
-      7 => DatePickerStep(
-          title: l10n.onboardingDatePickerTitle,
-          subtitle: l10n.onboardingDatePickerSubtitle,
-          date: _readDate(
-              state, 'birth_date', DateTime(DateTime.now().year - 25)),
-          onDateChanged: (d) =>
-              cubit.answerSurvey('birth_date', _formatDate(d)),
+      // 8: Day picker (weekdays)
+      7 => DayPickerStep(
+          repeatDays: _readDays(state, 'repeat_days'),
+          onToggle: (i) {
+            final days = List<bool>.from(_readDays(state, 'repeat_days'));
+            days[i] = !days[i];
+            cubit.answerSurvey('repeat_days', _formatDays(days));
+          },
         ),
       // 9: Info
       8 => InfoStep(

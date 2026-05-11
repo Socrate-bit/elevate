@@ -920,17 +920,17 @@ abstract class AppLocalizations {
   /// **'Replace with your prompt.'**
   String get onboardingTimePickerSubtitle;
 
-  /// No description provided for @onboardingDatePickerTitle.
+  /// No description provided for @onboardingDayPickerTitle.
   ///
   /// In en, this message translates to:
-  /// **'What\'s your birth date?'**
-  String get onboardingDatePickerTitle;
+  /// **'Which days?'**
+  String get onboardingDayPickerTitle;
 
-  /// No description provided for @onboardingDatePickerSubtitle.
+  /// No description provided for @onboardingDayPickerSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Replace with your prompt.'**
-  String get onboardingDatePickerSubtitle;
+  /// **'Pick the days that work for you.'**
+  String get onboardingDayPickerSubtitle;
 
   /// No description provided for @onboardingSignInTitle.
   ///

@@ -160,8 +160,8 @@
 
   "onboardingTimePickerTitle": "Pick a time",
   "onboardingTimePickerSubtitle": "Replace with your prompt.",
-  "onboardingDatePickerTitle": "What's your birth date?",
-  "onboardingDatePickerSubtitle": "Replace with your prompt.",
+  "onboardingDayPickerTitle": "Which days?",
+  "onboardingDayPickerSubtitle": "Pick the days that work for you.",
 
 
   "onboardingSignInTitle": "Create your account",

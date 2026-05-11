@@ -160,8 +160,8 @@
 
   "onboardingTimePickerTitle": "Choisissez une heure",
   "onboardingTimePickerSubtitle": "Remplacez par votre question.",
-  "onboardingDatePickerTitle": "Quelle est votre date de naissance ?",
-  "onboardingDatePickerSubtitle": "Remplacez par votre question.",
+  "onboardingDayPickerTitle": "Quels jours ?",
+  "onboardingDayPickerSubtitle": "Choisissez les jours qui vous conviennent.",
 
 
   "onboardingSignInTitle": "Créez votre compte",

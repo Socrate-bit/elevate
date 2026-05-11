@@ -435,11 +435,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get onboardingTimePickerSubtitle => 'Remplacez par votre question.';
 
   @override
-  String get onboardingDatePickerTitle =>
-      'Quelle est votre date de naissance ?';
+  String get onboardingDayPickerTitle => 'Quels jours ?';
 
   @override
-  String get onboardingDatePickerSubtitle => 'Remplacez par votre question.';
+  String get onboardingDayPickerSubtitle =>
+      'Choisissez les jours qui vous conviennent.';
 
   @override
   String get onboardingSignInTitle => 'Créez votre compte';
