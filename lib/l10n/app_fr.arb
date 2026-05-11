@@ -147,6 +147,22 @@
   "onboardingSignatureCommit": "Je m'engage",
 
   "onboardingLoadingTitle": "Préparation de l'app…",
+  "onboardingLoadingStep1": "Tâche 1",
+  "onboardingLoadingStep2": "Tâche 2",
+  "onboardingLoadingStep3": "Tâche 3",
+  "onboardingLoadingStep4": "Tâche 4",
+  "onboardingLoadingStep5": "Tâche 5",
+  "onboardingLoadingStep6": "Tâche 6",
+
+  "onboardingAgeRangeQuestion": "Quelle est votre tranche d'âge ?",
+  "onboardingGenderQuestion": "Comment vous identifiez-vous ?",
+  "onboardingOriginQuestion": "D'où venez-vous ?",
+
+  "onboardingTimePickerTitle": "Choisissez une heure",
+  "onboardingTimePickerSubtitle": "Remplacez par votre question.",
+  "onboardingDayPickerTitle": "Quels jours ?",
+  "onboardingDayPickerSubtitle": "Choisissez les jours qui vous conviennent.",
+
 
   "onboardingSignInTitle": "Créez votre compte",
   "onboardingSignInSubtitle": "Synchronisez vos données entre vos appareils.",

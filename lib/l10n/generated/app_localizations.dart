@@ -854,6 +854,84 @@ abstract class AppLocalizations {
   /// **'Preparing your app…'**
   String get onboardingLoadingTitle;
 
+  /// No description provided for @onboardingLoadingStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Task 1'**
+  String get onboardingLoadingStep1;
+
+  /// No description provided for @onboardingLoadingStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Task 2'**
+  String get onboardingLoadingStep2;
+
+  /// No description provided for @onboardingLoadingStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Task 3'**
+  String get onboardingLoadingStep3;
+
+  /// No description provided for @onboardingLoadingStep4.
+  ///
+  /// In en, this message translates to:
+  /// **'Task 4'**
+  String get onboardingLoadingStep4;
+
+  /// No description provided for @onboardingLoadingStep5.
+  ///
+  /// In en, this message translates to:
+  /// **'Task 5'**
+  String get onboardingLoadingStep5;
+
+  /// No description provided for @onboardingLoadingStep6.
+  ///
+  /// In en, this message translates to:
+  /// **'Task 6'**
+  String get onboardingLoadingStep6;
+
+  /// No description provided for @onboardingAgeRangeQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s your age range?'**
+  String get onboardingAgeRangeQuestion;
+
+  /// No description provided for @onboardingGenderQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you identify?'**
+  String get onboardingGenderQuestion;
+
+  /// No description provided for @onboardingOriginQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Where are you from?'**
+  String get onboardingOriginQuestion;
+
+  /// No description provided for @onboardingTimePickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a time'**
+  String get onboardingTimePickerTitle;
+
+  /// No description provided for @onboardingTimePickerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace with your prompt.'**
+  String get onboardingTimePickerSubtitle;
+
+  /// No description provided for @onboardingDayPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which days?'**
+  String get onboardingDayPickerTitle;
+
+  /// No description provided for @onboardingDayPickerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the days that work for you.'**
+  String get onboardingDayPickerSubtitle;
+
   /// No description provided for @onboardingSignInTitle.
   ///
   /// In en, this message translates to:

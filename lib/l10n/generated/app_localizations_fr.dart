@@ -402,6 +402,46 @@ class AppLocalizationsFr extends AppLocalizations {
   String get onboardingLoadingTitle => 'Préparation de l\'app…';
 
   @override
+  String get onboardingLoadingStep1 => 'Tâche 1';
+
+  @override
+  String get onboardingLoadingStep2 => 'Tâche 2';
+
+  @override
+  String get onboardingLoadingStep3 => 'Tâche 3';
+
+  @override
+  String get onboardingLoadingStep4 => 'Tâche 4';
+
+  @override
+  String get onboardingLoadingStep5 => 'Tâche 5';
+
+  @override
+  String get onboardingLoadingStep6 => 'Tâche 6';
+
+  @override
+  String get onboardingAgeRangeQuestion => 'Quelle est votre tranche d\'âge ?';
+
+  @override
+  String get onboardingGenderQuestion => 'Comment vous identifiez-vous ?';
+
+  @override
+  String get onboardingOriginQuestion => 'D\'où venez-vous ?';
+
+  @override
+  String get onboardingTimePickerTitle => 'Choisissez une heure';
+
+  @override
+  String get onboardingTimePickerSubtitle => 'Remplacez par votre question.';
+
+  @override
+  String get onboardingDayPickerTitle => 'Quels jours ?';
+
+  @override
+  String get onboardingDayPickerSubtitle =>
+      'Choisissez les jours qui vous conviennent.';
+
+  @override
   String get onboardingSignInTitle => 'Créez votre compte';
 
   @override

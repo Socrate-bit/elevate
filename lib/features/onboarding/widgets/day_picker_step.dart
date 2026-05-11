@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:elevate/l10n/generated/app_localizations.dart';
+import 'package:elevate/l10n/l10n_helpers.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
-class SurveyStep extends StatelessWidget {
-  final String question;
-  final List<String> options;
-  final String? selectedOption;
-  final ValueChanged<String> onSelected;
-  final List<IconData>? icons;
+class DayPickerStep extends StatelessWidget {
+  final List<bool> repeatDays;
+  final ValueChanged<int> onToggle;
 
-  const SurveyStep({
+  const DayPickerStep({
     super.key,
-    required this.question,
-    required this.options,
-    required this.selectedOption,
-    required this.onSelected,
-    this.icons,
+    required this.repeatDays,
+    required this.onToggle,
   });
+
+  // repeatDays index: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  // Display order: Mon–Sun
+  static const _displayOrder = [1, 2, 3, 4, 5, 6, 0];
 
   @override
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
@@ -30,7 +31,7 @@ class SurveyStep extends StatelessWidget {
         children: [
           SizedBox(height: 16.h),
           Text(
-            question,
+            l10n.onboardingDayPickerTitle,
             style: TextStyle(
               fontSize: 28.sp,
               fontWeight: FontWeight.bold,
@@ -38,15 +39,18 @@ class SurveyStep extends StatelessWidget {
               height: 1.2,
             ),
           ),
-          SizedBox(height: 24.h),
-          ...options.asMap().entries.map((entry) {
-            final index = entry.key;
-            final option = entry.value;
-            final isSelected = selectedOption == option;
+          SizedBox(height: 8.h),
+          Text(
+            l10n.onboardingDayPickerSubtitle,
+            style: TextStyle(fontSize: 16.sp, color: c.textSecondary),
+          ),
+          SizedBox(height: 32.h),
+          ..._displayOrder.map((dayIndex) {
+            final isSelected = repeatDays[dayIndex];
             return Padding(
               padding: EdgeInsets.only(bottom: 12.h),
               child: GestureDetector(
-                onTap: withHaptic(() => onSelected(option)),
+                onTap: withHaptic(() => onToggle(dayIndex)),
                 child: Container(
                   width: double.infinity,
                   padding:
@@ -61,20 +65,14 @@ class SurveyStep extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      if (icons != null && index < icons!.length) ...[
-                        Icon(icons![index],
-                            size: 22.sp, color: c.textSecondary),
-                        SizedBox(width: 12.w),
-                      ],
-                      Expanded(
-                        child: Text(
-                          option,
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: c.textPrimary,
-                          ),
+                      Text(
+                        localizedDayFull(l10n, dayIndex),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: c.textPrimary,
                         ),
                       ),
+                      const Spacer(),
                       Container(
                         width: 24.w,
                         height: 24.h,

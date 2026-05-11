@@ -147,6 +147,22 @@
   "onboardingSignatureCommit": "I commit",
 
   "onboardingLoadingTitle": "Preparing your app…",
+  "onboardingLoadingStep1": "Task 1",
+  "onboardingLoadingStep2": "Task 2",
+  "onboardingLoadingStep3": "Task 3",
+  "onboardingLoadingStep4": "Task 4",
+  "onboardingLoadingStep5": "Task 5",
+  "onboardingLoadingStep6": "Task 6",
+
+  "onboardingAgeRangeQuestion": "What's your age range?",
+  "onboardingGenderQuestion": "How do you identify?",
+  "onboardingOriginQuestion": "Where are you from?",
+
+  "onboardingTimePickerTitle": "Pick a time",
+  "onboardingTimePickerSubtitle": "Replace with your prompt.",
+  "onboardingDayPickerTitle": "Which days?",
+  "onboardingDayPickerSubtitle": "Pick the days that work for you.",
+
 
   "onboardingSignInTitle": "Create your account",
   "onboardingSignInSubtitle": "Save your progress and sync across devices.",

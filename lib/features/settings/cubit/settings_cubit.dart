@@ -10,38 +10,32 @@ class SettingsCubit extends Cubit<SettingsState> {
     _load();
   }
 
-  static const _themeKey = 'theme_mode'; // values: 'system' | 'light' | 'dark'
+  /// SharedPreferences key. Value: `true` = dark, `false`/missing = light.
+  static const _themeKey = 'theme_dark';
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_themeKey);
-    final mode = switch (raw) {
-      'light' => ThemeMode.light,
-      'dark' => ThemeMode.dark,
-      _ => ThemeMode.light,
-    };
-    emit(SettingsState(themeMode: mode));
+    final isDark = prefs.getBool(_themeKey) ?? false;
+    emit(SettingsState(themeMode: isDark ? ThemeMode.dark : ThemeMode.light));
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
-    if (state.themeMode == mode) return;
-    emit(state.copyWith(themeMode: mode));
+    // Only light and dark are supported.
+    final next = mode == ThemeMode.dark ? ThemeMode.dark : ThemeMode.light;
+    if (state.themeMode == next) return;
+    emit(state.copyWith(themeMode: next));
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_themeKey, mode.name);
+    await prefs.setBool(_themeKey, next == ThemeMode.dark);
   }
 
-  /// Cycles between system → light → dark → system.
+  /// Flips between light and dark.
   Future<void> toggleTheme() async {
-    final next = switch (state.themeMode) {
-      ThemeMode.system => ThemeMode.light,
-      ThemeMode.light => ThemeMode.dark,
-      ThemeMode.dark => ThemeMode.system,
-    };
-    await setThemeMode(next);
+    await setThemeMode(
+      state.themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
+    );
   }
 
-  /// Wipes all persisted settings and resets state to defaults. Called on
-  /// logout so the next account starts from a clean slate.
+  /// Wipes all persisted settings and resets to defaults. Called on logout.
   Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_themeKey);
