@@ -54,6 +54,10 @@ dependencies:
   time_picker_spinner: ^1.0.2
   signature: ^6.3.0
 
+  ## FEATURES
+  firebase_ai: ^3.11.0
+  speech_to_text: ^7.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

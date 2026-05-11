@@ -7,6 +7,7 @@
 
   "navHome": "Home",
   "navInsights": "Insights",
+  "navChat": "Chat",
   "navSettings": "Settings",
 
   "daySingleSun": "S",
@@ -230,5 +231,33 @@
   "@referralApplied": { "placeholders": { "plan": { "type": "String" } } },
   "referralInvalid": "Invalid code",
   "referralUsageLimit": "Usage limit reached",
-  "referralError": "Could not check code. Try again."
+  "referralError": "Could not check code. Try again.",
+
+  "chatTitle": "Chat",
+  "chatModelName": "Gemini",
+  "chatHistoryTitle": "Conversations",
+  "chatHistorySearchHint": "Search",
+  "chatHistoryEmpty": "No conversations yet",
+  "chatHistoryEmptyHint": "Tap + to start a new chat.",
+  "chatGreeting": "How can I help you tonight?",
+  "chatComposerHint": "Message",
+  "chatSend": "Send",
+  "chatNewConversation": "New chat",
+  "chatUntitledConversation": "New conversation",
+  "chatVoiceListening": "Listening…",
+  "chatVoiceUnavailable": "Voice input is unavailable.",
+  "chatVoicePermissionDenied": "Microphone permission denied.",
+  "chatSendFailed": "Couldn't send message. Please try again.",
+  "chatDelete": "Delete",
+  "chatDeleteConfirm": "Delete this conversation?",
+  "chatDeleteCancel": "Cancel",
+  "chatRelativeJustNow": "just now",
+  "chatRelativeSecondsAgo": "{n} seconds ago",
+  "@chatRelativeSecondsAgo": { "placeholders": { "n": { "type": "int" } } },
+  "chatRelativeMinutesAgo": "{n} minutes ago",
+  "@chatRelativeMinutesAgo": { "placeholders": { "n": { "type": "int" } } },
+  "chatRelativeHoursAgo": "{n} hours ago",
+  "@chatRelativeHoursAgo": { "placeholders": { "n": { "type": "int" } } },
+  "chatRelativeDaysAgo": "{n} days ago",
+  "@chatRelativeDaysAgo": { "placeholders": { "n": { "type": "int" } } }
 }

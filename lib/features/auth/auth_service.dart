@@ -12,7 +12,7 @@ import '../subscription/services/analytics_service.dart';
 
 /// Subcollections under `users/{uid}` that should be wiped on account deletion.
 /// Edit per-project to add any custom subcollections your app writes.
-const kUserSubcollections = ['alarms', 'activities', 'meta'];
+const kUserSubcollections = ['alarms', 'activities', 'meta', 'conversations'];
 
 /// Thrown when [blockNewAccounts] is set and the OAuth credential
 /// did not match any existing Firebase user.

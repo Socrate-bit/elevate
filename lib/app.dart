@@ -9,6 +9,7 @@ import 'package:device_preview/device_preview.dart';
 import 'config/app_config.dart';
 import 'features/alarms/cubit/alarm_cubit.dart';
 import 'features/alarms/screens/alarm_stop_screen.dart';
+import 'features/chat/cubit/chat_list_cubit.dart';
 import 'features/onboarding/cubit/onboarding_cubit.dart';
 import 'features/settings/cubit/settings_cubit.dart';
 import 'features/settings/cubit/settings_state.dart';
@@ -28,6 +29,7 @@ class SkeletonApp extends StatelessWidget {
         BlocProvider(create: (_) => AlarmCubit()),
         BlocProvider(create: (_) => SubscriptionCubit()),
         BlocProvider(create: (_) => OnboardingCubit()),
+        BlocProvider(create: (_) => ChatListCubit()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) => ScreenUtilInit(

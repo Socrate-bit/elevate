@@ -7,6 +7,7 @@
 
   "navHome": "Accueil",
   "navInsights": "Stats",
+  "navChat": "Chat",
   "navSettings": "Réglages",
 
   "daySingleSun": "D",
@@ -230,5 +231,33 @@
   "@referralApplied": { "placeholders": { "plan": { "type": "String" } } },
   "referralInvalid": "Code invalide",
   "referralUsageLimit": "Limite d'utilisation atteinte",
-  "referralError": "Impossible de vérifier le code. Réessayez."
+  "referralError": "Impossible de vérifier le code. Réessayez.",
+
+  "chatTitle": "Chat",
+  "chatModelName": "Gemini",
+  "chatHistoryTitle": "Conversations",
+  "chatHistorySearchHint": "Rechercher",
+  "chatHistoryEmpty": "Aucune conversation",
+  "chatHistoryEmptyHint": "Touchez + pour démarrer une discussion.",
+  "chatGreeting": "Comment puis-je vous aider ce soir ?",
+  "chatComposerHint": "Message",
+  "chatSend": "Envoyer",
+  "chatNewConversation": "Nouveau chat",
+  "chatUntitledConversation": "Nouvelle conversation",
+  "chatVoiceListening": "À l'écoute…",
+  "chatVoiceUnavailable": "La saisie vocale est indisponible.",
+  "chatVoicePermissionDenied": "Permission du microphone refusée.",
+  "chatSendFailed": "Impossible d'envoyer le message. Réessayez.",
+  "chatDelete": "Supprimer",
+  "chatDeleteConfirm": "Supprimer cette conversation ?",
+  "chatDeleteCancel": "Annuler",
+  "chatRelativeJustNow": "à l'instant",
+  "chatRelativeSecondsAgo": "il y a {n} secondes",
+  "@chatRelativeSecondsAgo": { "placeholders": { "n": { "type": "int" } } },
+  "chatRelativeMinutesAgo": "il y a {n} minutes",
+  "@chatRelativeMinutesAgo": { "placeholders": { "n": { "type": "int" } } },
+  "chatRelativeHoursAgo": "il y a {n} heures",
+  "@chatRelativeHoursAgo": { "placeholders": { "n": { "type": "int" } } },
+  "chatRelativeDaysAgo": "il y a {n} jours",
+  "@chatRelativeDaysAgo": { "placeholders": { "n": { "type": "int" } } }
 }
