@@ -18,7 +18,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     final mode = switch (raw) {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
-      _ => ThemeMode.system,
+      _ => ThemeMode.light,
     };
     emit(SettingsState(themeMode: mode));
   }
