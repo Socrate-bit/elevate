@@ -307,5 +307,7 @@
   "dismissRepOf": "of {target}",
   "@dismissRepOf": { "placeholders": { "target": { "type": "int" } } },
   "missionComplete": "Mission Complete!",
-  "missionCompleteMessage": "Great job! Keep it up."
+  "missionCompleteMessage": "Great job! Keep it up.",
+  "missionPickerTitle": "Missions",
+  "missionPickerSubtitle": "Pick a mission and start now"
 }

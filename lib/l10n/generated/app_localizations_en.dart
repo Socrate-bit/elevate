@@ -838,4 +838,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get missionCompleteMessage => 'Great job! Keep it up.';
+
+  @override
+  String get missionPickerTitle => 'Missions';
+
+  @override
+  String get missionPickerSubtitle => 'Pick a mission and start now';
 }

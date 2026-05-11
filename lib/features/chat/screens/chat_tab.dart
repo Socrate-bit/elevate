@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
+import '../../missions/screens/mission_picker_screen.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/chat_cubit.dart';
@@ -102,8 +103,13 @@ class _PreChatView extends StatelessWidget {
       backgroundColor: c.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.format_list_bulleted_rounded, size: 22.sp),
-          onPressed: withHaptic(onOpenHistory),
+          icon: Icon(Icons.bolt_rounded, size: 26.sp, color: c.textPrimary),
+          tooltip: l10n.missionPickerTitle,
+          onPressed: withMediumHaptic(() {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const MissionPickerScreen()),
+            );
+          }),
         ),
         centerTitle: true,
         title: Text(
@@ -114,6 +120,12 @@ class _PreChatView extends StatelessWidget {
             color: c.textPrimary,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.format_list_bulleted_rounded, size: 22.sp),
+            onPressed: withHaptic(onOpenHistory),
+          ),
+        ],
       ),
       body: Center(
         child: Padding(
