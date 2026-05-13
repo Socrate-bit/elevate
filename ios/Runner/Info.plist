@@ -26,6 +26,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>In order to validate mission</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>The app uses the microphone to transcribe your speech and let you talk directly to the AI chat.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
