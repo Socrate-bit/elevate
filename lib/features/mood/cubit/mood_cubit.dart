@@ -19,7 +19,9 @@ class MoodCubit extends Cubit<MoodState> {
     _sub?.cancel();
     _sub = MoodService.watchWeekMoods().listen(
       (weekMoods) {
-        if (!isClosed) emit(state.copyWith(weekMoods: weekMoods));
+        if (!isClosed) {
+          emit(state.copyWith(weekMoods: weekMoods, isLoaded: true));
+        }
       },
       onError: (e) => debugPrint('[MoodCubit] watchWeekMoods error: $e'),
     );
