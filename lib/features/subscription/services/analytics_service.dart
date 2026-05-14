@@ -66,6 +66,9 @@ class AnalyticsService {
   static const settingsNotificationsToggled = 'settings_notifications_toggled';
   static const settingsDarkModeToggled = 'settings_dark_mode_toggled';
 
+  // Mood
+  static const moodRecorded = 'mood_recorded'; // props: {mood, source}
+
   // Chat
   static const chatConversationCreated = 'chat_conversation_created';
   static const chatConversationDeleted = 'chat_conversation_deleted';

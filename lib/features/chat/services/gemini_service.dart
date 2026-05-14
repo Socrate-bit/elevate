@@ -4,22 +4,32 @@ import 'package:flutter/foundation.dart';
 import 'chat_form.dart';
 import 'chat_message.dart';
 import 'chat_mission_suggestion.dart';
+import 'chat_mood_check_in.dart';
 
-/// Either a text reply, a structured multiple-choice form, or a mission suggestion from the model.
+/// Either a text reply, a structured multiple-choice form, a mission suggestion, or a mood check-in.
 class GeminiReply {
   final String? text;
   final ChatForm? form;
   final ChatMissionSuggestion? missionSuggestion;
+  final ChatMoodCheckIn? moodCheckIn;
 
-  const GeminiReply._({this.text, this.form, this.missionSuggestion});
+  const GeminiReply._({
+    this.text,
+    this.form,
+    this.missionSuggestion,
+    this.moodCheckIn,
+  });
 
   factory GeminiReply.text(String text) => GeminiReply._(text: text);
   factory GeminiReply.form(ChatForm form) => GeminiReply._(form: form);
   factory GeminiReply.missionSuggestion(ChatMissionSuggestion s) =>
       GeminiReply._(missionSuggestion: s);
+  factory GeminiReply.moodCheckIn(ChatMoodCheckIn c) =>
+      GeminiReply._(moodCheckIn: c);
 
   bool get isForm => form != null;
   bool get isMissionSuggestion => missionSuggestion != null;
+  bool get isMoodCheckIn => moodCheckIn != null;
 }
 
 /// LLM surface the chat depends on. Implementations: [GeminiService] for
@@ -45,6 +55,7 @@ class GeminiService implements GeminiClient {
   static const _modelName = 'gemini-2.5-flash';
   static const _toolChoices = 'present_choices';
   static const _toolMission = 'suggest_mission';
+  static const _toolMood = 'ask_mood';
 
   static const _systemInstruction =
       'You are a helpful assistant inside a mobile chat app. '
@@ -55,6 +66,8 @@ class GeminiService implements GeminiClient {
       'focus, or try something physical or mindful, call the `suggest_mission` tool with '
       'the most relevant mission type and a one-sentence reason. Only suggest reactively — '
       "when the user's intent is explicit. Never suggest speculatively. "
+      "When the user's emotional state, stress level, energy, or wellbeing seems relevant "
+      'to the conversation, call the `ask_mood` tool to check in — reactively only, never speculatively. '
       'Use plain prose replies for everything else.';
 
   GenerativeModel? _model;
@@ -89,6 +102,15 @@ class GeminiService implements GeminiClient {
               ),
               'reason': Schema.string(
                 description: 'One short sentence explaining why this mission fits right now.',
+              ),
+            },
+          ),
+          FunctionDeclaration(
+            _toolMood,
+            'Check in on how the user is feeling when their emotional state is relevant.',
+            parameters: {
+              'question': Schema.string(
+                description: 'Short contextual question to display, e.g. "How are you feeling right now?"',
               ),
             },
           ),
@@ -129,6 +151,12 @@ class GeminiService implements GeminiClient {
           return GeminiReply.missionSuggestion(
             ChatMissionSuggestion(missionType: rawType, reason: reason),
           );
+        }
+        if (call.name == _toolMood) {
+          final args = call.args;
+          final question =
+              args['question']?.toString() ?? 'How are you feeling right now?';
+          return GeminiReply.moodCheckIn(ChatMoodCheckIn(question: question));
         }
       }
 
@@ -194,6 +222,14 @@ class GeminiService implements GeminiClient {
               'I suggested the "${suggestion.missionType}" mission: '
               '"${suggestion.reason}". $status',
             ),
+          ]));
+        } else if (m.moodCheckIn != null) {
+          final checkIn = m.moodCheckIn!;
+          final status = checkIn.selectedMood != null
+              ? 'User selected: ${checkIn.selectedMood!.name}.'
+              : 'Awaiting response.';
+          out.add(Content.model([
+            TextPart('I asked "${checkIn.question}". $status'),
           ]));
         } else if (m.text.isNotEmpty) {
           out.add(Content.model([TextPart(m.text)]));
