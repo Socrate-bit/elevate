@@ -98,7 +98,8 @@ class GeminiService implements GeminiClient {
             parameters: {
               'mission_type': Schema.string(
                 description: 'One of: pushUps, squats, shakePhone, math, affirmation, '
-                    'skyPhoto, makeBed, objectHunt, petHunt, natureHunt, touchGrass, random.',
+                    'breathing, skyPhoto, makeBed, objectHunt, petHunt, natureHunt, '
+                    'touchGrass, random.',
               ),
               'reason': Schema.string(
                 description: 'One short sentence explaining why this mission fits right now.',

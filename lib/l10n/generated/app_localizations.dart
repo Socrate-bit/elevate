@@ -1670,6 +1670,30 @@ abstract class AppLocalizations {
   /// **'Pick a mission and start now'**
   String get missionPickerSubtitle;
 
+  /// No description provided for @breathingPhaseInhale.
+  ///
+  /// In en, this message translates to:
+  /// **'Inhale'**
+  String get breathingPhaseInhale;
+
+  /// No description provided for @breathingPhaseHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold'**
+  String get breathingPhaseHold;
+
+  /// No description provided for @breathingPhaseExhale.
+  ///
+  /// In en, this message translates to:
+  /// **'Exhale'**
+  String get breathingPhaseExhale;
+
+  /// No description provided for @breathingRoundLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Round {current} / {total}'**
+  String breathingRoundLabel(int current, int total);
+
   /// No description provided for @moodPickerTitle.
   ///
   /// In en, this message translates to:

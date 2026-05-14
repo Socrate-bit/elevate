@@ -13,6 +13,7 @@ enum MissionType {
   natureHunt,
   touchGrass,
   affirmation,
+  breathing,
   random,
 }
 
@@ -139,6 +140,15 @@ const allMissions = <MissionInfo>[
     category: MissionCategory.trending,
   ),
   MissionInfo(
+    type: MissionType.breathing,
+    name: 'Breathing',
+    description: 'Guided box-breathing to focus',
+    iconColor: Color(0xFF5B8DEF),
+    iconBg: Color(0xFFEAF0FD),
+    icon: Icons.air,
+    category: MissionCategory.trending,
+  ),
+  MissionInfo(
     type: MissionType.random,
     name: 'Random',
     description: 'Surprise mission each morning',
@@ -180,6 +190,9 @@ MissionType missionTypeFromString(String s) {
     case 'speech':
     case 'affirmation':
       return MissionType.affirmation;
+    case 'breath':
+    case 'breathing':
+      return MissionType.breathing;
     default:
       return MissionType.values.firstWhere(
         (m) => m.name == s,

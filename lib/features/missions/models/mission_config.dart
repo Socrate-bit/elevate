@@ -29,6 +29,15 @@ class MissionConfig extends Equatable {
   /// Random pool — null/empty = all missions, 1 = that one, 2+ = random from pool.
   final List<MissionType>? randomPool;
 
+  /// Breathing phase durations in milliseconds (defaults applied at use site).
+  final int? inhaleDurationMs;
+  final int? holdAfterInhaleDurationMs;
+  final int? exhaleDurationMs;
+  final int? holdAfterExhaleDurationMs;
+
+  /// Number of breathing cycles to complete.
+  final int? breathingRounds;
+
   const MissionConfig({
     required this.type,
     this.repCount,
@@ -38,6 +47,11 @@ class MissionConfig extends Equatable {
     this.selectedAffirmations,
     this.affirmationCount,
     this.randomPool,
+    this.inhaleDurationMs,
+    this.holdAfterInhaleDurationMs,
+    this.exhaleDurationMs,
+    this.holdAfterExhaleDurationMs,
+    this.breathingRounds,
   });
 
   Map<String, dynamic> toMap() => {
@@ -51,6 +65,13 @@ class MissionConfig extends Equatable {
         if (affirmationCount != null) 'affirmationCount': affirmationCount,
         if (randomPool != null)
           'randomPool': randomPool!.map((t) => t.name).toList(),
+        if (inhaleDurationMs != null) 'inhaleDurationMs': inhaleDurationMs,
+        if (holdAfterInhaleDurationMs != null)
+          'holdAfterInhaleDurationMs': holdAfterInhaleDurationMs,
+        if (exhaleDurationMs != null) 'exhaleDurationMs': exhaleDurationMs,
+        if (holdAfterExhaleDurationMs != null)
+          'holdAfterExhaleDurationMs': holdAfterExhaleDurationMs,
+        if (breathingRounds != null) 'breathingRounds': breathingRounds,
       };
 
   factory MissionConfig.fromMap(Map<String, dynamic> m) {
@@ -79,6 +100,11 @@ class MissionConfig extends Equatable {
               ))
           .where((t) => t != MissionType.none)
           .toList(),
+      inhaleDurationMs: m['inhaleDurationMs'] as int?,
+      holdAfterInhaleDurationMs: m['holdAfterInhaleDurationMs'] as int?,
+      exhaleDurationMs: m['exhaleDurationMs'] as int?,
+      holdAfterExhaleDurationMs: m['holdAfterExhaleDurationMs'] as int?,
+      breathingRounds: m['breathingRounds'] as int?,
     );
   }
 
@@ -98,6 +124,16 @@ class MissionConfig extends Equatable {
     bool clearAffirmationCount = false,
     List<MissionType>? randomPool,
     bool clearRandomPool = false,
+    int? inhaleDurationMs,
+    bool clearInhaleDurationMs = false,
+    int? holdAfterInhaleDurationMs,
+    bool clearHoldAfterInhaleDurationMs = false,
+    int? exhaleDurationMs,
+    bool clearExhaleDurationMs = false,
+    int? holdAfterExhaleDurationMs,
+    bool clearHoldAfterExhaleDurationMs = false,
+    int? breathingRounds,
+    bool clearBreathingRounds = false,
   }) =>
       MissionConfig(
         type: type ?? this.type,
@@ -116,6 +152,21 @@ class MissionConfig extends Equatable {
             ? null
             : affirmationCount ?? this.affirmationCount,
         randomPool: clearRandomPool ? null : randomPool ?? this.randomPool,
+        inhaleDurationMs: clearInhaleDurationMs
+            ? null
+            : inhaleDurationMs ?? this.inhaleDurationMs,
+        holdAfterInhaleDurationMs: clearHoldAfterInhaleDurationMs
+            ? null
+            : holdAfterInhaleDurationMs ?? this.holdAfterInhaleDurationMs,
+        exhaleDurationMs: clearExhaleDurationMs
+            ? null
+            : exhaleDurationMs ?? this.exhaleDurationMs,
+        holdAfterExhaleDurationMs: clearHoldAfterExhaleDurationMs
+            ? null
+            : holdAfterExhaleDurationMs ?? this.holdAfterExhaleDurationMs,
+        breathingRounds: clearBreathingRounds
+            ? null
+            : breathingRounds ?? this.breathingRounds,
       );
 
   @override
@@ -128,5 +179,10 @@ class MissionConfig extends Equatable {
         selectedAffirmations,
         affirmationCount,
         randomPool,
+        inhaleDurationMs,
+        holdAfterInhaleDurationMs,
+        exhaleDurationMs,
+        holdAfterExhaleDurationMs,
+        breathingRounds,
       ];
 }

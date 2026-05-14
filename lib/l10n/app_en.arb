@@ -310,6 +310,11 @@
   "missionCompleteMessage": "Great job! Keep it up.",
   "missionPickerTitle": "Missions",
   "missionPickerSubtitle": "Pick a mission and start now",
+  "breathingPhaseInhale": "Inhale",
+  "breathingPhaseHold": "Hold",
+  "breathingPhaseExhale": "Exhale",
+  "breathingRoundLabel": "Round {current} / {total}",
+  "@breathingRoundLabel": { "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } } },
 
   "moodPickerTitle": "How are you?",
   "moodPickerRad": "rad",
