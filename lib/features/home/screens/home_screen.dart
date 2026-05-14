@@ -15,6 +15,7 @@ import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../missions/screens/photo_mission_screen.dart';
 import '../../missions/models/mission.dart';
+import '../../memory/cubit/memory_cubit.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../../routines/cubit/routine_state.dart';
 import '../../routines/models/routine.dart';
@@ -143,12 +144,14 @@ class _StartChatCardState extends State<_StartChatCard> {
       if (!mounted) return;
       setState(() => _loading = false);
       final routineCubit = context.read<RoutineCubit>();
+      final memoryCubit = context.read<MemoryCubit>();
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (_) => ChatCubit(
               conversationId: conv.id,
               routineCubit: routineCubit,
+              memoryCubit: memoryCubit,
             ),
             child: BlocProvider.value(
               value: routineCubit,

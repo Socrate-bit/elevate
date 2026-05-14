@@ -7,6 +7,7 @@ import 'utils/haptic_utils.dart';
 import 'package:elevate/features/chat/cubit/chat_cubit.dart';
 import 'package:elevate/features/chat/cubit/chat_list_cubit.dart';
 import 'package:elevate/features/chat/screens/chat_screen.dart';
+import 'package:elevate/features/memory/cubit/memory_cubit.dart';
 import 'package:elevate/features/routines/cubit/routine_cubit.dart';
 import 'package:elevate/features/routines/screens/routine_form_screen.dart';
 import 'package:elevate/features/routines/models/routine.dart';
@@ -97,6 +98,7 @@ class BottomNavShellState extends State<BottomNavShell> {
     if (!context.mounted) return;
     final listCubit = context.read<ChatListCubit>();
     final routineCubit = context.read<RoutineCubit>();
+    final memoryCubit = context.read<MemoryCubit>();
     final conv = await listCubit.createConversation();
     if (!context.mounted) return;
     Navigator.of(context).push(MaterialPageRoute(
@@ -104,6 +106,7 @@ class BottomNavShellState extends State<BottomNavShell> {
         create: (_) => ChatCubit(
           conversationId: conv.id,
           routineCubit: routineCubit,
+          memoryCubit: memoryCubit,
         ),
         child: BlocProvider.value(
           value: routineCubit,
