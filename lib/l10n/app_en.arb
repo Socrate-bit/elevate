@@ -314,5 +314,13 @@
   "breathingPhaseHold": "Hold",
   "breathingPhaseExhale": "Exhale",
   "breathingRoundLabel": "Round {current} / {total}",
-  "@breathingRoundLabel": { "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } } }
+  "@breathingRoundLabel": { "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } } },
+
+  "moodPickerTitle": "How are you?",
+  "moodPickerRad": "rad",
+  "moodPickerGood": "good",
+  "moodPickerMeh": "meh",
+  "moodPickerBad": "bad",
+  "moodPickerAwful": "awful",
+  "moodSectionTitle": "Mood"
 }

@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../mood/models/mood_entry.dart';
+import '../../mood/services/mood_service.dart';
 import '../../subscription/services/analytics_service.dart';
 import '../services/chat_firestore_service.dart';
 import '../services/chat_message.dart';
@@ -118,6 +120,7 @@ class ChatCubit extends Cubit<ChatState> {
         text: reply.text ?? '',
         form: reply.form,
         missionSuggestion: reply.missionSuggestion,
+        moodCheckIn: reply.moodCheckIn,
         createdAt: DateTime.now(),
       );
 
@@ -128,7 +131,7 @@ class ChatCubit extends Cubit<ChatState> {
       );
       debugPrint(
         '[ChatCubit] saved model reply '
-        '(form=${reply.isForm}, mission=${reply.isMissionSuggestion})',
+        '(form=${reply.isForm}, mission=${reply.isMissionSuggestion}, mood=${reply.isMoodCheckIn})',
       );
     } catch (e) {
       debugPrint('[ChatCubit] _generateModelReply failed: $e');
@@ -228,6 +231,40 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     await sendText('No thanks, not now.');
+  }
+
+  /// Records the user's mood selection from an inline check-in card.
+  /// Saves to Firestore, updates the message, then sends the mood as a user turn.
+  Future<void> selectMood(String messageId, MoodValue mood) async {
+    final idx = state.messages.indexWhere((m) => m.id == messageId);
+    if (idx == -1) return;
+    final msg = state.messages[idx];
+    final checkIn = msg.moodCheckIn;
+    if (checkIn == null || checkIn.selectedMood != null) return;
+
+    final updated = msg.copyWith(
+      moodCheckIn: checkIn.copyWith(selectedMood: mood),
+    );
+    final updatedMessages = List<ChatMessage>.from(state.messages)..[idx] = updated;
+    emit(state.copyWith(messages: updatedMessages));
+
+    try {
+      await _repo.updateMessageMoodCheckIn(
+        state.conversationId,
+        messageId,
+        mood.name,
+      );
+      await MoodService.saveMood(mood);
+      AnalyticsService.capture(
+        AnalyticsService.moodRecorded,
+        {'mood': mood.name, 'source': 'chat'},
+      );
+      debugPrint('[ChatCubit] mood selected in chat: ${mood.name}');
+    } catch (e) {
+      debugPrint('[ChatCubit] selectMood failed: $e');
+    }
+
+    await sendText("I'm feeling ${mood.name}.");
   }
 
   /// Starts voice capture; partial transcripts flow into [state.voicePartial].

@@ -1,4 +1,7 @@
 import '../../activity/models/activity.dart';
+import '../../mood/models/mood_entry.dart';
+
+export '../../mood/models/mood_entry.dart' show MoodValue;
 
 enum InsightsRange { week, month, allTime }
 
@@ -15,6 +18,8 @@ class InsightsState {
   final bool loading;
   final List<Activity> activities;
   final int totalActivities;
+  /// Normalized day (DateTime(y,m,d)) → averaged MoodValue for the current range.
+  final Map<DateTime, MoodValue> moodsByDay;
 
   const InsightsState({
     this.currentStreak = 0,
@@ -29,6 +34,7 @@ class InsightsState {
     this.loading = true,
     this.activities = const [],
     this.totalActivities = 0,
+    this.moodsByDay = const {},
   });
 
   InsightsState copyWith({
@@ -44,6 +50,7 @@ class InsightsState {
     bool? loading,
     List<Activity>? activities,
     int? totalActivities,
+    Map<DateTime, MoodValue>? moodsByDay,
   }) =>
       InsightsState(
         currentStreak: currentStreak ?? this.currentStreak,
@@ -58,5 +65,6 @@ class InsightsState {
         loading: loading ?? this.loading,
         activities: activities ?? this.activities,
         totalActivities: totalActivities ?? this.totalActivities,
+        moodsByDay: moodsByDay ?? this.moodsByDay,
       );
 }

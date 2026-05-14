@@ -1693,6 +1693,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Round {current} / {total}'**
   String breathingRoundLabel(int current, int total);
+
+  /// No description provided for @moodPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How are you?'**
+  String get moodPickerTitle;
+
+  /// No description provided for @moodPickerRad.
+  ///
+  /// In en, this message translates to:
+  /// **'rad'**
+  String get moodPickerRad;
+
+  /// No description provided for @moodPickerGood.
+  ///
+  /// In en, this message translates to:
+  /// **'good'**
+  String get moodPickerGood;
+
+  /// No description provided for @moodPickerMeh.
+  ///
+  /// In en, this message translates to:
+  /// **'meh'**
+  String get moodPickerMeh;
+
+  /// No description provided for @moodPickerBad.
+  ///
+  /// In en, this message translates to:
+  /// **'bad'**
+  String get moodPickerBad;
+
+  /// No description provided for @moodPickerAwful.
+  ///
+  /// In en, this message translates to:
+  /// **'awful'**
+  String get moodPickerAwful;
+
+  /// No description provided for @moodSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood'**
+  String get moodSectionTitle;
 }
 
 class _AppLocalizationsDelegate

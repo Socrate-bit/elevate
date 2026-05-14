@@ -864,4 +864,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String breathingRoundLabel(int current, int total) {
     return 'Cycle $current / $total';
   }
+
+  @override
+  String get moodPickerTitle => 'Comment vas-tu ?';
+
+  @override
+  String get moodPickerRad => 'génial';
+
+  @override
+  String get moodPickerGood => 'bien';
+
+  @override
+  String get moodPickerMeh => 'bof';
+
+  @override
+  String get moodPickerBad => 'mal';
+
+  @override
+  String get moodPickerAwful => 'terrible';
+
+  @override
+  String get moodSectionTitle => 'Humeur';
 }
