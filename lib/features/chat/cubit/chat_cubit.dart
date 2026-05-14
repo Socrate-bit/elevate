@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../memory/cubit/memory_cubit.dart';
 import '../../mood/models/mood_entry.dart';
 import '../../mood/services/mood_service.dart';
 import '../../routines/cubit/routine_cubit.dart';
@@ -23,6 +24,7 @@ class ChatCubit extends Cubit<ChatState> {
   ChatCubit({
     required String conversationId,
     RoutineCubit? routineCubit,
+    MemoryCubit? memoryCubit,
     ChatRepository? repository,
     GeminiClient? gemini,
     VoiceController? voice,
@@ -31,6 +33,7 @@ class ChatCubit extends Cubit<ChatState> {
         _gemini = gemini ?? GeminiService.instance,
         _voice = voice ?? VoiceService.instance,
         _routineCubit = routineCubit,
+        _memoryCubit = memoryCubit,
         _uuid = uuid ?? const Uuid(),
         super(ChatState(conversationId: conversationId, isLoading: true)) {
     _subscribe();
@@ -40,8 +43,10 @@ class ChatCubit extends Cubit<ChatState> {
   final GeminiClient _gemini;
   final VoiceController _voice;
   final RoutineCubit? _routineCubit;
+  final MemoryCubit? _memoryCubit;
   final Uuid _uuid;
   StreamSubscription? _sub;
+  bool _hasNewUserActivity = false;
 
   void _subscribe() {
     _sub?.cancel();
@@ -92,8 +97,15 @@ class ChatCubit extends Cubit<ChatState> {
     if (isFirstUserMessage) {
       unawaited(_titleConversation(trimmed));
     }
+    // Bump lastMessageAt and unflag memoryExtracted so this conversation is
+    // picked up for re-extraction on the next quit / app start.
+    _hasNewUserActivity = true;
     unawaited(
-      _repo.updateConversation(state.conversationId, lastMessageAt: now),
+      _repo.updateConversation(
+        state.conversationId,
+        lastMessageAt: now,
+        memoryExtracted: false,
+      ),
     );
 
     AnalyticsService.capture(AnalyticsService.chatMessageSent);
@@ -112,9 +124,13 @@ class ChatCubit extends Cubit<ChatState> {
 
   Future<void> _generateModelReply() async {
     try {
+      final memoryContext = _memoryCubit?.buildMemoryContext(
+        excludeConversationId: state.conversationId,
+      );
       final reply = await _gemini.send(
         history: state.messages.toList(),
         userText: state.messages.last.text,
+        memoryContext: memoryContext,
       );
 
       ChatRoutineMutation? mutation;
@@ -438,6 +454,16 @@ class ChatCubit extends Cubit<ChatState> {
   @override
   Future<void> close() {
     _sub?.cancel();
+    // Fire-and-forget memory extraction if the user sent at least one message
+    // in this session. The extractor itself is best-effort and silent on
+    // failure.
+    if (_hasNewUserActivity) {
+      final cubit = _memoryCubit;
+      final cid = state.conversationId;
+      if (cubit != null) {
+        unawaited(cubit.extractNow(cid));
+      }
+    }
     return super.close();
   }
 }
