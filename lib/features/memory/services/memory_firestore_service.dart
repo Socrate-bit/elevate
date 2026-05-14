@@ -76,22 +76,20 @@ class MemoryFirestoreService implements MemoryRepository {
     return snap.docs.map((d) => LifeEvent.fromMap(d.id, d.data())).toList();
   }
 
-  /// Merges new facts into the profile. Uses Firestore dotted-path updates so
-  /// only the touched keys are written; existing keys remain untouched.
+  /// Merges new facts into the profile. Passes facts as a nested map with
+  /// SetOptions.merge so Firestore deep-merges: only the touched keys are
+  /// written and existing keys remain untouched. Also creates the doc if
+  /// missing.
   @override
   Future<void> mergeProfileFacts(Map<String, String> newFacts) async {
     if (newFacts.isEmpty) return;
-    final patch = <String, dynamic>{
-      'updatedAtMs': DateTime.now().millisecondsSinceEpoch,
-    };
-    for (final entry in newFacts.entries) {
-      patch['facts.${entry.key}'] = entry.value;
-    }
     await _profileDoc().set(
-      {'facts': <String, dynamic>{}, 'updatedAtMs': 0},
+      {
+        'facts': newFacts,
+        'updatedAtMs': DateTime.now().millisecondsSinceEpoch,
+      },
       SetOptions(merge: true),
     );
-    await _profileDoc().update(patch);
   }
 
   @override
