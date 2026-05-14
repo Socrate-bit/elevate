@@ -180,7 +180,7 @@ unprompted reference.
 1. First message / Form: Hello X, how I can help you today? (OPTION FORM)
    - "💬 I want to talk about something"
    - "😶‍🌫️ Help me manage an emotion"
-   - "🌧️/☀️ Why do I feel [X etc.] today?" (Based on daily mood entry / Don't show it if no entry)
+   - "[🌧️ OR ☀️] Why do I feel [Mood entry] today?" (Based on daily mood entry / Don't show it if no entry)
    - "🔁 How is [open thread] going?" (If last session is existing / relevant)
    - "🤔 I don't know"
 2. Deep breathing:
