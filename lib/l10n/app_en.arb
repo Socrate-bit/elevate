@@ -309,5 +309,13 @@
   "missionComplete": "Mission Complete!",
   "missionCompleteMessage": "Great job! Keep it up.",
   "missionPickerTitle": "Missions",
-  "missionPickerSubtitle": "Pick a mission and start now"
+  "missionPickerSubtitle": "Pick a mission and start now",
+
+  "moodPickerTitle": "How are you?",
+  "moodPickerRad": "rad",
+  "moodPickerGood": "good",
+  "moodPickerMeh": "meh",
+  "moodPickerBad": "bad",
+  "moodPickerAwful": "awful",
+  "moodSectionTitle": "Mood"
 }

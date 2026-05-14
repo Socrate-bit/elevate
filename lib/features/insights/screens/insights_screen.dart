@@ -6,6 +6,7 @@ import 'package:elevate/l10n/l10n_helpers.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
 import '../../../shared/theme/app_theme.dart';
+import '../../mood/models/mood_entry.dart';
 import '../widgets/hexagon_badge.dart';
 import '../../milestones/screens/milestones_screen.dart';
 import '../../activity/models/activity.dart';
@@ -122,6 +123,20 @@ class _InsightsView extends StatelessWidget {
                               value: state.avgDuration,
                             ),
                           ],
+                        ),
+                        SizedBox(height: 24.h),
+                        Text(
+                          l10n.moodSectionTitle,
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: c.textPrimary,
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                        _MoodCalendar(
+                          range: state.range,
+                          moodsByDay: state.moodsByDay,
                         ),
                         SizedBox(height: 24.h),
                         Text(
@@ -378,6 +393,191 @@ class _StatCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _MoodCalendar extends StatelessWidget {
+  final InsightsRange range;
+  final Map<DateTime, MoodValue> moodsByDay;
+
+  const _MoodCalendar({required this.range, required this.moodsByDay});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final now = DateTime.now();
+
+    if (range == InsightsRange.week) {
+      return _buildWeekStrip(context, c, l10n, now);
+    } else {
+      return _buildGrid(context, c, now);
+    }
+  }
+
+  Widget _buildWeekStrip(
+    BuildContext context,
+    AppColors c,
+    AppLocalizations l10n,
+    DateTime now,
+  ) {
+    final daysFromSunday = now.weekday % 7;
+    final sunday = DateTime(now.year, now.month, now.day - daysFromSunday);
+
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: c.card,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(7, (i) {
+          final day = sunday.add(Duration(days: i));
+          final normalized = DateTime(day.year, day.month, day.day);
+          final mood = moodsByDay[normalized];
+          final label = localizedDayShort(l10n, i);
+          final isFuture = normalized.isAfter(DateTime(now.year, now.month, now.day));
+
+          return Column(
+            children: [
+              Text(
+                label,
+                style: TextStyle(fontSize: 11.sp, color: c.textSecondary),
+              ),
+              SizedBox(height: 6.h),
+              Container(
+                width: 36.w,
+                height: 36.w,
+                decoration: BoxDecoration(
+                  color: mood != null ? mood.color.withAlpha(40) : Colors.transparent,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: mood != null
+                        ? mood.color
+                        : c.separator,
+                    width: 1.5,
+                  ),
+                ),
+                child: Center(
+                  child: isFuture
+                      ? null
+                      : mood != null
+                          ? Text(mood.emoji, style: TextStyle(fontSize: 16.sp))
+                          : Text(
+                              '—',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: c.textSecondary.withAlpha(80),
+                              ),
+                            ),
+                ),
+              ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildGrid(BuildContext context, AppColors c, DateTime now) {
+    // Build a list of days to display
+    final DateTime start;
+    if (range == InsightsRange.month) {
+      start = DateTime(now.year, now.month, 1);
+    } else {
+      // All time: last 90 days
+      start = DateTime(now.year, now.month, now.day)
+          .subtract(const Duration(days: 89));
+    }
+
+    // Align start to Sunday
+    final offset = start.weekday % 7; // days after the preceding Sunday
+    final gridStart = start.subtract(Duration(days: offset));
+
+    final end = range == InsightsRange.month
+        ? DateTime(now.year, now.month + 1, 0) // last day of month
+        : DateTime(now.year, now.month, now.day);
+
+    final totalDays = end.difference(gridStart).inDays + 1;
+    final weeks = (totalDays / 7).ceil();
+
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: c.card,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Day-of-week header
+          Row(
+            children: ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d) {
+              return Expanded(
+                child: Center(
+                  child: Text(
+                    d,
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: c.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          SizedBox(height: 6.h),
+          ...List.generate(weeks, (week) {
+            return Padding(
+              padding: EdgeInsets.only(bottom: 4.h),
+              child: Row(
+                children: List.generate(7, (day) {
+                  final date = gridStart.add(Duration(days: week * 7 + day));
+                  final normalized = DateTime(date.year, date.month, date.day);
+                  final inRange = !date.isBefore(start) && !date.isAfter(end);
+                  final isFuture =
+                      normalized.isAfter(DateTime(now.year, now.month, now.day));
+                  final mood = inRange ? moodsByDay[normalized] : null;
+
+                  return Expanded(
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Container(
+                        margin: EdgeInsets.all(1.5.w),
+                        decoration: BoxDecoration(
+                          color: !inRange
+                              ? Colors.transparent
+                              : mood != null
+                                  ? mood.color.withAlpha(50)
+                                  : c.separator.withAlpha(80),
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                        child: Center(
+                          child: inRange && !isFuture
+                              ? mood != null
+                                  ? Text(mood.emoji,
+                                      style: TextStyle(fontSize: 12.sp))
+                                  : Text(
+                                      '—',
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        color: c.textSecondary.withAlpha(60),
+                                      ),
+                                    )
+                              : null,
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            );
+          }),
+        ],
       ),
     );
   }

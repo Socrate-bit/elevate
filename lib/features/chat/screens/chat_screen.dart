@@ -15,6 +15,7 @@ import '../services/voice_service.dart';
 import '../widgets/chat_composer.dart';
 import '../widgets/chat_form_card.dart';
 import '../widgets/chat_mission_card.dart';
+import '../widgets/chat_mood_check_in_card.dart';
 import '../widgets/message_bubble.dart';
 
 /// Active conversation, pushed full-screen above the bottom-nav shell.
@@ -245,6 +246,12 @@ class _MessagesList extends StatelessWidget {
             },
             onDecline: () =>
                 context.read<ChatCubit>().declineMissionSuggestion(m.id),
+          );
+        }
+        if (m.moodCheckIn != null && m.role == ChatRole.model) {
+          return ChatMoodCheckInCard(
+            messageId: m.id,
+            checkIn: m.moodCheckIn!,
           );
         }
         return MessageBubble(message: m);

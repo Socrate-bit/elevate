@@ -850,4 +850,25 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get missionPickerSubtitle => 'Choisissez une mission et commencez';
+
+  @override
+  String get moodPickerTitle => 'Comment vas-tu ?';
+
+  @override
+  String get moodPickerRad => 'génial';
+
+  @override
+  String get moodPickerGood => 'bien';
+
+  @override
+  String get moodPickerMeh => 'bof';
+
+  @override
+  String get moodPickerBad => 'mal';
+
+  @override
+  String get moodPickerAwful => 'terrible';
+
+  @override
+  String get moodSectionTitle => 'Humeur';
 }
