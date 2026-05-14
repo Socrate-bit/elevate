@@ -11,6 +11,7 @@ import '../../chat/screens/chat_screen.dart';
 import '../../mood/cubit/mood_cubit.dart';
 import '../../mood/cubit/mood_state.dart';
 import '../../mood/models/mood_entry.dart';
+import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../missions/screens/photo_mission_screen.dart';
 import '../../missions/models/mission.dart';
@@ -33,8 +34,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with AutomaticKeepAliveClientMixin {
+  bool _moodCheckDone = false;
+
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check if mood data is already loaded at mount time (fast cache hit).
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkMoodOnce());
+  }
+
+  void _checkMoodOnce() {
+    if (!mounted || _moodCheckDone) return;
+    final moodState = context.read<MoodCubit>().state;
+    if (!moodState.isLoaded) return; // BlocListener below will handle it
+    _moodCheckDone = true;
+    if (!moodState.hasMoodToday) showMoodPickerSheet(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +60,15 @@ class _HomeScreenState extends State<HomeScreen>
     return BlocProvider(
       create: (context) =>
           HomeCubit(routineCubit: context.read<RoutineCubit>())..load(),
-      child: const _HomeView(),
+      child: BlocListener<MoodCubit, MoodState>(
+        listenWhen: (prev, curr) => !prev.isLoaded && curr.isLoaded,
+        listener: (context, state) {
+          if (_moodCheckDone) return;
+          _moodCheckDone = true;
+          if (!state.hasMoodToday) showMoodPickerSheet(context);
+        },
+        child: const _HomeView(),
+      ),
     );
   }
 }
