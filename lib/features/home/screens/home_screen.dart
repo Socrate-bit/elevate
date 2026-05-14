@@ -5,6 +5,10 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 import 'package:elevate/l10n/l10n_helpers.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
+import '../../mood/cubit/mood_cubit.dart';
+import '../../mood/cubit/mood_state.dart';
+import '../../mood/models/mood_entry.dart';
+import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/bottom_nav_shell.dart';
 import '../../missions/screens/photo_mission_screen.dart';
@@ -65,7 +69,12 @@ class _HomeView extends StatelessWidget {
                         SizedBox(height: 12.h),
                         _TopBar(streak: state.currentStreak),
                         SizedBox(height: 20.h),
-                        _WeekRow(weekDays: state.weekDays),
+                        BlocBuilder<MoodCubit, MoodState>(
+                          builder: (context, moodState) => _WeekRow(
+                            weekDays: state.weekDays,
+                            weekMoods: moodState.weekMoods,
+                          ),
+                        ),
                         SizedBox(height: 24.h),
                         BlocBuilder<RoutineCubit, RoutineState>(
                           builder: (context, routineState) {
@@ -280,6 +289,24 @@ class _TopBar extends StatelessWidget {
             ),
           ),
         ),
+        SizedBox(width: 8.w),
+        GestureDetector(
+          onTap: withHaptic(() => showMoodPickerSheet(context)),
+          child: Container(
+            width: 36.w,
+            height: 36.w,
+            decoration: BoxDecoration(
+              color: c.card,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 8),
+              ],
+            ),
+            child: Center(
+              child: Text('🙂', style: TextStyle(fontSize: 18.sp)),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -287,7 +314,9 @@ class _TopBar extends StatelessWidget {
 
 class _WeekRow extends StatelessWidget {
   final List<DayStatus> weekDays;
-  const _WeekRow({required this.weekDays});
+  final Map<int, MoodValue> weekMoods;
+
+  const _WeekRow({required this.weekDays, required this.weekMoods});
 
   @override
   Widget build(BuildContext context) {
@@ -296,19 +325,28 @@ class _WeekRow extends StatelessWidget {
     final now = DateTime.now();
     final todayIndex = now.weekday % 7; // 0=Sun
 
-    final dates = List.generate(7, (i) {
-      final diff = i - todayIndex;
-      return now.add(Duration(days: diff));
-    });
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: List.generate(7, (i) {
         final isToday = i == todayIndex;
         final isFuture = i > todayIndex;
         final status = weekDays.length > i ? weekDays[i] : DayStatus.none;
-        final dayNum = dates[i].day.toString();
         final label = localizedDayShort(l10n, i);
+        final mood = weekMoods[i];
+
+        // Content inside the circle: mood emoji or faded dash
+        Widget circleContent;
+        if (mood != null) {
+          circleContent = Text(mood.emoji, style: TextStyle(fontSize: 18.sp));
+        } else {
+          circleContent = Text(
+            '—',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: c.textSecondary.withAlpha(80),
+            ),
+          );
+        }
 
         if (isToday) {
           return Container(
@@ -343,16 +381,7 @@ class _WeekRow extends StatelessWidget {
                         ? Border.all(color: c.primary, width: 2)
                         : Border.all(color: c.separator, width: 2),
                   ),
-                  child: Center(
-                    child: Text(
-                      dayNum,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: c.textPrimary,
-                      ),
-                    ),
-                  ),
+                  child: Center(child: circleContent),
                 ),
               ],
             ),
@@ -368,16 +397,7 @@ class _WeekRow extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: c.primary, width: 2),
             ),
-            child: Center(
-              child: Text(
-                dayNum,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: c.textPrimary,
-                ),
-              ),
-            ),
+            child: Center(child: circleContent),
           );
         } else if (status == DayStatus.frozen) {
           circle = Container(
@@ -387,16 +407,7 @@ class _WeekRow extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: c.frozen, width: 2.5),
             ),
-            child: Center(
-              child: Text(
-                dayNum,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: c.textPrimary,
-                ),
-              ),
-            ),
+            child: Center(child: circleContent),
           );
         } else if (isFuture) {
           circle = Container(
@@ -409,10 +420,10 @@ class _WeekRow extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                dayNum,
+                '—',
                 style: TextStyle(
-                  fontSize: 16.sp,
-                  color: c.textSecondary.withAlpha(100),
+                  fontSize: 14.sp,
+                  color: c.textSecondary.withAlpha(40),
                 ),
               ),
             ),
@@ -428,15 +439,7 @@ class _WeekRow extends StatelessWidget {
             child: SizedBox(
               width: 42.w,
               height: 42.h,
-              child: Center(
-                child: Text(
-                  dayNum,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: c.textSecondary,
-                  ),
-                ),
-              ),
+              child: Center(child: circleContent),
             ),
           );
         }

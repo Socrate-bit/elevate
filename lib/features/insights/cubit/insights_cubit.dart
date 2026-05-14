@@ -1,16 +1,19 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../activity/models/activity.dart';
 import '../../activity/services/activity_service.dart';
 import '../../milestones/services/streak_service.dart';
+import '../../mood/services/mood_service.dart';
 import 'insights_state.dart';
 
 class InsightsCubit extends Cubit<InsightsState> {
   StreamSubscription<List<Activity>>? _activitiesSub;
   StreamSubscription<StreakProfile>? _profileSub;
+  StreamSubscription<Map<DateTime, MoodValue>>? _moodSub;
   Completer<void>? _loadCompleter;
 
   List<Activity> _allActivities = [];
@@ -38,7 +41,30 @@ class InsightsCubit extends Cubit<InsightsState> {
       _profileReady = true;
       if (_activitiesReady) _recompute();
     });
+
+    _subscribeMoods();
   }
+
+  void _subscribeMoods() {
+    _moodSub?.cancel();
+    final now = DateTime.now();
+    final start = _moodRangeStart(now);
+    _moodSub = MoodService.watchMoodsInRange(
+      start,
+      now.add(const Duration(days: 1)),
+    ).listen(
+      (moods) {
+        if (!isClosed) emit(state.copyWith(moodsByDay: moods));
+      },
+      onError: (e) => debugPrint('[InsightsCubit] watchMoodsInRange error: $e'),
+    );
+  }
+
+  DateTime _moodRangeStart(DateTime now) => switch (state.range) {
+        InsightsRange.week => _startOfWeek(now),
+        InsightsRange.month => DateTime(now.year, now.month, 1),
+        InsightsRange.allTime => now.subtract(const Duration(days: 90)),
+      };
 
   Future<void> load() {
     _loadCompleter?.complete();
@@ -52,6 +78,7 @@ class InsightsCubit extends Cubit<InsightsState> {
   Future<void> changeRange(InsightsRange range) async {
     if (state.range == range) return;
     emit(state.copyWith(range: range));
+    _subscribeMoods();
     await _recompute();
   }
 
@@ -105,8 +132,10 @@ class InsightsCubit extends Cubit<InsightsState> {
   void _cancelSubs() {
     _activitiesSub?.cancel();
     _profileSub?.cancel();
+    _moodSub?.cancel();
     _activitiesSub = null;
     _profileSub = null;
+    _moodSub = null;
   }
 
   @override

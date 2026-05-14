@@ -311,6 +311,20 @@
   "missionPickerTitle": "Missions",
   "missionPickerSubtitle": "Choisissez une mission et commencez",
 
+  "breathingPhaseInhale": "Inspirez",
+  "breathingPhaseHold": "Retenez",
+  "breathingPhaseExhale": "Expirez",
+  "breathingRoundLabel": "Cycle {current} / {total}",
+  "@breathingRoundLabel": { "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } } },
+
+  "moodPickerTitle": "Comment vas-tu ?",
+  "moodPickerRad": "génial",
+  "moodPickerGood": "bien",
+  "moodPickerMeh": "bof",
+  "moodPickerBad": "mal",
+  "moodPickerAwful": "terrible",
+  "moodSectionTitle": "Humeur",
+
   "homeActionsTitle": "Actions",
   "homeActionsEmpty": "Aucune action. Appuyez sur + pour en ajouter.",
   "homeHabitsTitle": "Habitudes",

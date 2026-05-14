@@ -8,6 +8,7 @@ import 'package:device_preview/device_preview.dart';
 
 import 'config/app_config.dart';
 import 'features/alarms/cubit/alarm_cubit.dart';
+import 'features/mood/cubit/mood_cubit.dart';
 import 'features/alarms/screens/alarm_stop_screen.dart';
 import 'features/chat/cubit/chat_list_cubit.dart';
 import 'features/onboarding/cubit/onboarding_cubit.dart';
@@ -26,6 +27,7 @@ class SkeletonApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (_) => MoodCubit()),
         BlocProvider(create: (_) => SettingsCubit()),
         BlocProvider(create: (_) => AlarmCubit()),
         BlocProvider(create: (_) => RoutineCubit()),

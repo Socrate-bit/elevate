@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'chat_form.dart';
 import 'chat_message.dart';
 import 'chat_mission_suggestion.dart';
+import 'chat_mood_check_in.dart';
 
 /// Tool call returned by Gemini that mutates the user's routines. The chat
 /// layer applies it and produces a `ChatRoutineMutation` confirmation card.
@@ -14,17 +15,19 @@ class RoutineToolCall {
 }
 
 /// Either a text reply, a structured multiple-choice form, a mission suggestion,
-/// or a routine tool call from the model.
+/// a mood check-in, or a routine tool call from the model.
 class GeminiReply {
   final String? text;
   final ChatForm? form;
   final ChatMissionSuggestion? missionSuggestion;
+  final ChatMoodCheckIn? moodCheckIn;
   final RoutineToolCall? routineToolCall;
 
   const GeminiReply._({
     this.text,
     this.form,
     this.missionSuggestion,
+    this.moodCheckIn,
     this.routineToolCall,
   });
 
@@ -32,11 +35,14 @@ class GeminiReply {
   factory GeminiReply.form(ChatForm form) => GeminiReply._(form: form);
   factory GeminiReply.missionSuggestion(ChatMissionSuggestion s) =>
       GeminiReply._(missionSuggestion: s);
+  factory GeminiReply.moodCheckIn(ChatMoodCheckIn c) =>
+      GeminiReply._(moodCheckIn: c);
   factory GeminiReply.routineToolCall(RoutineToolCall t) =>
       GeminiReply._(routineToolCall: t);
 
   bool get isForm => form != null;
   bool get isMissionSuggestion => missionSuggestion != null;
+  bool get isMoodCheckIn => moodCheckIn != null;
   bool get isRoutineToolCall => routineToolCall != null;
 }
 
@@ -65,6 +71,7 @@ class GeminiService implements GeminiClient {
   static const _modelName = 'gemini-2.5-flash';
   static const _toolChoices = 'present_choices';
   static const _toolMission = 'suggest_mission';
+  static const _toolMood = 'ask_mood';
   static const _toolCreateRoutine = 'create_routine';
   static const _toolUpdateRoutine = 'update_routine';
   static const _toolDeleteRoutine = 'delete_routine';
@@ -78,6 +85,8 @@ class GeminiService implements GeminiClient {
       'focus, or try something physical or mindful, call the `suggest_mission` tool with '
       'the most relevant mission type and a one-sentence reason. Only suggest reactively — '
       "when the user's intent is explicit. Never suggest speculatively. "
+      "When the user's emotional state, stress level, energy, or wellbeing seems relevant "
+      'to the conversation, call the `ask_mood` tool to check in — reactively only, never speculatively. '
       'When the user asks to add, change, or remove a habit or one-off action, '
       'call the routine tools (`create_routine`, `update_routine`, `delete_routine`). '
       'An "action" is a one-shot to-do that disappears once validated; a "habit" recurs on '
@@ -112,10 +121,20 @@ class GeminiService implements GeminiClient {
             parameters: {
               'mission_type': Schema.string(
                 description: 'One of: pushUps, squats, shakePhone, math, affirmation, '
-                    'skyPhoto, makeBed, objectHunt, petHunt, natureHunt, touchGrass, random.',
+                    'breathing, skyPhoto, makeBed, objectHunt, petHunt, natureHunt, '
+                    'touchGrass, random.',
               ),
               'reason': Schema.string(
                 description: 'One short sentence explaining why this mission fits right now.',
+              ),
+            },
+          ),
+          FunctionDeclaration(
+            _toolMood,
+            'Check in on how the user is feeling when their emotional state is relevant.',
+            parameters: {
+              'question': Schema.string(
+                description: 'Short contextual question to display, e.g. "How are you feeling right now?"',
               ),
             },
           ),
@@ -222,6 +241,12 @@ class GeminiService implements GeminiClient {
             ChatMissionSuggestion(missionType: rawType, reason: reason),
           );
         }
+        if (call.name == _toolMood) {
+          final args = call.args;
+          final question =
+              args['question']?.toString() ?? 'How are you feeling right now?';
+          return GeminiReply.moodCheckIn(ChatMoodCheckIn(question: question));
+        }
         if (call.name == _toolCreateRoutine ||
             call.name == _toolUpdateRoutine ||
             call.name == _toolDeleteRoutine) {
@@ -294,6 +319,14 @@ class GeminiService implements GeminiClient {
               'I suggested the "${suggestion.missionType}" mission: '
               '"${suggestion.reason}". $status',
             ),
+          ]));
+        } else if (m.moodCheckIn != null) {
+          final checkIn = m.moodCheckIn!;
+          final status = checkIn.selectedMood != null
+              ? 'User selected: ${checkIn.selectedMood!.name}.'
+              : 'Awaiting response.';
+          out.add(Content.model([
+            TextPart('I asked "${checkIn.question}". $status'),
           ]));
         } else if (mutation != null) {
           out.add(Content.model([

@@ -852,6 +852,41 @@ class AppLocalizationsFr extends AppLocalizations {
   String get missionPickerSubtitle => 'Choisissez une mission et commencez';
 
   @override
+  String get breathingPhaseInhale => 'Inspirez';
+
+  @override
+  String get breathingPhaseHold => 'Retenez';
+
+  @override
+  String get breathingPhaseExhale => 'Expirez';
+
+  @override
+  String breathingRoundLabel(int current, int total) {
+    return 'Cycle $current / $total';
+  }
+
+  @override
+  String get moodPickerTitle => 'Comment vas-tu ?';
+
+  @override
+  String get moodPickerRad => 'génial';
+
+  @override
+  String get moodPickerGood => 'bien';
+
+  @override
+  String get moodPickerMeh => 'bof';
+
+  @override
+  String get moodPickerBad => 'mal';
+
+  @override
+  String get moodPickerAwful => 'terrible';
+
+  @override
+  String get moodSectionTitle => 'Humeur';
+
+  @override
   String get homeActionsTitle => 'Actions';
 
   @override
