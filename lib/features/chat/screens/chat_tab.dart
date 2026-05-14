@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
+import '../../memory/cubit/memory_cubit.dart';
 import '../../missions/screens/mission_picker_screen.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
@@ -55,12 +56,14 @@ class _ChatTabState extends State<ChatTab> with AutomaticKeepAliveClientMixin {
 
   void _openChat(String conversationId) {
     final routineCubit = context.read<RoutineCubit>();
+    final memoryCubit = context.read<MemoryCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => BlocProvider(
           create: (_) => ChatCubit(
             conversationId: conversationId,
             routineCubit: routineCubit,
+            memoryCubit: memoryCubit,
           ),
           child: BlocProvider.value(
             value: routineCubit,

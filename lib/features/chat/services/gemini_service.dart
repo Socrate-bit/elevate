@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/foundation.dart';
 
@@ -46,15 +48,57 @@ class GeminiReply {
   bool get isRoutineToolCall => routineToolCall != null;
 }
 
+/// Plain DTO produced by [GeminiClient.extractMemory]. The memory feature
+/// converts these into Firestore documents (profile + life events + summary).
+class ExtractedLifeEvent {
+  final String title;
+  final String description;
+  final DateTime? occurredAt;
+
+  const ExtractedLifeEvent({
+    required this.title,
+    required this.description,
+    this.occurredAt,
+  });
+}
+
+class MemoryExtraction {
+  /// Sparse map of profile-fact keys → new/updated values.
+  final Map<String, String> factUpdates;
+  final List<ExtractedLifeEvent> newEvents;
+  final String summary;
+
+  const MemoryExtraction({
+    required this.factUpdates,
+    required this.newEvents,
+    required this.summary,
+  });
+
+  static const empty = MemoryExtraction(
+    factUpdates: {},
+    newEvents: [],
+    summary: '',
+  );
+}
+
 /// LLM surface the chat depends on. Implementations: [GeminiService] for
 /// production (Firebase + Gemini), or a fake for tests.
 abstract interface class GeminiClient {
   Future<GeminiReply> send({
     required List<ChatMessage> history,
     required String userText,
+    String? memoryContext,
   });
 
   Future<String> generateTitle(String firstUserMessage);
+
+  /// Extracts structured memory from a finished conversation. Returns sparse
+  /// updates only; callers merge into existing storage.
+  Future<MemoryExtraction> extractMemory({
+    required List<ChatMessage> history,
+    required Map<String, String> existingFacts,
+    required List<String> existingEventTitles,
+  });
 }
 
 /// Firebase Gemini implementation with function tools:
@@ -204,12 +248,29 @@ specific weekdays. Pick reasonable defaults (icon_key, color_key) — see allowe
 Use plain prose replies for everything else.
 ''';
 
-  GenerativeModel? _model;
+  static const _extractorSystemInstruction =
+      'You analyze a finished chat conversation and extract structured memory '
+      'about the user. Return JSON matching the schema. '
+      '`profile_facts` are durable semantic facts about the person (age, gender, job, '
+      'city, marital_status, purpose, what_tried, what_works, etc.) — include only NEW '
+      'or UPDATED facts not already present in the existing list. Keys are short '
+      'snake_case strings; values are concise strings. '
+      '`new_life_events` are notable events that happened in the user\'s life that they '
+      'mentioned (a job change, a breakup, a loss, a trip, a milestone). Skip anything '
+      'whose title closely matches an already-extracted event. Leave `occurred_at_iso` '
+      'empty if unknown. '
+      '`summary` is a 1–3 sentence neutral recap of what was discussed in this '
+      'conversation.';
 
-  GenerativeModel _getModel() {
-    return _model ??= FirebaseAI.googleAI().generativeModel(
+  GenerativeModel _buildChatModel(String? memoryContext) {
+    final instruction = (memoryContext == null || memoryContext.isEmpty)
+        ? _systemInstruction
+        : '$_systemInstruction\n\n'
+            '--- What you already know about this user ---\n'
+            '$memoryContext';
+    return FirebaseAI.googleAI().generativeModel(
       model: _modelName,
-      systemInstruction: Content.system(_systemInstruction),
+      systemInstruction: Content.system(instruction),
       tools: [
         Tool.functionDeclarations([
           FunctionDeclaration(
@@ -273,6 +334,57 @@ Use plain prose replies for everything else.
     );
   }
 
+  GenerativeModel _buildExtractorModel() {
+    return FirebaseAI.googleAI().generativeModel(
+      model: _modelName,
+      systemInstruction: Content.system(_extractorSystemInstruction),
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: Schema.object(
+          properties: {
+            'profile_facts': Schema.array(
+              items: Schema.object(
+                properties: {
+                  'key': Schema.string(
+                    description:
+                        'snake_case fact key, e.g. "job", "city", "purpose".',
+                  ),
+                  'value': Schema.string(
+                    description: 'Short value for the fact.',
+                  ),
+                },
+              ),
+              description:
+                  'New or updated profile facts. Skip facts already present unchanged.',
+            ),
+            'new_life_events': Schema.array(
+              items: Schema.object(
+                properties: {
+                  'title': Schema.string(
+                    description: 'Short event title.',
+                  ),
+                  'description': Schema.string(
+                    description: 'One sentence describing what happened.',
+                  ),
+                  'occurred_at_iso': Schema.string(
+                    description:
+                        'ISO 8601 date (YYYY-MM-DD) if known, else empty string.',
+                  ),
+                },
+              ),
+              description:
+                  'Notable events mentioned by the user. Skip duplicates of existing events.',
+            ),
+            'summary': Schema.string(
+              description:
+                  '1–3 sentence neutral recap of what was discussed.',
+            ),
+          },
+        ),
+      ),
+    );
+  }
+
   static Map<String, Schema> _routineSchema({required bool includeId}) {
     return {
       if (includeId)
@@ -323,10 +435,12 @@ Use plain prose replies for everything else.
   Future<GeminiReply> send({
     required List<ChatMessage> history,
     required String userText,
+    String? memoryContext,
   }) async {
     try {
       final contents = _buildContents(history, userText);
-      final response = await _getModel().generateContent(contents);
+      final response =
+          await _buildChatModel(memoryContext).generateContent(contents);
 
       final calls = response.functionCalls.toList();
       if (calls.isNotEmpty) {
@@ -382,7 +496,7 @@ Use plain prose replies for everything else.
           'Write a 3 to 6 word title for a chat that starts with this user message. '
           'Reply with just the title — no quotes, no punctuation at the end.\n\n'
           'Message: $firstUserMessage';
-      final response = await _getModel().generateContent([
+      final response = await _buildChatModel(null).generateContent([
         Content.text(prompt),
       ]);
       final text = response.text?.trim() ?? '';
@@ -392,6 +506,124 @@ Use plain prose replies for everything else.
       debugPrint('[GeminiService] generateTitle failed: $e');
       return _fallbackTitle(firstUserMessage);
     }
+  }
+
+  @override
+  Future<MemoryExtraction> extractMemory({
+    required List<ChatMessage> history,
+    required Map<String, String> existingFacts,
+    required List<String> existingEventTitles,
+  }) async {
+    try {
+      final transcript = _renderTranscript(history);
+      final factsBlock = existingFacts.isEmpty
+          ? '(none)'
+          : existingFacts.entries
+              .map((e) => '- ${e.key}: ${e.value}')
+              .join('\n');
+      final eventsBlock = existingEventTitles.isEmpty
+          ? '(none)'
+          : existingEventTitles.map((t) => '- $t').join('\n');
+
+      final prompt = 'Conversation transcript:\n$transcript\n\n'
+          'Existing profile facts (do not repeat unchanged):\n$factsBlock\n\n'
+          'Already-extracted life events (do not duplicate):\n$eventsBlock\n\n'
+          'Return JSON per the schema.';
+
+      final response = await _buildExtractorModel().generateContent([
+        Content.text(prompt),
+      ]);
+      final text = response.text?.trim() ?? '';
+      if (text.isEmpty) return MemoryExtraction.empty;
+      return _parseExtraction(text);
+    } catch (e, st) {
+      debugPrint('[GeminiService] extractMemory failed: $e\n$st');
+      return MemoryExtraction.empty;
+    }
+  }
+
+  static MemoryExtraction _parseExtraction(String jsonText) {
+    final dynamic decoded;
+    try {
+      decoded = jsonDecode(jsonText);
+    } catch (e) {
+      debugPrint('[GeminiService] extractMemory invalid JSON: $e');
+      return MemoryExtraction.empty;
+    }
+    if (decoded is! Map) return MemoryExtraction.empty;
+
+    final facts = <String, String>{};
+    final rawFacts = decoded['profile_facts'];
+    if (rawFacts is List) {
+      for (final f in rawFacts) {
+        if (f is Map) {
+          final key = f['key']?.toString().trim() ?? '';
+          final value = f['value']?.toString().trim() ?? '';
+          if (key.isNotEmpty && value.isNotEmpty) facts[key] = value;
+        }
+      }
+    }
+
+    final events = <ExtractedLifeEvent>[];
+    final rawEvents = decoded['new_life_events'];
+    if (rawEvents is List) {
+      for (final e in rawEvents) {
+        if (e is Map) {
+          final title = e['title']?.toString().trim() ?? '';
+          if (title.isEmpty) continue;
+          final desc = e['description']?.toString().trim() ?? '';
+          final iso = e['occurred_at_iso']?.toString().trim() ?? '';
+          DateTime? occurred;
+          if (iso.isNotEmpty) occurred = DateTime.tryParse(iso);
+          events.add(ExtractedLifeEvent(
+            title: title,
+            description: desc,
+            occurredAt: occurred,
+          ));
+        }
+      }
+    }
+
+    final summary = decoded['summary']?.toString().trim() ?? '';
+    return MemoryExtraction(
+      factUpdates: facts,
+      newEvents: events,
+      summary: summary,
+    );
+  }
+
+  static String _renderTranscript(List<ChatMessage> history) {
+    final lines = <String>[];
+    for (final m in history) {
+      final role = m.role == ChatRole.user ? 'User' : 'Assistant';
+      if (m.text.isNotEmpty) {
+        lines.add('$role: ${m.text}');
+        continue;
+      }
+      final form = m.form;
+      final mission = m.missionSuggestion;
+      final mood = m.moodCheckIn;
+      final mutation = m.routineMutation;
+      if (form != null) {
+        lines.add(
+          'Assistant: [asked "${form.question}", options: ${form.options.join(", ")}]',
+        );
+      } else if (mission != null) {
+        lines.add(
+          'Assistant: [suggested mission ${mission.missionType}: ${mission.reason}]',
+        );
+      } else if (mood != null) {
+        final chosen = mood.selectedMood?.name;
+        lines.add(
+          'Assistant: [mood check-in "${mood.question}"${chosen != null ? ', user picked $chosen' : ''}]',
+        );
+      } else if (mutation != null) {
+        lines.add(
+          'Assistant: [${mutation.kind.name} ${mutation.routineType.name} "${mutation.routineName}"]',
+        );
+      }
+    }
+    return lines.join('\n');
   }
 
   static String _fallbackTitle(String text) {

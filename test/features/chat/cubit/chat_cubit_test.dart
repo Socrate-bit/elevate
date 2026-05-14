@@ -105,6 +105,9 @@ void main() {
           any(),
           title: any(named: 'title'),
           lastMessageAt: any(named: 'lastMessageAt'),
+          summary: any(named: 'summary'),
+          summaryAt: any(named: 'summaryAt'),
+          memoryExtracted: any(named: 'memoryExtracted'),
         )).thenAnswer((_) async {});
     when(() => repo.updateMessageForm(any(), any(), any()))
         .thenAnswer((_) async {});
@@ -113,6 +116,7 @@ void main() {
     when(() => gemini.send(
           history: any(named: 'history'),
           userText: any(named: 'userText'),
+          memoryContext: any(named: 'memoryContext'),
         )).thenAnswer((_) async => GeminiReply.text('hello back'));
   });
 
@@ -203,6 +207,7 @@ void main() {
       when(() => gemini.send(
             history: any(named: 'history'),
             userText: any(named: 'userText'),
+            memoryContext: any(named: 'memoryContext'),
           )).thenAnswer((_) async => GeminiReply.text('hello back 2'));
 
       await cubit.sendText('second');

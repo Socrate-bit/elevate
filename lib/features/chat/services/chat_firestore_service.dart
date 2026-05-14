@@ -10,11 +10,15 @@ import 'chat_message.dart';
 abstract interface class ChatRepository {
   Stream<List<ChatConversation>> watchConversations();
   Stream<List<ChatMessage>> watchMessages(String conversationId);
+  Future<List<ChatMessage>> getMessages(String conversationId);
   Future<void> saveConversation(ChatConversation c);
   Future<void> updateConversation(
     String id, {
     String? title,
     DateTime? lastMessageAt,
+    String? summary,
+    DateTime? summaryAt,
+    bool? memoryExtracted,
   });
   Future<void> deleteConversation(String id);
   Future<void> saveMessage(ChatMessage m);
@@ -79,6 +83,15 @@ class ChatFirestoreService implements ChatRepository {
   }
 
   @override
+  Future<List<ChatMessage>> getMessages(String conversationId) async {
+    final snap =
+        await _messages(conversationId).orderBy('createdAtMs').get();
+    return snap.docs
+        .map((d) => ChatMessage.fromMap(d.id, conversationId, d.data()))
+        .toList();
+  }
+
+  @override
   Future<void> saveConversation(ChatConversation c) =>
       _conversations().doc(c.id).set(c.toMap());
 
@@ -87,12 +100,21 @@ class ChatFirestoreService implements ChatRepository {
     String id, {
     String? title,
     DateTime? lastMessageAt,
+    String? summary,
+    DateTime? summaryAt,
+    bool? memoryExtracted,
   }) {
     final patch = <String, dynamic>{};
     if (title != null) patch['title'] = title;
     if (lastMessageAt != null) {
       patch['lastMessageAtMs'] = lastMessageAt.millisecondsSinceEpoch;
     }
+    if (summary != null) patch['summary'] = summary;
+    if (summaryAt != null) {
+      patch['summaryAtMs'] = summaryAt.millisecondsSinceEpoch;
+    }
+    if (memoryExtracted != null) patch['memoryExtracted'] = memoryExtracted;
+    if (patch.isEmpty) return Future.value();
     return _conversations().doc(id).update(patch);
   }
 
