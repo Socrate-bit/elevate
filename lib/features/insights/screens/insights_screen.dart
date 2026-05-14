@@ -11,6 +11,7 @@ import '../../chat/cubit/chat_list_cubit.dart';
 import '../../chat/screens/chat_screen.dart';
 import '../../chat/widgets/chat_history_sheet.dart';
 import '../../mood/models/mood_entry.dart';
+import '../../memory/cubit/memory_cubit.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../widgets/hexagon_badge.dart';
 import '../../milestones/screens/milestones_screen.dart';
@@ -706,11 +707,13 @@ class _ChatHistoryButtonState extends State<_ChatHistoryButton> {
     final conv = await showChatHistorySheet(context);
     if (conv == null || !mounted) return;
     final routineCubit = context.read<RoutineCubit>();
+    final memoryCubit = context.read<MemoryCubit>();
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => BlocProvider(
         create: (_) => ChatCubit(
           conversationId: conv.id,
           routineCubit: routineCubit,
+          memoryCubit: memoryCubit,
         ),
         child: BlocProvider.value(
           value: routineCubit,
@@ -724,6 +727,7 @@ class _ChatHistoryButtonState extends State<_ChatHistoryButton> {
     Navigator.of(context).pop();
     final listCubit = context.read<ChatListCubit>();
     final routineCubit = context.read<RoutineCubit>();
+    final memoryCubit = context.read<MemoryCubit>();
     final conv = await listCubit.createConversation();
     if (!mounted) return;
     Navigator.of(context).push(MaterialPageRoute(
@@ -731,6 +735,7 @@ class _ChatHistoryButtonState extends State<_ChatHistoryButton> {
         create: (_) => ChatCubit(
           conversationId: conv.id,
           routineCubit: routineCubit,
+          memoryCubit: memoryCubit,
         ),
         child: BlocProvider.value(
           value: routineCubit,
