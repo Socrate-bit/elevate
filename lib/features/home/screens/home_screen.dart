@@ -5,11 +5,17 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 import 'package:elevate/l10n/l10n_helpers.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
-import '../../alarms/cubit/alarm_cubit.dart';
-import '../../alarms/cubit/alarm_state.dart';
-import '../../alarms/screens/alarm_form_screen.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/bottom_nav_shell.dart';
+import '../../missions/screens/photo_mission_screen.dart';
+import '../../missions/models/mission.dart';
+import '../../routines/cubit/routine_cubit.dart';
+import '../../routines/cubit/routine_state.dart';
+import '../../routines/models/routine.dart';
+import '../../routines/screens/routine_form_screen.dart';
+import '../../routines/widgets/action_card.dart';
+import '../../routines/widgets/habit_card.dart';
+import '../../activity/models/activity.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
@@ -29,7 +35,8 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     super.build(context);
     return BlocProvider(
-      create: (_) => HomeCubit()..load(),
+      create: (context) =>
+          HomeCubit(routineCubit: context.read<RoutineCubit>())..load(),
       child: const _HomeView(),
     );
   }
@@ -41,7 +48,6 @@ class _HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
-    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, state) {
         return Scaffold(
@@ -61,68 +67,11 @@ class _HomeView extends StatelessWidget {
                         SizedBox(height: 20.h),
                         _WeekRow(weekDays: state.weekDays),
                         SizedBox(height: 24.h),
-                        BlocBuilder<AlarmCubit, AlarmState>(
-                          builder: (context, alarmState) {
-                            final now = DateTime.now();
-                            final upcoming = alarmState.alarms
-                                .where((a) => a.isEnabled)
-                                .map((a) => (
-                                      alarm: a,
-                                      fireAt: a.nextFireAt(now),
-                                    ))
-                                .where((e) => e.fireAt != null)
-                                .toList()
-                              ..sort(
-                                (a, b) => a.fireAt!.compareTo(b.fireAt!),
-                              );
-                            final next = upcoming.isNotEmpty
-                                ? upcoming.first.alarm
-                                : null;
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.homeNextAlarm,
-                                  style: TextStyle(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: c.textPrimary,
-                                  ),
-                                ),
-                                SizedBox(height: 10.h),
-                                if (next != null)
-                                  _NextAlarmCard(alarm: next)
-                                else
-                                  const _NoAlarmCard(),
-                                SizedBox(height: 24.h),
-                              ],
-                            );
-                          },
-                        ),
-                        BlocBuilder<AlarmCubit, AlarmState>(
-                          builder: (context, alarmState) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.alarmsTitle,
-                                  style: TextStyle(
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: c.textPrimary,
-                                  ),
-                                ),
-                                SizedBox(height: 10.h),
-                                if (alarmState.alarms.isEmpty)
-                                  const _EmptyAlarmsCard()
-                                else
-                                  ...alarmState.alarms.map(
-                                    (alarm) => Padding(
-                                      padding: EdgeInsets.only(bottom: 12.h),
-                                      child: _AlarmCard(alarm: alarm),
-                                    ),
-                                  ),
-                              ],
+                        BlocBuilder<RoutineCubit, RoutineState>(
+                          builder: (context, routineState) {
+                            return _RoutineSections(
+                              routines: routineState.routines,
+                              completedActivities: state.completedActivities,
                             );
                           },
                         ),
@@ -133,6 +82,152 @@ class _HomeView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _RoutineSections extends StatelessWidget {
+  final List<Routine> routines;
+  final List<Activity> completedActivities;
+
+  const _RoutineSections({
+    required this.routines,
+    required this.completedActivities,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final actions = routines
+        .where((r) => r.type == RoutineType.action)
+        .toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final habits = routines
+        .where((r) => r.type == RoutineType.habit)
+        .toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    final today = DateTime.now();
+    final completedTodayIds = completedActivities
+        .where((a) => a.completed && _isSameDay(a.timestamp, today))
+        .map((a) => a.sourceId)
+        .whereType<String>()
+        .toSet();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.homeActionsTitle,
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: c.textPrimary,
+          ),
+        ),
+        SizedBox(height: 10.h),
+        if (actions.isEmpty)
+          _EmptySection(text: l10n.homeActionsEmpty)
+        else
+          ...actions.map(
+            (r) => Padding(
+              padding: EdgeInsets.only(bottom: 10.h),
+              child: ActionCard(
+                routine: r,
+                onValidate: () => _validate(context, r),
+                onEdit: () => _edit(context, r),
+              ),
+            ),
+          ),
+        SizedBox(height: 24.h),
+        Text(
+          l10n.homeHabitsTitle,
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+            color: c.textPrimary,
+          ),
+        ),
+        SizedBox(height: 10.h),
+        if (habits.isEmpty)
+          _EmptySection(text: l10n.homeHabitsEmpty)
+        else
+          ...habits.map(
+            (r) => Padding(
+              padding: EdgeInsets.only(bottom: 10.h),
+              child: HabitCard(
+                routine: r,
+                completedToday: completedTodayIds.contains(r.id),
+                scheduledToday: r.isScheduledToday,
+                onValidate: () => _validate(context, r),
+                onEdit: () => _edit(context, r),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _validate(BuildContext context, Routine r) async {
+    final cubit = context.read<RoutineCubit>();
+    final objectCheck = r.objectCheck;
+    if (objectCheck == null || objectCheck.isEmpty) {
+      await cubit.validate(r.id);
+      return;
+    }
+    final nav = Navigator.of(context);
+    await nav.push(
+      MaterialPageRoute(
+        builder: (_) => PhotoMissionScreen(
+          missionType: MissionType.objectHunt,
+          selectedItems: [objectCheck],
+          onComplete: () async {
+            nav.pop();
+            await cubit.validate(r.id);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _edit(BuildContext context, Routine r) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: context.read<RoutineCubit>(),
+          child: RoutineFormScreen(routine: r),
+        ),
+      ),
+    );
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+}
+
+class _EmptySection extends StatelessWidget {
+  final String text;
+  const _EmptySection({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
+      decoration: BoxDecoration(
+        color: c.card,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Center(
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 14.sp, color: c.textSecondary),
+        ),
+      ),
     );
   }
 }
@@ -407,353 +502,4 @@ class _DashedCirclePainter extends CustomPainter {
   bool shouldRepaint(covariant _DashedCirclePainter oldDelegate) =>
       color != oldDelegate.color ||
       strokeWidth != oldDelegate.strokeWidth;
-}
-
-class _NoAlarmCard extends StatelessWidget {
-  const _NoAlarmCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColors.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    return GestureDetector(
-      onTap: withHaptic(() => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider.value(
-                value: context.read<AlarmCubit>(),
-                child: const AlarmFormScreen(),
-              ),
-            ),
-          )),
-      child: Container(
-        padding: EdgeInsets.all(20.w),
-        decoration: BoxDecoration(
-          color: c.card,
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: c.primary.withAlpha(60), width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(6),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 46.w,
-              height: 46.h,
-              decoration: BoxDecoration(
-                color: c.primary.withAlpha(25),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(
-                Icons.add_alarm_rounded,
-                color: c.primary,
-                size: 24.sp,
-              ),
-            ),
-            SizedBox(width: 14.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.homeNoActiveAlarm,
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w600,
-                      color: c.textPrimary,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    l10n.homeNoActiveAlarmHint,
-                    style:
-                        TextStyle(fontSize: 13.sp, color: c.textSecondary),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: c.textSecondary, size: 20.sp),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _NextAlarmCard extends StatelessWidget {
-  final AppAlarmEntry alarm;
-  const _NextAlarmCard({required this.alarm});
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColors.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final now = DateTime.now();
-    final fireAt = alarm.nextFireAt(now) ?? alarm.dateTime;
-    final diff = fireAt.difference(now);
-    final hoursLeft = diff.inHours;
-    final minsLeft = diff.inMinutes % 60;
-    final timeStr = _formatTime(alarm.dateTime);
-    final isPM = alarm.dateTime.hour >= 12;
-
-    return GestureDetector(
-      onTap: withHaptic(() => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider.value(
-                value: context.read<AlarmCubit>(),
-                child: AlarmFormScreen(alarm: alarm),
-              ),
-            ),
-          )),
-      child: Container(
-        padding: EdgeInsets.all(18.w),
-        decoration: BoxDecoration(
-          color: c.card,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(8),
-              blurRadius: 12,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              diff.isNegative
-                  ? l10n.homeToday
-                  : diff.inHours < 24
-                      ? l10n.homeToday
-                      : l10n.homeTomorrow,
-              style: TextStyle(fontSize: 14.sp, color: c.textSecondary),
-            ),
-            SizedBox(height: 4.h),
-            Row(
-              children: [
-                Text(
-                  timeStr,
-                  style: TextStyle(
-                    fontSize: 40.sp,
-                    fontWeight: FontWeight.bold,
-                    color: c.textPrimary,
-                    letterSpacing: -1,
-                  ),
-                ),
-                SizedBox(width: 4.w),
-                Padding(
-                  padding: EdgeInsets.only(top: 12.h),
-                  child: Text(
-                    isPM ? 'pm' : 'am',
-                    style:
-                        TextStyle(fontSize: 16.sp, color: c.textSecondary),
-                  ),
-                ),
-                const Spacer(),
-                Switch(
-                  value: alarm.isEnabled,
-                  activeThumbColor: c.primary,
-                  onChanged: withHapticValue((val) =>
-                      context.read<AlarmCubit>().toggleAlarm(alarm.id, val)),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Icon(
-                  Icons.access_time_outlined,
-                  size: 14.sp,
-                  color: c.textSecondary,
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  diff.isNegative
-                      ? l10n.homePastAlarm
-                      : l10n.homeRingsIn(hoursLeft, minsLeft),
-                  style: TextStyle(fontSize: 13.sp, color: c.textSecondary),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _formatTime(DateTime dt) {
-    final h = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
-    final m = dt.minute.toString().padLeft(2, '0');
-    return '$h:$m';
-  }
-}
-
-class _AlarmCard extends StatelessWidget {
-  final AppAlarmEntry alarm;
-  const _AlarmCard({required this.alarm});
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColors.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final t = alarm.dateTime;
-    final h = t.hour > 12 ? t.hour - 12 : (t.hour == 0 ? 12 : t.hour);
-    final m = t.minute.toString().padLeft(2, '0');
-    final isPM = t.hour >= 12;
-    final dayStr = alarm.isOneTime
-        ? l10n.alarmsOneTime
-        : _daysLabel(l10n, alarm.repeatDays);
-
-    return GestureDetector(
-      onTap: withHaptic(() => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider.value(
-                value: context.read<AlarmCubit>(),
-                child: AlarmFormScreen(alarm: alarm),
-              ),
-            ),
-          )),
-      child: Container(
-        padding: EdgeInsets.all(18.w),
-        decoration: BoxDecoration(
-          color: c.card,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(6),
-              blurRadius: 10,
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              dayStr,
-              style: TextStyle(fontSize: 13.sp, color: c.textSecondary),
-            ),
-            SizedBox(height: 4.h),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '$h:$m',
-                  style: TextStyle(
-                    fontSize: 44.sp,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -1,
-                    color: c.textPrimary,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 8.h, left: 4.w),
-                  child: Text(
-                    isPM ? 'PM' : 'AM',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                      color: c.textSecondary,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Padding(
-                  padding: EdgeInsets.only(bottom: 10.h),
-                  child: Switch(
-                    value: alarm.isEnabled,
-                    activeThumbColor: c.primary,
-                    onChanged: withHapticValue((val) => context
-                        .read<AlarmCubit>()
-                        .toggleAlarm(alarm.id, val)),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Text(
-                  alarm.name.isNotEmpty
-                      ? alarm.name
-                      : l10n.alarmsDefaultName(1),
-                  style: TextStyle(fontSize: 13.sp, color: c.textSecondary),
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: withHaptic(
-                      () => context.read<AlarmCubit>().removeAlarm(alarm.id)),
-                  child: Icon(Icons.delete_outline,
-                      size: 24.sp, color: c.textSecondary.withAlpha(140)),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _daysLabel(AppLocalizations l10n, List<bool> days) {
-    if (days.every((d) => d)) return l10n.alarmsEveryDay;
-    if (days.every((d) => !d)) return l10n.alarmsOneTime;
-
-    final selected = <String>[];
-    for (int i = 0; i < days.length; i++) {
-      if (days[i]) selected.add(localizedDayShort(l10n, i));
-    }
-    if (days[1] &&
-        days[2] &&
-        days[3] &&
-        days[4] &&
-        days[5] &&
-        !days[0] &&
-        !days[6]) {
-      return l10n.alarmsWeekdays;
-    }
-    return selected.join(', ');
-  }
-}
-
-class _EmptyAlarmsCard extends StatelessWidget {
-  const _EmptyAlarmsCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColors.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: EdgeInsets.all(32.w),
-      decoration: BoxDecoration(
-        color: c.card,
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Center(
-        child: Column(
-          children: [
-            Icon(Icons.alarm_off_rounded, size: 48.sp, color: c.textSecondary),
-            SizedBox(height: 12.h),
-            Text(
-              l10n.alarmsEmpty,
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: c.textPrimary,
-              ),
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              l10n.alarmsEmptyHint,
-              style: TextStyle(fontSize: 14.sp, color: c.textSecondary),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

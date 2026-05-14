@@ -850,4 +850,124 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get missionPickerSubtitle => 'Choisissez une mission et commencez';
+
+  @override
+  String get homeActionsTitle => 'Actions';
+
+  @override
+  String get homeActionsEmpty =>
+      'Aucune action. Appuyez sur + pour en ajouter.';
+
+  @override
+  String get homeHabitsTitle => 'Habitudes';
+
+  @override
+  String get homeHabitsEmpty =>
+      'Aucune habitude. Appuyez sur + pour en ajouter.';
+
+  @override
+  String get routinePickerTitle => 'Que voulez-vous ajouter ?';
+
+  @override
+  String get routinePickerSubtitle =>
+      'Les actions sont uniques. Les habitudes se répètent.';
+
+  @override
+  String get routineTypeAction => 'Action';
+
+  @override
+  String get routineTypeActionDesc => 'Une tâche unique.';
+
+  @override
+  String get routineTypeHabit => 'Habitude';
+
+  @override
+  String get routineTypeHabitDesc => 'Se répète les jours choisis.';
+
+  @override
+  String get routineFormNewAction => 'Nouvelle action';
+
+  @override
+  String get routineFormNewHabit => 'Nouvelle habitude';
+
+  @override
+  String get routineFormEditTitle => 'Modifier';
+
+  @override
+  String get routineFormCreate => 'Créer';
+
+  @override
+  String get routineFormNameHint => 'Nom';
+
+  @override
+  String get routineFormDescriptionHint => 'Description (optionnelle)';
+
+  @override
+  String get routineFormColorLabel => 'Couleur';
+
+  @override
+  String get routineFormIconLabel => 'Choisir une icône';
+
+  @override
+  String get routineFormObjectCheckLabel => 'Vérification photo';
+
+  @override
+  String get routineFormObjectCheckHint =>
+      'ex. brosse à dents, livre, bouteille d\'eau';
+
+  @override
+  String get routineFormDateLabel => 'Date';
+
+  @override
+  String get routineFormPickDate => 'Choisir une date';
+
+  @override
+  String get routineFormPickTime => 'Choisir une heure';
+
+  @override
+  String get routineFormClear => 'Effacer';
+
+  @override
+  String get routineFormAlarmLabel => 'Sonner une alarme';
+
+  @override
+  String get routineFormAlarmHint => 'Joue à l\'heure prévue.';
+
+  @override
+  String get routineFormDeleteTitle => 'Supprimer ?';
+
+  @override
+  String get routineFormDeleteMessage => 'Cela retire l\'élément du suivi.';
+
+  @override
+  String get routineFormDeleteCancel => 'Annuler';
+
+  @override
+  String get routineFormDeleteConfirm => 'Supprimer';
+
+  @override
+  String get routineCardTapToValidate => 'Appuyez pour valider';
+
+  @override
+  String routineCardObjectCheck(String object) {
+    return 'Photo : $object';
+  }
+
+  @override
+  String get routineHabitNoSchedule => 'Pas de planning';
+
+  @override
+  String chatRoutineCreated(String name) {
+    return 'Créé \'$name\'';
+  }
+
+  @override
+  String chatRoutineUpdated(String name) {
+    return 'Modifié \'$name\'';
+  }
+
+  @override
+  String chatRoutineDeleted(String name) {
+    return 'Supprimé \'$name\'';
+  }
 }

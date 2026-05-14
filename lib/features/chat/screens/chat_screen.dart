@@ -15,6 +15,7 @@ import '../services/voice_service.dart';
 import '../widgets/chat_composer.dart';
 import '../widgets/chat_form_card.dart';
 import '../widgets/chat_mission_card.dart';
+import '../widgets/chat_routine_card.dart';
 import '../widgets/message_bubble.dart';
 
 /// Active conversation, pushed full-screen above the bottom-nav shell.
@@ -246,6 +247,9 @@ class _MessagesList extends StatelessWidget {
             onDecline: () =>
                 context.read<ChatCubit>().declineMissionSuggestion(m.id),
           );
+        }
+        if (m.routineMutation != null && m.role == ChatRole.model) {
+          return ChatRoutineCard(mutation: m.routineMutation!);
         }
         return MessageBubble(message: m);
       },

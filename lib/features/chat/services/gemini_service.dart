@@ -5,21 +5,39 @@ import 'chat_form.dart';
 import 'chat_message.dart';
 import 'chat_mission_suggestion.dart';
 
-/// Either a text reply, a structured multiple-choice form, or a mission suggestion from the model.
+/// Tool call returned by Gemini that mutates the user's routines. The chat
+/// layer applies it and produces a `ChatRoutineMutation` confirmation card.
+class RoutineToolCall {
+  final String tool; // 'create_routine' | 'update_routine' | 'delete_routine'
+  final Map<String, dynamic> args;
+  const RoutineToolCall({required this.tool, required this.args});
+}
+
+/// Either a text reply, a structured multiple-choice form, a mission suggestion,
+/// or a routine tool call from the model.
 class GeminiReply {
   final String? text;
   final ChatForm? form;
   final ChatMissionSuggestion? missionSuggestion;
+  final RoutineToolCall? routineToolCall;
 
-  const GeminiReply._({this.text, this.form, this.missionSuggestion});
+  const GeminiReply._({
+    this.text,
+    this.form,
+    this.missionSuggestion,
+    this.routineToolCall,
+  });
 
   factory GeminiReply.text(String text) => GeminiReply._(text: text);
   factory GeminiReply.form(ChatForm form) => GeminiReply._(form: form);
   factory GeminiReply.missionSuggestion(ChatMissionSuggestion s) =>
       GeminiReply._(missionSuggestion: s);
+  factory GeminiReply.routineToolCall(RoutineToolCall t) =>
+      GeminiReply._(routineToolCall: t);
 
   bool get isForm => form != null;
   bool get isMissionSuggestion => missionSuggestion != null;
+  bool get isRoutineToolCall => routineToolCall != null;
 }
 
 /// LLM surface the chat depends on. Implementations: [GeminiService] for
@@ -35,7 +53,9 @@ abstract interface class GeminiClient {
 
 /// Firebase Gemini implementation with function tools:
 /// - `present_choices`: renders interactive multiple-choice cards inline in chat
-/// - `suggest_mission`: proposes a Levio mission card when context calls for it
+/// - `suggest_mission`: proposes a mission card when context calls for it
+/// - `create_routine` / `update_routine` / `delete_routine`: mutate the user's
+///   action/habit tracker
 class GeminiService implements GeminiClient {
   GeminiService();
 
@@ -45,6 +65,9 @@ class GeminiService implements GeminiClient {
   static const _modelName = 'gemini-2.5-flash';
   static const _toolChoices = 'present_choices';
   static const _toolMission = 'suggest_mission';
+  static const _toolCreateRoutine = 'create_routine';
+  static const _toolUpdateRoutine = 'update_routine';
+  static const _toolDeleteRoutine = 'delete_routine';
 
   static const _systemInstruction =
       'You are a helpful assistant inside a mobile chat app. '
@@ -55,6 +78,10 @@ class GeminiService implements GeminiClient {
       'focus, or try something physical or mindful, call the `suggest_mission` tool with '
       'the most relevant mission type and a one-sentence reason. Only suggest reactively — '
       "when the user's intent is explicit. Never suggest speculatively. "
+      'When the user asks to add, change, or remove a habit or one-off action, '
+      'call the routine tools (`create_routine`, `update_routine`, `delete_routine`). '
+      'An "action" is a one-shot to-do that disappears once validated; a "habit" recurs on '
+      'specific weekdays. Pick reasonable defaults (icon_key, color_key) — see allowed values. '
       'Use plain prose replies for everything else.';
 
   GenerativeModel? _model;
@@ -80,7 +107,7 @@ class GeminiService implements GeminiClient {
           ),
           FunctionDeclaration(
             _toolMission,
-            'Propose a Levio mission to the user when context suggests they want to exercise, '
+            'Propose a mission to the user when context suggests they want to exercise, '
             'focus, wake up, build a habit, or try something active.',
             parameters: {
               'mission_type': Schema.string(
@@ -92,9 +119,74 @@ class GeminiService implements GeminiClient {
               ),
             },
           ),
+          FunctionDeclaration(
+            _toolCreateRoutine,
+            'Create a new routine (action or habit) for the user.',
+            parameters: _routineSchema(includeId: false),
+          ),
+          FunctionDeclaration(
+            _toolUpdateRoutine,
+            "Update an existing routine. Pass `routine_id` plus the fields to change.",
+            parameters: _routineSchema(includeId: true),
+          ),
+          FunctionDeclaration(
+            _toolDeleteRoutine,
+            'Delete a routine by id.',
+            parameters: {
+              'routine_id': Schema.string(
+                description: 'Id of the routine to delete.',
+              ),
+            },
+          ),
         ]),
       ],
     );
+  }
+
+  static Map<String, Schema> _routineSchema({required bool includeId}) {
+    return {
+      if (includeId)
+        'routine_id': Schema.string(description: 'Id of the routine to update.'),
+      'type': Schema.string(
+        description: '"action" (one-shot) or "habit" (recurring).',
+      ),
+      'name': Schema.string(description: 'Short human-readable name.'),
+      'description': Schema.string(
+        description: 'Optional longer description, may be empty.',
+      ),
+      'icon_key': Schema.string(
+        description:
+            'One of: star, running, walking, cycling, water, coffee, food, '
+            'book, pencil, study, meditation, sleep, sun, leaf, gym, yoga, '
+            'brush, music, paint, home, cleaning, shower, tooth, pill, heart, '
+            'phone, work, plant, pet, check.',
+      ),
+      'color_key': Schema.string(
+        description:
+            'One of: orange, blue, green, purple, red, pink, yellow, teal.',
+      ),
+      'object_check': Schema.string(
+        description:
+            'Free-text object name for photo validation, or empty for none. '
+            'Example: "toothbrush", "book", "water bottle".',
+      ),
+      'scheduled_date': Schema.string(
+        description:
+            'Action-only ISO 8601 date (YYYY-MM-DD), or empty for no date.',
+      ),
+      'scheduled_days': Schema.array(
+        items: Schema.boolean(),
+        description:
+            'Habit-only: 7-element array, index 0 = Sunday … 6 = Saturday.',
+      ),
+      'scheduled_minute': Schema.integer(
+        description:
+            'Minutes since midnight (0-1439). Use -1 for no time set.',
+      ),
+      'has_alarm': Schema.boolean(
+        description: 'True to ring an alarm at the scheduled time.',
+      ),
+    };
   }
 
   @override
@@ -128,6 +220,13 @@ class GeminiService implements GeminiClient {
           final reason = args['reason']?.toString() ?? '';
           return GeminiReply.missionSuggestion(
             ChatMissionSuggestion(missionType: rawType, reason: reason),
+          );
+        }
+        if (call.name == _toolCreateRoutine ||
+            call.name == _toolUpdateRoutine ||
+            call.name == _toolDeleteRoutine) {
+          return GeminiReply.routineToolCall(
+            RoutineToolCall(tool: call.name, args: Map.from(call.args)),
           );
         }
       }
@@ -166,8 +265,8 @@ class GeminiService implements GeminiClient {
   }
 
   /// Converts our local history into Firebase AI [Content] entries.
-  /// Form and mission suggestion messages are serialized as model prose
-  /// so Gemini retains context on what was offered and how the user responded.
+  /// Form, mission suggestion, and routine-mutation messages are serialized
+  /// as model prose so Gemini retains context.
   static List<Content> _buildContents(
     List<ChatMessage> history,
     String userText,
@@ -179,6 +278,7 @@ class GeminiService implements GeminiClient {
       } else {
         final form = m.form;
         final suggestion = m.missionSuggestion;
+        final mutation = m.routineMutation;
         if (form != null) {
           final summary =
               'I offered these choices for "${form.question}": ${form.options.join(", ")}.';
@@ -193,6 +293,13 @@ class GeminiService implements GeminiClient {
             TextPart(
               'I suggested the "${suggestion.missionType}" mission: '
               '"${suggestion.reason}". $status',
+            ),
+          ]));
+        } else if (mutation != null) {
+          out.add(Content.model([
+            TextPart(
+              'I ${mutation.kind.name} the ${mutation.routineType.name} '
+              '"${mutation.routineName}" (id ${mutation.routineId}).',
             ),
           ]));
         } else if (m.text.isNotEmpty) {

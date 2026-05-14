@@ -2,11 +2,13 @@ import 'package:equatable/equatable.dart';
 
 import 'chat_form.dart';
 import 'chat_mission_suggestion.dart';
+import 'chat_routine_mutation.dart';
 
 /// Role of the author of a chat message.
 enum ChatRole { user, model }
 
-/// A single chat turn — either user text or a model reply (text, form, or mission suggestion).
+/// A single chat turn — either user text or a model reply (text, form,
+/// mission suggestion, or routine-mutation confirmation).
 class ChatMessage extends Equatable {
   final String id;
   final String conversationId;
@@ -14,6 +16,7 @@ class ChatMessage extends Equatable {
   final String text;
   final ChatForm? form;
   final ChatMissionSuggestion? missionSuggestion;
+  final ChatRoutineMutation? routineMutation;
   final DateTime createdAt;
 
   const ChatMessage({
@@ -24,6 +27,7 @@ class ChatMessage extends Equatable {
     required this.createdAt,
     this.form,
     this.missionSuggestion,
+    this.routineMutation,
   });
 
   ChatMessage copyWith({
@@ -33,6 +37,7 @@ class ChatMessage extends Equatable {
     String? text,
     ChatForm? form,
     ChatMissionSuggestion? missionSuggestion,
+    ChatRoutineMutation? routineMutation,
     DateTime? createdAt,
   }) =>
       ChatMessage(
@@ -42,6 +47,7 @@ class ChatMessage extends Equatable {
         text: text ?? this.text,
         form: form ?? this.form,
         missionSuggestion: missionSuggestion ?? this.missionSuggestion,
+        routineMutation: routineMutation ?? this.routineMutation,
         createdAt: createdAt ?? this.createdAt,
       );
 
@@ -50,6 +56,7 @@ class ChatMessage extends Equatable {
         'text': text,
         'form': form?.toMap(),
         'missionSuggestion': missionSuggestion?.toMap(),
+        'routineMutation': routineMutation?.toMap(),
         'createdAtMs': createdAt.millisecondsSinceEpoch,
       };
 
@@ -61,6 +68,7 @@ class ChatMessage extends Equatable {
     final roleStr = m['role'] as String? ?? 'user';
     final formMap = m['form'] as Map<String, dynamic>?;
     final missionMap = m['missionSuggestion'] as Map<String, dynamic>?;
+    final routineMap = m['routineMutation'] as Map<String, dynamic>?;
     return ChatMessage(
       id: id,
       conversationId: conversationId,
@@ -69,6 +77,8 @@ class ChatMessage extends Equatable {
       form: formMap == null ? null : ChatForm.fromMap(formMap),
       missionSuggestion:
           missionMap == null ? null : ChatMissionSuggestion.fromMap(missionMap),
+      routineMutation:
+          routineMap == null ? null : ChatRoutineMutation.fromMap(routineMap),
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         m['createdAtMs'] as int? ?? 0,
       ),
@@ -76,6 +86,14 @@ class ChatMessage extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [id, conversationId, role, text, form, missionSuggestion, createdAt];
+  List<Object?> get props => [
+        id,
+        conversationId,
+        role,
+        text,
+        form,
+        missionSuggestion,
+        routineMutation,
+        createdAt,
+      ];
 }

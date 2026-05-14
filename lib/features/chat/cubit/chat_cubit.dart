@@ -4,18 +4,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../routines/cubit/routine_cubit.dart';
+import '../../routines/models/routine.dart';
+import '../../routines/models/routine_palette.dart';
 import '../../subscription/services/analytics_service.dart';
 import '../services/chat_firestore_service.dart';
 import '../services/chat_message.dart';
+import '../services/chat_routine_mutation.dart';
 import '../services/gemini_service.dart';
 import '../services/voice_service.dart';
 import 'chat_state.dart';
 
 /// Owns the active conversation: messages stream, send-text, voice input,
-/// and form answers. Persists every turn through the injected services.
+/// form answers, and routine mutations triggered by Gemini tool calls.
 class ChatCubit extends Cubit<ChatState> {
   ChatCubit({
     required String conversationId,
+    RoutineCubit? routineCubit,
     ChatRepository? repository,
     GeminiClient? gemini,
     VoiceController? voice,
@@ -23,6 +28,7 @@ class ChatCubit extends Cubit<ChatState> {
   })  : _repo = repository ?? ChatFirestoreService.instance,
         _gemini = gemini ?? GeminiService.instance,
         _voice = voice ?? VoiceService.instance,
+        _routineCubit = routineCubit,
         _uuid = uuid ?? const Uuid(),
         super(ChatState(conversationId: conversationId, isLoading: true)) {
     _subscribe();
@@ -31,6 +37,7 @@ class ChatCubit extends Cubit<ChatState> {
   final ChatRepository _repo;
   final GeminiClient _gemini;
   final VoiceController _voice;
+  final RoutineCubit? _routineCubit;
   final Uuid _uuid;
   StreamSubscription? _sub;
 
@@ -62,7 +69,6 @@ class ChatCubit extends Cubit<ChatState> {
       createdAt: now,
     );
 
-    // Optimistic insert so the user sees their bubble immediately.
     emit(state.copyWith(
       messages: [...state.messages, userMsg],
       isSending: true,
@@ -79,7 +85,6 @@ class ChatCubit extends Cubit<ChatState> {
       rethrow;
     }
 
-    // First user message → name the conversation and update lastMessageAt.
     final isFirstUserMessage =
         state.messages.where((m) => m.role == ChatRole.user).length == 1;
     if (isFirstUserMessage) {
@@ -103,7 +108,6 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  /// Asks Gemini for a reply given current local history, then persists.
   Future<void> _generateModelReply() async {
     try {
       final reply = await _gemini.send(
@@ -111,13 +115,21 @@ class ChatCubit extends Cubit<ChatState> {
         userText: state.messages.last.text,
       );
 
+      ChatRoutineMutation? mutation;
+      String replyText = reply.text ?? '';
+      if (reply.routineToolCall != null) {
+        mutation = await _applyRoutineToolCall(reply.routineToolCall!);
+        replyText = '';
+      }
+
       final modelMsg = ChatMessage(
         id: _uuid.v4(),
         conversationId: state.conversationId,
         role: ChatRole.model,
-        text: reply.text ?? '',
+        text: replyText,
         form: reply.form,
         missionSuggestion: reply.missionSuggestion,
+        routineMutation: mutation,
         createdAt: DateTime.now(),
       );
 
@@ -128,7 +140,8 @@ class ChatCubit extends Cubit<ChatState> {
       );
       debugPrint(
         '[ChatCubit] saved model reply '
-        '(form=${reply.isForm}, mission=${reply.isMissionSuggestion})',
+        '(form=${reply.isForm}, mission=${reply.isMissionSuggestion}, '
+        'routine=${mutation != null})',
       );
     } catch (e) {
       debugPrint('[ChatCubit] _generateModelReply failed: $e');
@@ -136,6 +149,140 @@ class ChatCubit extends Cubit<ChatState> {
     } finally {
       emit(state.copyWith(isSending: false));
     }
+  }
+
+  /// Applies a Gemini-driven routine mutation against [RoutineCubit] and
+  /// returns the receipt to attach to the chat message.
+  Future<ChatRoutineMutation?> _applyRoutineToolCall(
+    RoutineToolCall call,
+  ) async {
+    final routineCubit = _routineCubit;
+    if (routineCubit == null) return null;
+    try {
+      switch (call.tool) {
+        case 'create_routine':
+          final draft = _routineFromArgs(call.args, existing: null);
+          if (draft == null) return null;
+          final saved = await routineCubit.addRoutine(draft);
+          return ChatRoutineMutation(
+            kind: ChatRoutineMutationKind.created,
+            routineType: saved.type,
+            routineId: saved.id,
+            routineName: saved.name,
+            iconKey: saved.iconKey,
+            colorKey: saved.colorKey,
+          );
+        case 'update_routine':
+          final id = call.args['routine_id']?.toString() ?? '';
+          final existing = routineCubit.state.routines
+              .where((r) => r.id == id)
+              .toList();
+          if (existing.isEmpty) return null;
+          final draft = _routineFromArgs(call.args, existing: existing.first);
+          if (draft == null) return null;
+          await routineCubit.editRoutine(draft);
+          return ChatRoutineMutation(
+            kind: ChatRoutineMutationKind.updated,
+            routineType: draft.type,
+            routineId: draft.id,
+            routineName: draft.name,
+            iconKey: draft.iconKey,
+            colorKey: draft.colorKey,
+          );
+        case 'delete_routine':
+          final id = call.args['routine_id']?.toString() ?? '';
+          final match = routineCubit.state.routines
+              .where((r) => r.id == id)
+              .toList();
+          if (match.isEmpty) return null;
+          final r = match.first;
+          await routineCubit.removeRoutine(id);
+          return ChatRoutineMutation(
+            kind: ChatRoutineMutationKind.deleted,
+            routineType: r.type,
+            routineId: r.id,
+            routineName: r.name,
+            iconKey: r.iconKey,
+            colorKey: r.colorKey,
+          );
+      }
+    } catch (e) {
+      debugPrint('[ChatCubit] applyRoutineToolCall failed: $e');
+    }
+    return null;
+  }
+
+  Routine? _routineFromArgs(
+    Map<String, dynamic> args, {
+    required Routine? existing,
+  }) {
+    final typeStr = args['type']?.toString() ??
+        (existing?.type == RoutineType.habit ? 'habit' : 'action');
+    final type =
+        typeStr == 'habit' ? RoutineType.habit : RoutineType.action;
+    final name = args['name']?.toString().trim();
+    if ((name == null || name.isEmpty) && existing == null) return null;
+
+    final iconKey = (args['icon_key']?.toString() ?? '').isNotEmpty
+        ? args['icon_key'].toString()
+        : (existing?.iconKey ?? kDefaultRoutineIconKey);
+    final colorKey = (args['color_key']?.toString() ?? '').isNotEmpty
+        ? args['color_key'].toString()
+        : (existing?.colorKey ?? kDefaultRoutineColorKey);
+
+    final descRaw = args['description']?.toString();
+    final description = (descRaw == null || descRaw.trim().isEmpty)
+        ? existing?.description
+        : descRaw.trim();
+
+    final objectRaw = args['object_check']?.toString();
+    final objectCheck = (objectRaw == null || objectRaw.trim().isEmpty)
+        ? existing?.objectCheck
+        : objectRaw.trim();
+
+    DateTime? scheduledDate = existing?.scheduledDate;
+    final dateRaw = args['scheduled_date']?.toString();
+    if (dateRaw != null && dateRaw.isNotEmpty) {
+      scheduledDate = DateTime.tryParse(dateRaw);
+    }
+
+    final daysRaw = args['scheduled_days'];
+    final scheduledDays = (daysRaw is List && daysRaw.length == 7)
+        ? daysRaw.map((e) => e == true).toList()
+        : (existing?.scheduledDays ??
+            const [false, false, false, false, false, false, false]);
+
+    int? scheduledMinute = existing?.scheduledMinute;
+    final minRaw = args['scheduled_minute'];
+    if (minRaw is int) {
+      scheduledMinute = minRaw >= 0 && minRaw < 24 * 60 ? minRaw : null;
+    } else if (minRaw is num) {
+      final v = minRaw.toInt();
+      scheduledMinute = v >= 0 && v < 24 * 60 ? v : null;
+    }
+
+    final hasAlarm = args['has_alarm'] == true
+        ? true
+        : args['has_alarm'] == false
+            ? false
+            : (existing?.hasAlarm ?? false);
+
+    return Routine(
+      id: existing?.id ?? '',
+      type: type,
+      name: name ?? existing!.name,
+      description: description,
+      iconKey: iconKey,
+      colorKey: colorKey,
+      objectCheck: objectCheck,
+      scheduledDate: type == RoutineType.action ? scheduledDate : null,
+      scheduledDays: type == RoutineType.habit
+          ? scheduledDays
+          : const [false, false, false, false, false, false, false],
+      scheduledMinute: scheduledMinute,
+      hasAlarm: hasAlarm && scheduledMinute != null,
+      createdAt: existing?.createdAt,
+    );
   }
 
   /// Records the user's choice from a form message and treats it as the next
@@ -152,7 +299,6 @@ class ChatCubit extends Cubit<ChatState> {
     final updatedForm = form.copyWith(selectedIndex: optionIndex);
     final updatedMsg = msg.copyWith(form: updatedForm);
 
-    // Optimistic local update.
     final updatedMessages = List<ChatMessage>.from(state.messages);
     updatedMessages[idx] = updatedMsg;
     emit(state.copyWith(messages: updatedMessages));
@@ -170,12 +316,9 @@ class ChatCubit extends Cubit<ChatState> {
       debugPrint('[ChatCubit] updateMessageForm failed: $e');
     }
 
-    // Send the chosen option as the next user turn.
     await sendText(form.options[optionIndex]);
   }
 
-  /// Marks the mission suggestion as accepted (optimistic) and persists to Firestore.
-  /// Navigation to MissionConfirmScreen is handled by the UI layer.
   Future<void> acceptMissionSuggestion(String messageId) async {
     final idx = state.messages.indexWhere((m) => m.id == messageId);
     if (idx == -1) return;
@@ -201,8 +344,6 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  /// Marks the mission suggestion as declined (optimistic), persists, then
-  /// sends a user turn so Gemini can respond naturally.
   Future<void> declineMissionSuggestion(String messageId) async {
     final idx = state.messages.indexWhere((m) => m.id == messageId);
     if (idx == -1) return;
@@ -230,7 +371,6 @@ class ChatCubit extends Cubit<ChatState> {
     await sendText('No thanks, not now.');
   }
 
-  /// Starts voice capture; partial transcripts flow into [state.voicePartial].
   Future<void> startListening() async {
     if (state.isListening) return;
     final ok = await _voice.initialize();
@@ -250,8 +390,6 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  /// Stops voice capture. Returns the final transcript so the UI can fill the
-  /// composer (and optionally send it).
   Future<String> stopListening() async {
     await _voice.stop();
     final transcript = state.voicePartial;

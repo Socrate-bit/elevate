@@ -1669,6 +1669,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick a mission and start now'**
   String get missionPickerSubtitle;
+
+  /// No description provided for @homeActionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get homeActionsTitle;
+
+  /// No description provided for @homeActionsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No actions yet. Tap + to add one.'**
+  String get homeActionsEmpty;
+
+  /// No description provided for @homeHabitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Habits'**
+  String get homeHabitsTitle;
+
+  /// No description provided for @homeHabitsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No habits yet. Tap + to add one.'**
+  String get homeHabitsEmpty;
+
+  /// No description provided for @routinePickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to add?'**
+  String get routinePickerTitle;
+
+  /// No description provided for @routinePickerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions are one-shot. Habits repeat.'**
+  String get routinePickerSubtitle;
+
+  /// No description provided for @routineTypeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Action'**
+  String get routineTypeAction;
+
+  /// No description provided for @routineTypeActionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'A one-time task.'**
+  String get routineTypeActionDesc;
+
+  /// No description provided for @routineTypeHabit.
+  ///
+  /// In en, this message translates to:
+  /// **'Habit'**
+  String get routineTypeHabit;
+
+  /// No description provided for @routineTypeHabitDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeats on chosen days.'**
+  String get routineTypeHabitDesc;
+
+  /// No description provided for @routineFormNewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'New action'**
+  String get routineFormNewAction;
+
+  /// No description provided for @routineFormNewHabit.
+  ///
+  /// In en, this message translates to:
+  /// **'New habit'**
+  String get routineFormNewHabit;
+
+  /// No description provided for @routineFormEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get routineFormEditTitle;
+
+  /// No description provided for @routineFormCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get routineFormCreate;
+
+  /// No description provided for @routineFormNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get routineFormNameHint;
+
+  /// No description provided for @routineFormDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get routineFormDescriptionHint;
+
+  /// No description provided for @routineFormColorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get routineFormColorLabel;
+
+  /// No description provided for @routineFormIconLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an icon'**
+  String get routineFormIconLabel;
+
+  /// No description provided for @routineFormObjectCheckLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Object check'**
+  String get routineFormObjectCheckLabel;
+
+  /// No description provided for @routineFormObjectCheckHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. toothbrush, book, water bottle'**
+  String get routineFormObjectCheckHint;
+
+  /// No description provided for @routineFormDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get routineFormDateLabel;
+
+  /// No description provided for @routineFormPickDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date'**
+  String get routineFormPickDate;
+
+  /// No description provided for @routineFormPickTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a time'**
+  String get routineFormPickTime;
+
+  /// No description provided for @routineFormClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get routineFormClear;
+
+  /// No description provided for @routineFormAlarmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ring an alarm'**
+  String get routineFormAlarmLabel;
+
+  /// No description provided for @routineFormAlarmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Plays when the time arrives.'**
+  String get routineFormAlarmHint;
+
+  /// No description provided for @routineFormDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete routine?'**
+  String get routineFormDeleteTitle;
+
+  /// No description provided for @routineFormDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove it from your tracker.'**
+  String get routineFormDeleteMessage;
+
+  /// No description provided for @routineFormDeleteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get routineFormDeleteCancel;
+
+  /// No description provided for @routineFormDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get routineFormDeleteConfirm;
+
+  /// No description provided for @routineCardTapToValidate.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to validate'**
+  String get routineCardTapToValidate;
+
+  /// No description provided for @routineCardObjectCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo check: {object}'**
+  String routineCardObjectCheck(String object);
+
+  /// No description provided for @routineHabitNoSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'No schedule'**
+  String get routineHabitNoSchedule;
+
+  /// No description provided for @chatRoutineCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created \'{name}\''**
+  String chatRoutineCreated(String name);
+
+  /// No description provided for @chatRoutineUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated \'{name}\''**
+  String chatRoutineUpdated(String name);
+
+  /// No description provided for @chatRoutineDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted \'{name}\''**
+  String chatRoutineDeleted(String name);
 }
 
 class _AppLocalizationsDelegate
