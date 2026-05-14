@@ -16,6 +16,7 @@ import '../widgets/chat_composer.dart';
 import '../widgets/chat_form_card.dart';
 import '../widgets/chat_mission_card.dart';
 import '../widgets/chat_mood_check_in_card.dart';
+import '../widgets/chat_routine_card.dart';
 import '../widgets/message_bubble.dart';
 
 /// Active conversation, pushed full-screen above the bottom-nav shell.
@@ -253,6 +254,9 @@ class _MessagesList extends StatelessWidget {
             messageId: m.id,
             checkIn: m.moodCheckIn!,
           );
+        }
+        if (m.routineMutation != null && m.role == ChatRole.model) {
+          return ChatRoutineCard(mutation: m.routineMutation!);
         }
         return MessageBubble(message: m);
       },

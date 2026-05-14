@@ -4,8 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:liquid_glass_bar/liquid_glass_bar.dart';
 import 'theme/app_theme.dart';
 import 'utils/haptic_utils.dart';
-import 'package:elevate/features/alarms/cubit/alarm_cubit.dart';
-import 'package:elevate/features/alarms/screens/alarm_form_screen.dart';
+import 'package:elevate/features/routines/cubit/routine_cubit.dart';
+import 'package:elevate/features/routines/screens/routine_form_screen.dart';
+import 'package:elevate/features/routines/widgets/routine_picker_sheet.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
 import '../features/chat/screens/chat_tab.dart';
@@ -47,13 +48,15 @@ class BottomNavShellState extends State<BottomNavShell> {
 
   void navigateTo(int index) => _selectTab(index);
 
-  void _openAlarmForm(BuildContext context) {
+  Future<void> _openRoutinePicker(BuildContext context) async {
+    final type = await showRoutinePickerSheet(context);
+    if (type == null || !context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => BlocProvider.value(
-          value: context.read<AlarmCubit>(),
-          child: const AlarmFormScreen(),
+          value: context.read<RoutineCubit>(),
+          child: RoutineFormScreen(initialType: type),
         ),
       ),
     );
@@ -137,8 +140,7 @@ class BottomNavShellState extends State<BottomNavShell> {
             Padding(
               padding: EdgeInsets.only(right: 24.w, left: 6.w),
               child: _AddAlarmCircleButton(
-
-                onTap: () => _openAlarmForm(context),
+                onTap: () => _openRoutinePicker(context),
               ),
             ),
           ],

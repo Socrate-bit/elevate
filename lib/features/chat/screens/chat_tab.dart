@@ -7,6 +7,7 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../missions/screens/mission_picker_screen.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
+import '../../routines/cubit/routine_cubit.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_list_cubit.dart';
 import '../widgets/chat_history_sheet.dart';
@@ -53,11 +54,18 @@ class _ChatTabState extends State<ChatTab> with AutomaticKeepAliveClientMixin {
   }
 
   void _openChat(String conversationId) {
+    final routineCubit = context.read<RoutineCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => BlocProvider(
-          create: (_) => ChatCubit(conversationId: conversationId),
-          child: ChatScreen(onNewChat: _replaceWithNewChat),
+          create: (_) => ChatCubit(
+            conversationId: conversationId,
+            routineCubit: routineCubit,
+          ),
+          child: BlocProvider.value(
+            value: routineCubit,
+            child: ChatScreen(onNewChat: _replaceWithNewChat),
+          ),
         ),
       ),
     );

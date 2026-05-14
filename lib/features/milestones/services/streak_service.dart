@@ -5,6 +5,7 @@ import '../../subscription/services/analytics_service.dart';
 import '../../auth/auth_service.dart';
 import '../../activity/models/activity.dart';
 import '../../activity/services/activity_service.dart';
+import '../../routines/models/routine.dart';
 import '../models/badge_model.dart';
 
 /// Streak freeze rules — tweak per-project. A "freeze" is a missed day that
@@ -162,22 +163,56 @@ class StreakService {
   }
 
   /// Walks backward from today through [activities], applying freeze rules.
+  ///
+  /// When [routines] is non-empty, a day is `done` only when **every**
+  /// routine "expected" that day has a completion activity for that day:
+  /// every action that existed on the day, plus every habit scheduled on it.
+  /// When [routines] is empty (legacy users), falls back to the "any activity"
+  /// rule so existing streaks aren't broken.
   static StreakResult computeStreak({
     required List<Activity> activities,
+    List<Routine> routines = const [],
     DateTime? stopDate,
     DateTime? now,
   }) {
     final today = _dateOnly(now ?? DateTime.now());
+    final hasRoutines = routines.isNotEmpty;
 
-    final activityDays = <String>{};
+    // Map: dayKey → set of sourceIds completed that day.
+    final completionsByDay = <String, Set<String>>{};
     DateTime? oldestActivityDay;
     for (final a in activities) {
       if (!a.completed) continue;
       final d = _dateOnly(a.timestamp);
-      activityDays.add(_dateStr(d));
+      final key = _dateStr(d);
+      final sid = a.sourceId;
+      if (sid != null) {
+        (completionsByDay[key] ??= <String>{}).add(sid);
+      } else {
+        completionsByDay[key] ??= <String>{};
+      }
       if (oldestActivityDay == null || d.isBefore(oldestActivityDay)) {
         oldestActivityDay = d;
       }
+    }
+
+    bool isDayDone(DateTime day) {
+      final key = _dateStr(day);
+      final completedIds = completionsByDay[key];
+      if (completedIds == null) return false;
+      if (!hasRoutines) {
+        return completedIds.isNotEmpty || completionsByDay.containsKey(key);
+      }
+      final expected = <String>{};
+      for (final r in routines) {
+        if (r.createdAt.isAfter(day) &&
+            !_isSameDay(r.createdAt, day)) {
+          continue;
+        }
+        if (r.isExpectedOn(day)) expected.add(r.id);
+      }
+      if (expected.isEmpty) return false;
+      return expected.every(completedIds.contains);
     }
 
     final startOfDisplayWeek = _startOfDisplayWeek(today);
@@ -185,9 +220,8 @@ class StreakService {
     final weekDays = List<DayStatus>.filled(7, DayStatus.none);
     for (int i = 0; i < 7; i++) {
       final d = _addDays(startOfDisplayWeek, i);
-      if (activityDays.contains(_dateStr(d))) {
-        weekDays[i] = DayStatus.done;
-      }
+      if (d.isAfter(today)) continue;
+      if (isDayDone(d)) weekDays[i] = DayStatus.done;
     }
 
     final effectiveStop =
@@ -209,7 +243,7 @@ class StreakService {
         currentMonday = cursorMonday;
       }
 
-      if (activityDays.contains(_dateStr(cursor))) {
+      if (isDayDone(cursor)) {
         streak++;
         consecutiveFreezes = 0;
       } else if (weekFreezes < kStreakMaxFreezesPerWeek &&

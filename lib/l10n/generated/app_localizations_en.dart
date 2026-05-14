@@ -879,4 +879,122 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moodSectionTitle => 'Mood';
+
+  @override
+  String get homeActionsTitle => 'Actions';
+
+  @override
+  String get homeActionsEmpty => 'No actions yet. Tap + to add one.';
+
+  @override
+  String get homeHabitsTitle => 'Habits';
+
+  @override
+  String get homeHabitsEmpty => 'No habits yet. Tap + to add one.';
+
+  @override
+  String get routinePickerTitle => 'What do you want to add?';
+
+  @override
+  String get routinePickerSubtitle => 'Actions are one-shot. Habits repeat.';
+
+  @override
+  String get routineTypeAction => 'Action';
+
+  @override
+  String get routineTypeActionDesc => 'A one-time task.';
+
+  @override
+  String get routineTypeHabit => 'Habit';
+
+  @override
+  String get routineTypeHabitDesc => 'Repeats on chosen days.';
+
+  @override
+  String get routineFormNewAction => 'New action';
+
+  @override
+  String get routineFormNewHabit => 'New habit';
+
+  @override
+  String get routineFormEditTitle => 'Edit';
+
+  @override
+  String get routineFormCreate => 'Create';
+
+  @override
+  String get routineFormNameHint => 'Name';
+
+  @override
+  String get routineFormDescriptionHint => 'Description (optional)';
+
+  @override
+  String get routineFormColorLabel => 'Color';
+
+  @override
+  String get routineFormIconLabel => 'Choose an icon';
+
+  @override
+  String get routineFormObjectCheckLabel => 'Object check';
+
+  @override
+  String get routineFormObjectCheckHint =>
+      'e.g. toothbrush, book, water bottle';
+
+  @override
+  String get routineFormDateLabel => 'Date';
+
+  @override
+  String get routineFormPickDate => 'Pick a date';
+
+  @override
+  String get routineFormPickTime => 'Pick a time';
+
+  @override
+  String get routineFormClear => 'Clear';
+
+  @override
+  String get routineFormAlarmLabel => 'Ring an alarm';
+
+  @override
+  String get routineFormAlarmHint => 'Plays when the time arrives.';
+
+  @override
+  String get routineFormDeleteTitle => 'Delete routine?';
+
+  @override
+  String get routineFormDeleteMessage =>
+      'This will remove it from your tracker.';
+
+  @override
+  String get routineFormDeleteCancel => 'Cancel';
+
+  @override
+  String get routineFormDeleteConfirm => 'Delete';
+
+  @override
+  String get routineCardTapToValidate => 'Tap to validate';
+
+  @override
+  String routineCardObjectCheck(String object) {
+    return 'Photo check: $object';
+  }
+
+  @override
+  String get routineHabitNoSchedule => 'No schedule';
+
+  @override
+  String chatRoutineCreated(String name) {
+    return 'Created \'$name\'';
+  }
+
+  @override
+  String chatRoutineUpdated(String name) {
+    return 'Updated \'$name\'';
+  }
+
+  @override
+  String chatRoutineDeleted(String name) {
+    return 'Deleted \'$name\'';
+  }
 }

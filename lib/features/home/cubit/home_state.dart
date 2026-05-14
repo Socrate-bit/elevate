@@ -7,6 +7,10 @@ class HomeState {
   final int currentStreak;
   final List<DayStatus> weekDays; // Sun–Sat
   final Activity? lastActivity;
+
+  /// Recent completed activities, newest-first. Used by the home view to
+  /// mark which routines have been validated today.
+  final List<Activity> completedActivities;
   final int totalActivities;
   final bool loading;
 
@@ -22,6 +26,7 @@ class HomeState {
       DayStatus.none,
     ],
     this.lastActivity,
+    this.completedActivities = const [],
     this.totalActivities = 0,
     this.loading = true,
   });
@@ -31,6 +36,7 @@ class HomeState {
     List<DayStatus>? weekDays,
     Activity? lastActivity,
     bool clearLastActivity = false,
+    List<Activity>? completedActivities,
     int? totalActivities,
     bool? loading,
   }) =>
@@ -39,6 +45,8 @@ class HomeState {
         weekDays: weekDays ?? this.weekDays,
         lastActivity:
             clearLastActivity ? null : lastActivity ?? this.lastActivity,
+        completedActivities:
+            completedActivities ?? this.completedActivities,
         totalActivities: totalActivities ?? this.totalActivities,
         loading: loading ?? this.loading,
       );
