@@ -104,9 +104,19 @@ class RoutineCubit extends Cubit<RoutineState> {
     }
   }
 
-  /// Marks the routine as completed for today. For actions, also deletes the
-  /// routine (consumed). UI is expected to disable the card while a habit is
-  /// already validated today, so this method does not itself dedupe.
+  /// Removes today's completed activity for [id], resetting its validated state.
+  Future<void> unvalidate(String id) async {
+    try {
+      await ActivityService.deleteTodayActivity(id);
+      debugPrint('[RoutineCubit] unvalidated $id');
+    } catch (e) {
+      debugPrint('[RoutineCubit] unvalidate failed: $e');
+      rethrow;
+    }
+  }
+
+  /// Marks the routine as completed for today. UI is expected to disable the
+  /// card while the routine is already validated today.
   Future<void> validate(String id) async {
     final idx = state.routines.indexWhere((r) => r.id == id);
     if (idx == -1) return;
@@ -121,10 +131,6 @@ class RoutineCubit extends Cubit<RoutineState> {
     } catch (e) {
       debugPrint('[RoutineCubit] validate activity failed: $e');
       rethrow;
-    }
-
-    if (routine.type == RoutineType.action) {
-      await removeRoutine(routine.id);
     }
   }
 

@@ -137,6 +137,31 @@ class ActivityService {
   }
 
   /// Returns the most recent pending (incomplete) activity for the given source.
+  /// Deletes today's completed activity for [sourceId] (unvalidates it).
+  static Future<void> deleteTodayActivity(String sourceId) async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59).millisecondsSinceEpoch;
+
+    final snap = await _activities
+        .where('sourceId', isEqualTo: sourceId)
+        .where('completed', isEqualTo: true)
+        .where('timestamp', isGreaterThanOrEqualTo: startOfDay)
+        .where('timestamp', isLessThanOrEqualTo: endOfDay)
+        .get();
+
+    for (final doc in snap.docs) {
+      await doc.reference.delete();
+    }
+    if (snap.docs.isNotEmpty) {
+      await _profile.set(
+        {'totalActivities': FieldValue.increment(-snap.docs.length)},
+        SetOptions(merge: true),
+      );
+    }
+  }
+
+  /// Returns the most recent pending (incomplete) activity for the given source.
   static Future<Activity?> getPendingActivity(String sourceId) async {
     final snap = await _activities
         .where('sourceId', isEqualTo: sourceId)

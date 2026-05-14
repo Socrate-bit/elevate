@@ -893,6 +893,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeHabitsEmpty => 'No habits yet. Tap + to add one.';
 
   @override
+  String get homeAddTitle => 'What\'s next?';
+
+  @override
+  String get homeAddMoodDesc => 'Log your mood';
+
+  @override
+  String get homeAddMissionDesc => 'Start a quick mission';
+
+  @override
   String get routinePickerTitle => 'What do you want to add?';
 
   @override

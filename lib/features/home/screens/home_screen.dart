@@ -5,12 +5,13 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 import 'package:elevate/l10n/l10n_helpers.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
+import '../../chat/cubit/chat_cubit.dart';
+import '../../chat/cubit/chat_list_cubit.dart';
+import '../../chat/screens/chat_screen.dart';
 import '../../mood/cubit/mood_cubit.dart';
 import '../../mood/cubit/mood_state.dart';
 import '../../mood/models/mood_entry.dart';
-import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/bottom_nav_shell.dart';
 import '../../missions/screens/photo_mission_screen.dart';
 import '../../missions/models/mission.dart';
 import '../../routines/cubit/routine_cubit.dart';
@@ -76,6 +77,8 @@ class _HomeView extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 24.h),
+                        const _StartChatCard(),
+                        SizedBox(height: 24.h),
                         BlocBuilder<RoutineCubit, RoutineState>(
                           builder: (context, routineState) {
                             return _RoutineSections(
@@ -91,6 +94,126 @@ class _HomeView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Tappable card that creates a new conversation and opens ChatScreen.
+class _StartChatCard extends StatefulWidget {
+  const _StartChatCard();
+
+  @override
+  State<_StartChatCard> createState() => _StartChatCardState();
+}
+
+class _StartChatCardState extends State<_StartChatCard> {
+  bool _loading = false;
+
+  Future<void> _startChat() async {
+    if (_loading) return;
+    setState(() => _loading = true);
+    try {
+      final conv = await context.read<ChatListCubit>().createConversation();
+      if (!mounted) return;
+      setState(() => _loading = false);
+      final routineCubit = context.read<RoutineCubit>();
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => ChatCubit(
+              conversationId: conv.id,
+              routineCubit: routineCubit,
+            ),
+            child: BlocProvider.value(
+              value: routineCubit,
+              child: ChatScreen(onNewChat: _replaceWithNewChat),
+            ),
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint('[HomeScreen] startChat failed: $e');
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _replaceWithNewChat() async {
+    Navigator.of(context).pop();
+    await _startChat();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    return GestureDetector(
+      onTap: withHaptic(_loading ? null : _startChat),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 18.h, horizontal: 20.w),
+        decoration: BoxDecoration(
+          color: c.primary,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: c.primary.withAlpha(90),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.auto_awesome_rounded,
+              color: Colors.white.withAlpha(220),
+              size: 22.sp,
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                l10n.chatModelName,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 30.h,
+              child: _loading
+                  ? Center(
+                      child: SizedBox(
+                        width: 20.w,
+                        height: 20.w,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 14.w, vertical: 6.h),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(45),
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Text(
+                        l10n.chatStartChat,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -144,7 +267,9 @@ class _RoutineSections extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 10.h),
               child: ActionCard(
                 routine: r,
+                completedToday: completedTodayIds.contains(r.id),
                 onValidate: () => _validate(context, r),
+                onUnvalidate: () => _unvalidate(context, r),
                 onEdit: () => _edit(context, r),
               ),
             ),
@@ -170,6 +295,7 @@ class _RoutineSections extends StatelessWidget {
                 completedToday: completedTodayIds.contains(r.id),
                 scheduledToday: r.isScheduledToday,
                 onValidate: () => _validate(context, r),
+                onUnvalidate: () => _unvalidate(context, r),
                 onEdit: () => _edit(context, r),
               ),
             ),
@@ -198,6 +324,10 @@ class _RoutineSections extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _unvalidate(BuildContext context, Routine r) async {
+    await context.read<RoutineCubit>().unvalidate(r.id);
   }
 
   void _edit(BuildContext context, Routine r) {
@@ -261,50 +391,29 @@ class _TopBar extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        GestureDetector(
-          onTap: withHaptic(() => BottomNavShell.of(context)?.navigateTo(1)),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: c.card,
-              borderRadius: BorderRadius.circular(20.r),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 8),
-              ],
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.local_fire_department_rounded,
-                    size: 18.sp, color: c.primary),
-                SizedBox(width: 4.w),
-                Text(
-                  '$streak',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: c.textPrimary,
-                  ),
-                ),
-              ],
-            ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            color: c.card,
+            borderRadius: BorderRadius.circular(20.r),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 8),
+            ],
           ),
-        ),
-        SizedBox(width: 8.w),
-        GestureDetector(
-          onTap: withHaptic(() => showMoodPickerSheet(context)),
-          child: Container(
-            width: 36.w,
-            height: 36.w,
-            decoration: BoxDecoration(
-              color: c.card,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 8),
-              ],
-            ),
-            child: Center(
-              child: Text('🙂', style: TextStyle(fontSize: 18.sp)),
-            ),
+          child: Row(
+            children: [
+              Icon(Icons.local_fire_department_rounded,
+                  size: 18.sp, color: c.primary),
+              SizedBox(width: 4.w),
+              Text(
+                '$streak',
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.bold,
+                  color: c.textPrimary,
+                ),
+              ),
+            ],
           ),
         ),
       ],

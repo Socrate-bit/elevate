@@ -901,6 +901,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucune habitude. Appuyez sur + pour en ajouter.';
 
   @override
+  String get homeAddTitle => 'Et maintenant ?';
+
+  @override
+  String get homeAddMoodDesc => 'Notez votre humeur';
+
+  @override
+  String get homeAddMissionDesc => 'Démarrer une mission';
+
+  @override
   String get routinePickerTitle => 'Que voulez-vous ajouter ?';
 
   @override

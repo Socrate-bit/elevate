@@ -10,13 +10,17 @@ import '../models/routine_palette.dart';
 
 class ActionCard extends StatelessWidget {
   final Routine routine;
+  final bool completedToday;
   final VoidCallback onValidate;
+  final VoidCallback onUnvalidate;
   final VoidCallback onEdit;
 
   const ActionCard({
     super.key,
     required this.routine,
+    required this.completedToday,
     required this.onValidate,
+    required this.onUnvalidate,
     required this.onEdit,
   });
 
@@ -32,13 +36,15 @@ class ActionCard extends StatelessWidget {
     final scheduleText = _scheduleText(time, date);
 
     return GestureDetector(
-      onTap: withHaptic(onValidate),
+      onTap: completedToday ? withHaptic(onUnvalidate) : withHaptic(onValidate),
       onLongPress: withHaptic(onEdit),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: c.card,
           borderRadius: BorderRadius.circular(16.r),
+          border: completedToday ? Border.all(color: tint, width: 2) : null,
           boxShadow: [
             BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 10),
           ],
@@ -86,14 +92,16 @@ class ActionCard extends StatelessWidget {
               width: 36.w,
               height: 36.h,
               decoration: BoxDecoration(
-                color: tint,
+                color: completedToday ? tint : tint.withAlpha(60),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                routine.objectCheck != null
-                    ? Icons.camera_alt_rounded
-                    : Icons.check_rounded,
-                color: Colors.white,
+                completedToday
+                    ? Icons.check_rounded
+                    : (routine.objectCheck != null
+                        ? Icons.camera_alt_rounded
+                        : Icons.check_rounded),
+                color: completedToday ? Colors.white : tint,
                 size: 20.sp,
               ),
             ),

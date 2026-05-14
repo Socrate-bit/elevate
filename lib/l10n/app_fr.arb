@@ -329,6 +329,9 @@
   "homeActionsEmpty": "Aucune action. Appuyez sur + pour en ajouter.",
   "homeHabitsTitle": "Habitudes",
   "homeHabitsEmpty": "Aucune habitude. Appuyez sur + pour en ajouter.",
+  "homeAddTitle": "Et maintenant ?",
+  "homeAddMoodDesc": "Notez votre humeur",
+  "homeAddMissionDesc": "Démarrer une mission",
 
   "routinePickerTitle": "Que voulez-vous ajouter ?",
   "routinePickerSubtitle": "Les actions sont uniques. Les habitudes se répètent.",

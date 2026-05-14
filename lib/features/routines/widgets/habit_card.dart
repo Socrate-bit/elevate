@@ -13,10 +13,10 @@ class HabitCard extends StatelessWidget {
   final Routine routine;
   final bool completedToday;
 
-  /// True if [routine] is scheduled for today. Cards for non-today habits
-  /// are dimmed and non-interactive (tap still opens edit).
+  /// True if [routine] is scheduled for today (non-scheduled days are dimmed).
   final bool scheduledToday;
   final VoidCallback onValidate;
+  final VoidCallback onUnvalidate;
   final VoidCallback onEdit;
 
   const HabitCard({
@@ -25,6 +25,7 @@ class HabitCard extends StatelessWidget {
     required this.completedToday,
     required this.scheduledToday,
     required this.onValidate,
+    required this.onUnvalidate,
     required this.onEdit,
   });
 
@@ -34,12 +35,10 @@ class HabitCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final tint = routineColor(routine.colorKey);
     final icon = routineIcon(routine.iconKey);
-    final dimmed = !scheduledToday;
+    final dimmed = !scheduledToday && !completedToday;
 
     return GestureDetector(
-      onTap: (completedToday || !scheduledToday)
-          ? withHaptic(onEdit)
-          : withHaptic(onValidate),
+      onTap: withHaptic(completedToday ? onUnvalidate : onValidate),
       onLongPress: withHaptic(onEdit),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),

@@ -329,6 +329,9 @@
   "homeActionsEmpty": "No actions yet. Tap + to add one.",
   "homeHabitsTitle": "Habits",
   "homeHabitsEmpty": "No habits yet. Tap + to add one.",
+  "homeAddTitle": "What's next?",
+  "homeAddMoodDesc": "Log your mood",
+  "homeAddMissionDesc": "Start a quick mission",
 
   "routinePickerTitle": "What do you want to add?",
   "routinePickerSubtitle": "Actions are one-shot. Habits repeat.",

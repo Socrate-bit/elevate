@@ -1760,6 +1760,24 @@ abstract class AppLocalizations {
   /// **'No habits yet. Tap + to add one.'**
   String get homeHabitsEmpty;
 
+  /// No description provided for @homeAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s next?'**
+  String get homeAddTitle;
+
+  /// No description provided for @homeAddMoodDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Log your mood'**
+  String get homeAddMoodDesc;
+
+  /// No description provided for @homeAddMissionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a quick mission'**
+  String get homeAddMissionDesc;
+
   /// No description provided for @routinePickerTitle.
   ///
   /// In en, this message translates to:

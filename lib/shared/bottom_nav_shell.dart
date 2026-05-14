@@ -4,12 +4,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:liquid_glass_bar/liquid_glass_bar.dart';
 import 'theme/app_theme.dart';
 import 'utils/haptic_utils.dart';
+import 'package:elevate/features/chat/cubit/chat_cubit.dart';
+import 'package:elevate/features/chat/cubit/chat_list_cubit.dart';
+import 'package:elevate/features/chat/screens/chat_screen.dart';
 import 'package:elevate/features/routines/cubit/routine_cubit.dart';
 import 'package:elevate/features/routines/screens/routine_form_screen.dart';
-import 'package:elevate/features/routines/widgets/routine_picker_sheet.dart';
+import 'package:elevate/features/routines/models/routine.dart';
+import 'package:elevate/features/mood/widgets/mood_picker_sheet.dart';
+import 'package:elevate/features/missions/screens/mission_picker_screen.dart';
+import 'package:elevate/features/home/widgets/home_action_sheet.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
-import '../features/chat/screens/chat_tab.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/insights/screens/insights_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
@@ -35,7 +40,7 @@ class BottomNavShellState extends State<BottomNavShell> {
     _index = widget.initialIndex;
   }
 
-  static const _tabNames = ['chat', 'home', 'insights', 'settings'];
+  static const _tabNames = ['home', 'insights', 'settings'];
 
   void _selectTab(int index) {
     if (index == _index) return;
@@ -48,22 +53,70 @@ class BottomNavShellState extends State<BottomNavShell> {
 
   void navigateTo(int index) => _selectTab(index);
 
-  Future<void> _openRoutinePicker(BuildContext context) async {
-    final type = await showRoutinePickerSheet(context);
-    if (type == null || !context.mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: context.read<RoutineCubit>(),
-          child: RoutineFormScreen(initialType: type),
+  Future<void> _openHomeActionSheet(BuildContext context) async {
+    final routineCubit = context.read<RoutineCubit>();
+    final action = await showHomeActionSheet(context);
+    if (action == null || !context.mounted) return;
+    switch (action) {
+      case HomeAction.startChat:
+        await _pushNewChat(context);
+      case HomeAction.action:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider.value(
+              value: routineCubit,
+              child: RoutineFormScreen(initialType: RoutineType.action),
+            ),
+          ),
+        );
+      case HomeAction.habit:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BlocProvider.value(
+              value: routineCubit,
+              child: RoutineFormScreen(initialType: RoutineType.habit),
+            ),
+          ),
+        );
+      case HomeAction.mood:
+        // ignore: use_build_context_synchronously
+        showMoodPickerSheet(context);
+      case HomeAction.mission:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MissionPickerScreen()),
+        );
+    }
+  }
+
+  /// Creates a new conversation and pushes [ChatScreen]. The [onNewChat]
+  /// callback pops the current screen and starts a fresh chat.
+  Future<void> _pushNewChat(BuildContext context) async {
+    if (!context.mounted) return;
+    final listCubit = context.read<ChatListCubit>();
+    final routineCubit = context.read<RoutineCubit>();
+    final conv = await listCubit.createConversation();
+    if (!context.mounted) return;
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) => ChatCubit(
+          conversationId: conv.id,
+          routineCubit: routineCubit,
+        ),
+        child: BlocProvider.value(
+          value: routineCubit,
+          child: ChatScreen(onNewChat: () async {
+            Navigator.of(context).pop();
+            await _pushNewChat(context);
+          }),
         ),
       ),
-    );
+    ));
   }
 
   static const _tabs = [
-    ChatTab(),
     HomeScreen(),
     InsightsScreen(),
     SettingsScreen(),
@@ -119,10 +172,6 @@ class BottomNavShellState extends State<BottomNavShell> {
                 ),
                 items: [
                   LiquidGlassBarItem(
-                    iconData: Icons.chat_bubble_outline_rounded,
-                    label: l10n.navChat,
-                  ),
-                  LiquidGlassBarItem(
                     iconData: Icons.home_rounded,
                     label: l10n.navHome,
                   ),
@@ -139,8 +188,8 @@ class BottomNavShellState extends State<BottomNavShell> {
             ),
             Padding(
               padding: EdgeInsets.only(right: 24.w, left: 6.w),
-              child: _AddAlarmCircleButton(
-                onTap: () => _openRoutinePicker(context),
+              child: _AddCircleButton(
+                onTap: () => _openHomeActionSheet(context),
               ),
             ),
           ],
@@ -150,9 +199,9 @@ class BottomNavShellState extends State<BottomNavShell> {
   }
 }
 
-class _AddAlarmCircleButton extends StatelessWidget {
+class _AddCircleButton extends StatelessWidget {
   final VoidCallback onTap;
-  const _AddAlarmCircleButton({required this.onTap});
+  const _AddCircleButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {

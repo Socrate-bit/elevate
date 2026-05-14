@@ -6,7 +6,12 @@ import 'package:elevate/l10n/l10n_helpers.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
 import '../../../shared/theme/app_theme.dart';
+import '../../chat/cubit/chat_cubit.dart';
+import '../../chat/cubit/chat_list_cubit.dart';
+import '../../chat/screens/chat_screen.dart';
+import '../../chat/widgets/chat_history_sheet.dart';
 import '../../mood/models/mood_entry.dart';
+import '../../routines/cubit/routine_cubit.dart';
 import '../widgets/hexagon_badge.dart';
 import '../../milestones/screens/milestones_screen.dart';
 import '../../activity/models/activity.dart';
@@ -55,14 +60,20 @@ class _InsightsView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l10n.insightsTitle,
-                          style: TextStyle(
-                            fontSize: 28.sp,
-                            fontWeight: FontWeight.bold,
-                            color: c.textPrimary,
-                            letterSpacing: -0.5,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              l10n.insightsTitle,
+                              style: TextStyle(
+                                fontSize: 28.sp,
+                                fontWeight: FontWeight.bold,
+                                color: c.textPrimary,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const Spacer(),
+                            const _ChatHistoryButton(),
+                          ],
                         ),
                         SizedBox(height: 16.h),
                         _RangeToggle(
@@ -676,6 +687,72 @@ class _ActivityTile extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Icon button that opens chat history and navigates to the selected conversation.
+class _ChatHistoryButton extends StatefulWidget {
+  const _ChatHistoryButton();
+
+  @override
+  State<_ChatHistoryButton> createState() => _ChatHistoryButtonState();
+}
+
+class _ChatHistoryButtonState extends State<_ChatHistoryButton> {
+  Future<void> _open() async {
+    final conv = await showChatHistorySheet(context);
+    if (conv == null || !mounted) return;
+    final routineCubit = context.read<RoutineCubit>();
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) => ChatCubit(
+          conversationId: conv.id,
+          routineCubit: routineCubit,
+        ),
+        child: BlocProvider.value(
+          value: routineCubit,
+          child: ChatScreen(onNewChat: _newChat),
+        ),
+      ),
+    ));
+  }
+
+  Future<void> _newChat() async {
+    Navigator.of(context).pop();
+    final listCubit = context.read<ChatListCubit>();
+    final routineCubit = context.read<RoutineCubit>();
+    final conv = await listCubit.createConversation();
+    if (!mounted) return;
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) => ChatCubit(
+          conversationId: conv.id,
+          routineCubit: routineCubit,
+        ),
+        child: BlocProvider.value(
+          value: routineCubit,
+          child: ChatScreen(onNewChat: _newChat),
+        ),
+      ),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+    return GestureDetector(
+      onTap: withHaptic(_open),
+      child: Container(
+        width: 36.w,
+        height: 36.w,
+        decoration: BoxDecoration(color: c.card, shape: BoxShape.circle),
+        child: Icon(
+          Icons.format_list_bulleted_rounded,
+          size: 18.sp,
+          color: c.textPrimary,
         ),
       ),
     );
