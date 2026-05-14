@@ -6,6 +6,7 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 
 import '../../memory/cubit/memory_cubit.dart';
 import '../../missions/screens/mission_picker_screen.dart';
+import '../../mood/cubit/mood_cubit.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../routines/cubit/routine_cubit.dart';
@@ -47,16 +48,17 @@ class _ChatTabState extends State<ChatTab> with AutomaticKeepAliveClientMixin {
       final conv = await context.read<ChatListCubit>().createConversation();
       if (!mounted) return;
       setState(() => _starting = false);
-      _openChat(conv.id);
+      _openChat(conv.id, autoStart: true);
     } catch (e) {
       debugPrint('[ChatTab] createConversation failed: $e');
       if (mounted) setState(() => _starting = false);
     }
   }
 
-  void _openChat(String conversationId) {
+  void _openChat(String conversationId, {bool autoStart = false}) {
     final routineCubit = context.read<RoutineCubit>();
     final memoryCubit = context.read<MemoryCubit>();
+    final moodCubit = context.read<MoodCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => BlocProvider(
@@ -64,6 +66,8 @@ class _ChatTabState extends State<ChatTab> with AutomaticKeepAliveClientMixin {
             conversationId: conversationId,
             routineCubit: routineCubit,
             memoryCubit: memoryCubit,
+            moodCubit: moodCubit,
+            autoStart: autoStart,
           ),
           child: BlocProvider.value(
             value: routineCubit,

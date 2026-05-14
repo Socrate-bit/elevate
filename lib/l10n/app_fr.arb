@@ -265,6 +265,7 @@
   "chatMissionDecline": "Pas maintenant",
   "chatMissionAccepted": "Mission lancée",
   "chatMissionDeclined": "Peut-être plus tard",
+  "chatMissionValidated": "Je viens de terminer la mission !",
   "chatMissionSetUp": "Configurer cette mission",
   "dismissMissionTimeToWakeUp": "Il est temps de se lever !",
   "dismissMissionLabel": "Mission {n} sur {total} : {name}",
@@ -371,5 +372,8 @@
   "chatRoutineUpdated": "Modifié '{name}'",
   "@chatRoutineUpdated": { "placeholders": { "name": { "type": "String" } } },
   "chatRoutineDeleted": "Supprimé '{name}'",
-  "@chatRoutineDeleted": { "placeholders": { "name": { "type": "String" } } }
+  "@chatRoutineDeleted": { "placeholders": { "name": { "type": "String" } } },
+  "chatActionStartNow": "Commencer maintenant",
+  "chatActionDone": "Terminé",
+  "chatActionCompleted": "Je viens de le faire !"
 }

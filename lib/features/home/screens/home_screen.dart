@@ -145,6 +145,7 @@ class _StartChatCardState extends State<_StartChatCard> {
       setState(() => _loading = false);
       final routineCubit = context.read<RoutineCubit>();
       final memoryCubit = context.read<MemoryCubit>();
+      final moodCubit = context.read<MoodCubit>();
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -152,6 +153,8 @@ class _StartChatCardState extends State<_StartChatCard> {
               conversationId: conv.id,
               routineCubit: routineCubit,
               memoryCubit: memoryCubit,
+              moodCubit: moodCubit,
+              autoStart: true,
             ),
             child: BlocProvider.value(
               value: routineCubit,

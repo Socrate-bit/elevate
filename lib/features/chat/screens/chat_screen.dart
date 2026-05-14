@@ -6,6 +6,7 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 
 import '../../missions/models/mission.dart';
 import '../../missions/screens/mission_confirm_screen.dart';
+import '../../routines/cubit/routine_cubit.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/chat_cubit.dart';
@@ -44,9 +45,9 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _composer.addListener(() => setState(() {}));
-    // Send the first message that was typed in the pre-chat view.
     final pending = widget.initialMessage;
     if (pending != null && pending.isNotEmpty) {
+      // Send the pre-filled message typed in the pre-chat view.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.read<ChatCubit>().sendText(pending);
       });
@@ -101,7 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
           body: Column(
             children: [
               Expanded(
-                child: state.messages.isEmpty && !state.isLoading
+                child: state.messages.isEmpty && !state.isLoading && !state.isSending
                     ? _GreetingHero()
                     : state.isLoading
                         ? const Center(child: CircularProgressIndicator())
@@ -238,10 +239,19 @@ class _MessagesList extends StatelessWidget {
               if (!context.mounted) return;
               final missionType =
                   missionTypeFromString(m.missionSuggestion!.missionType);
+              final l10n = AppLocalizations.of(context)!;
+              final cubit = context.read<ChatCubit>();
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) =>
-                      MissionConfirmScreen(missionType: missionType),
+                  builder: (_) => MissionConfirmScreen(
+                    missionType: missionType,
+                    onMissionComplete: () {
+                      // Pop MissionSequenceScreen then MissionConfirmScreen.
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                      cubit.sendText(l10n.chatMissionValidated);
+                    },
+                  ),
                 ),
               );
             },
@@ -256,7 +266,22 @@ class _MessagesList extends StatelessWidget {
           );
         }
         if (m.routineMutation != null && m.role == ChatRole.model) {
-          return ChatRoutineCard(mutation: m.routineMutation!);
+          final mutation = m.routineMutation!;
+          return ChatRoutineCard(
+            mutation: mutation,
+            onStartNow: () async {
+              final l10n = AppLocalizations.of(context)!;
+              final routineCubit = context.read<RoutineCubit>();
+              final chatCubit = context.read<ChatCubit>();
+              try {
+                await routineCubit.validate(mutation.routineId);
+                debugPrint('[ChatScreen] action validated: ${mutation.routineId}');
+              } catch (e) {
+                debugPrint('[ChatScreen] validate failed: $e');
+              }
+              await chatCubit.sendText(l10n.chatActionCompleted);
+            },
+          );
         }
         return MessageBubble(message: m);
       },

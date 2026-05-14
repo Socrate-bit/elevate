@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../memory/cubit/memory_cubit.dart';
+import '../../mood/cubit/mood_cubit.dart';
 import '../../mood/models/mood_entry.dart';
 import '../../mood/services/mood_service.dart';
 import '../../routines/cubit/routine_cubit.dart';
@@ -25,6 +26,8 @@ class ChatCubit extends Cubit<ChatState> {
     required String conversationId,
     RoutineCubit? routineCubit,
     MemoryCubit? memoryCubit,
+    MoodCubit? moodCubit,
+    bool autoStart = false,
     ChatRepository? repository,
     GeminiClient? gemini,
     VoiceController? voice,
@@ -34,9 +37,15 @@ class ChatCubit extends Cubit<ChatState> {
         _voice = voice ?? VoiceService.instance,
         _routineCubit = routineCubit,
         _memoryCubit = memoryCubit,
+        _moodCubit = moodCubit,
         _uuid = uuid ?? const Uuid(),
-        super(ChatState(conversationId: conversationId, isLoading: true)) {
+        super(ChatState(
+          conversationId: conversationId,
+          isLoading: true,
+          isSending: autoStart, // show typing indicator from the very first frame
+        )) {
     _subscribe();
+    if (autoStart) unawaited(_doStart());
   }
 
   final ChatRepository _repo;
@@ -44,6 +53,7 @@ class ChatCubit extends Cubit<ChatState> {
   final VoiceController _voice;
   final RoutineCubit? _routineCubit;
   final MemoryCubit? _memoryCubit;
+  final MoodCubit? _moodCubit;
   final Uuid _uuid;
   StreamSubscription? _sub;
   bool _hasNewUserActivity = false;
@@ -122,52 +132,102 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  /// Sends the AI's opening greeting without a user message.
+  /// Normally invoked automatically via [autoStart]; exposed for external callers.
+  Future<void> startSession() async {
+    if (state.messages.isNotEmpty || state.isSending) return;
+    emit(state.copyWith(isSending: true));
+    await _doStart();
+  }
+
+  /// Core session-start work — skips the guard so it can be called directly
+  /// from the constructor when [autoStart] pre-sets [isSending] to true.
+  Future<void> _doStart() async {
+    try {
+      final reply = await _gemini.send(
+        history: const [],
+        userText: '.',
+        memoryContext: _buildContext(),
+      );
+      await _commitModelReply(reply);
+    } catch (e) {
+      debugPrint('[ChatCubit] startSession failed: $e');
+    } finally {
+      emit(state.copyWith(isSending: false));
+    }
+  }
+
   Future<void> _generateModelReply() async {
     try {
-      final memoryContext = _memoryCubit?.buildMemoryContext(
-        excludeConversationId: state.conversationId,
-      );
       final reply = await _gemini.send(
         history: state.messages.toList(),
         userText: state.messages.last.text,
-        memoryContext: memoryContext,
+        memoryContext: _buildContext(),
       );
-
-      ChatRoutineMutation? mutation;
-      String replyText = reply.text ?? '';
-      if (reply.routineToolCall != null) {
-        mutation = await _applyRoutineToolCall(reply.routineToolCall!);
-        replyText = '';
-      }
-
-      final modelMsg = ChatMessage(
-        id: _uuid.v4(),
-        conversationId: state.conversationId,
-        role: ChatRole.model,
-        text: replyText,
-        form: reply.form,
-        missionSuggestion: reply.missionSuggestion,
-        moodCheckIn: reply.moodCheckIn,
-        routineMutation: mutation,
-        createdAt: DateTime.now(),
-      );
-
-      await _repo.saveMessage(modelMsg);
-      await _repo.updateConversation(
-        state.conversationId,
-        lastMessageAt: modelMsg.createdAt,
-      );
-      debugPrint(
-        '[ChatCubit] saved model reply '
-        '(form=${reply.isForm}, mission=${reply.isMissionSuggestion}, '
-        'mood=${reply.isMoodCheckIn}, routine=${mutation != null})',
-      );
+      await _commitModelReply(reply);
     } catch (e) {
       debugPrint('[ChatCubit] _generateModelReply failed: $e');
       rethrow;
     } finally {
       emit(state.copyWith(isSending: false));
     }
+  }
+
+  /// Builds the full context string injected into Gemini's system prompt:
+  /// memory facts + conversation summaries + this week's mood check-ins.
+  String? _buildContext() {
+    final memory = _memoryCubit?.buildMemoryContext(
+      excludeConversationId: state.conversationId,
+    );
+    final weekMoods = _moodCubit?.state.weekMoods;
+    if (weekMoods == null || weekMoods.isEmpty) return memory;
+
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    final todayIndex = DateTime.now().weekday % 7;
+    final moodLines = (weekMoods.entries.toList()..sort((a, b) => a.key.compareTo(b.key)))
+        .map((e) {
+          final tag = e.key == todayIndex ? ' (today)' : '';
+          return '- ${dayNames[e.key]}: ${e.value.name} ${e.value.emoji}$tag';
+        })
+        .join('\n');
+    final moodSection = "This week's mood check-ins:\n$moodLines";
+
+    if (memory == null || memory.isEmpty) return moodSection;
+    return '$memory\n\n$moodSection';
+  }
+
+  /// Persists a Gemini reply as a model [ChatMessage] and updates the
+  /// conversation's lastMessageAt. Shared by [startSession] and [_generateModelReply].
+  Future<void> _commitModelReply(GeminiReply reply) async {
+    ChatRoutineMutation? mutation;
+    String replyText = reply.text ?? '';
+    if (reply.routineToolCall != null) {
+      mutation = await _applyRoutineToolCall(reply.routineToolCall!);
+      replyText = '';
+    }
+
+    final modelMsg = ChatMessage(
+      id: _uuid.v4(),
+      conversationId: state.conversationId,
+      role: ChatRole.model,
+      text: replyText,
+      form: reply.form,
+      missionSuggestion: reply.missionSuggestion,
+      moodCheckIn: reply.moodCheckIn,
+      routineMutation: mutation,
+      createdAt: DateTime.now(),
+    );
+
+    await _repo.saveMessage(modelMsg);
+    await _repo.updateConversation(
+      state.conversationId,
+      lastMessageAt: modelMsg.createdAt,
+    );
+    debugPrint(
+      '[ChatCubit] saved model reply '
+      '(form=${reply.isForm}, mission=${reply.isMissionSuggestion}, '
+      'mood=${reply.isMoodCheckIn}, routine=${mutation != null})',
+    );
   }
 
   /// Applies a Gemini-driven routine mutation against [RoutineCubit] and
@@ -190,6 +250,7 @@ class ChatCubit extends Cubit<ChatState> {
             routineName: saved.name,
             iconKey: saved.iconKey,
             colorKey: saved.colorKey,
+            scheduledDate: saved.scheduledDate,
           );
         case 'update_routine':
           final id = call.args['routine_id']?.toString() ?? '';

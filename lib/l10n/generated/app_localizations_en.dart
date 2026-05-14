@@ -721,6 +721,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatMissionDeclined => 'Maybe later';
 
   @override
+  String get chatMissionValidated => 'I just finished the mission!';
+
+  @override
   String get chatMissionSetUp => 'Set up this mission';
 
   @override
@@ -1006,4 +1009,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String chatRoutineDeleted(String name) {
     return 'Deleted \'$name\'';
   }
+
+  @override
+  String get chatActionStartNow => 'Start now';
+
+  @override
+  String get chatActionDone => 'Done';
+
+  @override
+  String get chatActionCompleted => 'I just completed it!';
 }

@@ -11,10 +11,17 @@ import 'mission_sequence_screen.dart';
 
 /// Focused confirmation screen shown when the AI chat suggests a mission.
 /// Displays the proposed mission and launches it directly on confirm.
+/// When [onMissionComplete] is provided it is forwarded to [MissionSequenceScreen]
+/// so the caller (e.g. chat) can react after the mission is finished.
 class MissionConfirmScreen extends StatelessWidget {
   final MissionType missionType;
+  final VoidCallback? onMissionComplete;
 
-  const MissionConfirmScreen({super.key, required this.missionType});
+  const MissionConfirmScreen({
+    super.key,
+    required this.missionType,
+    this.onMissionComplete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +82,7 @@ class MissionConfirmScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (_) => MissionSequenceScreen(
                         missions: [MissionConfig(type: missionType)],
+                        onAllComplete: onMissionComplete,
                       ),
                     ),
                   );

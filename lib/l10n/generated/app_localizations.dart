@@ -1460,6 +1460,12 @@ abstract class AppLocalizations {
   /// **'Maybe later'**
   String get chatMissionDeclined;
 
+  /// No description provided for @chatMissionValidated.
+  ///
+  /// In en, this message translates to:
+  /// **'I just finished the mission!'**
+  String get chatMissionValidated;
+
   /// No description provided for @chatMissionSetUp.
   ///
   /// In en, this message translates to:
@@ -1969,6 +1975,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deleted \'{name}\''**
   String chatRoutineDeleted(String name);
+
+  /// No description provided for @chatActionStartNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Start now'**
+  String get chatActionStartNow;
+
+  /// No description provided for @chatActionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get chatActionDone;
+
+  /// No description provided for @chatActionCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'I just completed it!'**
+  String get chatActionCompleted;
 }
 
 class _AppLocalizationsDelegate

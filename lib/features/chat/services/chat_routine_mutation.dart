@@ -16,6 +16,10 @@ class ChatRoutineMutation extends Equatable {
   final String iconKey;
   final String colorKey;
 
+  /// For action-type routines: the scheduled date, if any. Used to offer a
+  /// "Start now" button when the action is scheduled for today.
+  final DateTime? scheduledDate;
+
   const ChatRoutineMutation({
     required this.kind,
     required this.routineType,
@@ -23,6 +27,7 @@ class ChatRoutineMutation extends Equatable {
     required this.routineName,
     required this.iconKey,
     required this.colorKey,
+    this.scheduledDate,
   });
 
   Map<String, dynamic> toMap() => {
@@ -32,11 +37,14 @@ class ChatRoutineMutation extends Equatable {
         'routineName': routineName,
         'iconKey': iconKey,
         'colorKey': colorKey,
+        if (scheduledDate != null)
+          'scheduledDate': scheduledDate!.toIso8601String(),
       };
 
   static ChatRoutineMutation fromMap(Map<String, dynamic> m) {
     final kindStr = m['kind'] as String? ?? 'created';
     final typeStr = m['routineType'] as String? ?? 'action';
+    final dateRaw = m['scheduledDate'] as String?;
     return ChatRoutineMutation(
       kind: ChatRoutineMutationKind.values.firstWhere(
         (k) => k.name == kindStr,
@@ -47,10 +55,20 @@ class ChatRoutineMutation extends Equatable {
       routineName: m['routineName'] as String? ?? '',
       iconKey: m['iconKey'] as String? ?? 'star',
       colorKey: m['colorKey'] as String? ?? 'blue',
+      scheduledDate:
+          dateRaw != null ? DateTime.tryParse(dateRaw) : null,
     );
+  }
+
+  bool get isScheduledToday {
+    if (scheduledDate == null) return false;
+    final now = DateTime.now();
+    return scheduledDate!.year == now.year &&
+        scheduledDate!.month == now.month &&
+        scheduledDate!.day == now.day;
   }
 
   @override
   List<Object?> get props =>
-      [kind, routineType, routineId, routineName, iconKey, colorKey];
+      [kind, routineType, routineId, routineName, iconKey, colorKey, scheduledDate];
 }

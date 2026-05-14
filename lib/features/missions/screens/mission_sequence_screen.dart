@@ -16,10 +16,18 @@ import 'squat_mission_screen.dart';
 ///
 /// Shows [MissionStartScreen] before each mission, advances through the list,
 /// and pushes [MissionCompleteScreen] after the final one.
+/// When [onAllComplete] is provided it is called instead of pushing
+/// [MissionCompleteScreen], letting the caller handle navigation (e.g. return
+/// to an active chat and post a completion message).
 class MissionSequenceScreen extends StatefulWidget {
   final List<MissionConfig> missions;
+  final VoidCallback? onAllComplete;
 
-  const MissionSequenceScreen({super.key, required this.missions});
+  const MissionSequenceScreen({
+    super.key,
+    required this.missions,
+    this.onAllComplete,
+  });
 
   @override
   State<MissionSequenceScreen> createState() => _MissionSequenceScreenState();
@@ -65,6 +73,10 @@ class _MissionSequenceScreenState extends State<MissionSequenceScreen> {
     if (_currentIndex + 1 < _resolvedMissions.length) {
       Navigator.of(context).pop();
       setState(() => _currentIndex++);
+    } else if (widget.onAllComplete != null) {
+      // Pop the individual mission screen, then let the caller handle the rest.
+      Navigator.of(context).pop();
+      widget.onAllComplete!();
     } else {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const MissionCompleteScreen()),
