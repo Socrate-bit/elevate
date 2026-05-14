@@ -844,4 +844,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get missionPickerSubtitle => 'Pick a mission and start now';
+
+  @override
+  String get breathingPhaseInhale => 'Inhale';
+
+  @override
+  String get breathingPhaseHold => 'Hold';
+
+  @override
+  String get breathingPhaseExhale => 'Exhale';
+
+  @override
+  String breathingRoundLabel(int current, int total) {
+    return 'Round $current / $total';
+  }
 }

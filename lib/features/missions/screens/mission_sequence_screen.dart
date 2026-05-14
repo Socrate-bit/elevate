@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/mission.dart';
 import '../models/mission_config.dart';
 import '../widgets/mission_complete_screen.dart';
+import 'breathing_mission_screen.dart';
 import 'math_mission_screen.dart';
 import 'mission_start_screen.dart';
 import 'photo_mission_screen.dart';
@@ -116,6 +117,15 @@ Widget _buildMissionScreen({
       return SpeechMissionScreen(
         selectedAffirmations: config.selectedAffirmations,
         affirmationCount: config.affirmationCount ?? 1,
+        onComplete: onComplete,
+      );
+    case MissionType.breathing:
+      return BreathingMissionScreen(
+        inhaleDurationMs: config.inhaleDurationMs ?? 4000,
+        holdAfterInhaleDurationMs: config.holdAfterInhaleDurationMs ?? 4000,
+        exhaleDurationMs: config.exhaleDurationMs ?? 4000,
+        holdAfterExhaleDurationMs: config.holdAfterExhaleDurationMs ?? 4000,
+        rounds: config.breathingRounds ?? 3,
         onComplete: onComplete,
       );
     case MissionType.skyPhoto:
