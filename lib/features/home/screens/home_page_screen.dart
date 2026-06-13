@@ -4,8 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/widgets/app_glass_nav_bar.dart';
-import '../../tools/screens/tools_page_screen.dart';
+import '../../../shared/widgets/appy_nav_bar.dart';
 import '../cubit/home_page_cubit.dart';
 import '../cubit/home_page_state.dart';
 import '../models/home_mock_data.dart';
@@ -134,21 +133,7 @@ class _HomeViewState extends State<_HomeView> {
           ],
         ),
       ),
-      bottomNavigationBar: BlocBuilder<HomePageCubit, HomePageState>(
-        buildWhen: (p, c) => p.navIndex != c.navIndex,
-        builder: (context, state) => AppGlassNavBar(
-          selectedIndex: state.navIndex,
-          onTabSelected: (index) {
-            context.read<HomePageCubit>().selectTab(index);
-            // Tools tab opens the tools page.
-            if (index == 3) {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ToolsPage()),
-              );
-            }
-          },
-        ),
-      ),
+      bottomNavigationBar: const AppyNavBar(),
     );
   }
 }

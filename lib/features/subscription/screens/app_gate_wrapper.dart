@@ -8,7 +8,7 @@ import '../../alarms/cubit/alarm_state.dart';
 import '../../alarms/services/alarm_service.dart';
 import '../cubit/subscription_cubit.dart';
 import '../cubit/subscription_state.dart';
-import '../../home/screens/home_page_screen.dart';
+import '../../../shared/appy_shell.dart';
 
 /// Subscription gate. Loads user_type once, drives [AlarmCubit.sync] only
 /// when the user has access, and renders BottomNavShell — wrapped in a
@@ -80,7 +80,7 @@ class _AppGateWrapperState extends State<AppGateWrapper> {
               // }
               if (sub.hasAccess) {
                 alarmCubit.restoreSubscriptionDisabled();
-                return const HomePage();
+                return const AppyShell();
               }
 
               alarmCubit.disableAllForSubscription();
@@ -88,12 +88,12 @@ class _AppGateWrapperState extends State<AppGateWrapper> {
               // UI can be developed/tested. Production still gates with the
               // tap-catching paywall overlay.
               if (kDebugMode) {
-                return const HomePage();
+                return const AppyShell();
               }
               Superwall.shared.registerPlacement('app_start');
               return Stack(
                 children: [
-                  const HomePage(),
+                  const AppyShell(),
                   Positioned.fill(
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,

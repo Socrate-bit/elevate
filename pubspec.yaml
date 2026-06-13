@@ -87,6 +87,8 @@ flutter:
     - shorebird.yaml
     - assets/home/
     - assets/activities/
+    - assets/chat/
+    - assets/journal/
   uses-material-design: true
   fonts:
     - family: Nunito

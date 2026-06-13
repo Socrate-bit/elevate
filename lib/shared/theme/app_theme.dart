@@ -114,6 +114,71 @@ class HomePalette {
   static const toolsTherapyPurple = Color(0xFF8E5BC9);
 }
 
+/// Palette for the illustrated "Appy" chat page ("Forest Friend") — sampled
+/// from the design. Translucent surfaces float over the cozy-room background.
+class ChatPalette {
+  // Appy (assistant) bubble — near-opaque white.
+  static const appyBubble = Color(0xF2FFFFFF);
+  static const appyText = Color(0xFF3A4440);
+
+  // User bubble — soft translucent sage green.
+  static const userBubble = Color(0xE6A8C677);
+  static const userText = Color(0xFF2C3D18);
+  static const timestamp = Color(0xFF5E6A52);
+
+  // Header / "Today" — frosted dark pills with white content.
+  static const glassPill = Color(0x40000000);
+  static const headerTitle = Color(0xFF2C3D18);
+  static const headerSubtitle = Color(0xFF5E6A52);
+
+  // "Start a conversation" frosted panel.
+  static const panel = Color(0x59343C28);
+  static const panelText = Colors.white;
+  static const suggestion = Color(0xF2FFFFFF);
+  static const suggestionText = Color(0xFF3A4440);
+
+  // Composer bar.
+  static const composer = Color(0xF2FFFFFF);
+  static const composerHint = Color(0xFF9AA08F);
+  static const composerText = Color(0xFF3A4440);
+
+  // Round action buttons (composer +, send/call) — leafy green.
+  static const accent = Color(0xFF7BAE3F);
+}
+
+/// Palette for the illustrated Journal page (sampled from the design).
+class JournalPalette {
+  // Soft scrim that fades the scene background into a readable surface for the
+  // lower cards.
+  static const scrim = Color(0xFFFCF5EC);
+
+  // Quote card — translucent sky-blue with a teal quote glyph.
+  static const quoteCardBg = Color(0xFFCDE8F0);
+  static const quoteGlyph = Color(0xFF6FB8C4);
+
+  // Monthly Insight card.
+  static const insightCardBg = Color(0xFFFBF6EA);
+  static const insightBody = Color(0xFF5C6B57);
+
+  // Entry icon tiles (pastel circles behind the emoji).
+  static const tilePink = Color(0xFFFBE0E3);
+  static const tileAmber = Color(0xFFFCEFC9);
+
+  // Category chips (background + text) per entry type.
+  static const chipConversationBg = Color(0xFFDDEBFB);
+  static const chipConversationText = Color(0xFF4C7BB8);
+  static const chipReflectionBg = Color(0xFFEAE2F7);
+  static const chipReflectionText = Color(0xFF8266B0);
+  static const chipWinBg = Color(0xFFFBEFCB);
+  static const chipWinText = Color(0xFFB98417);
+  static const chipPatternBg = Color(0xFFE6F0CF);
+  static const chipPatternText = Color(0xFF6B8C2F);
+
+  // Insight tag chips.
+  static const tagBg = Color(0xFFEFF1DE);
+  static const tagText = Color(0xFF5C6B57);
+}
+
 class AppTheme {
   static ThemeData get light {
     const bg = Color(0xFFF2F2F7);

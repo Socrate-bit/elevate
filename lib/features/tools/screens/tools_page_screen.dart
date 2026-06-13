@@ -1,31 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/widgets/app_glass_nav_bar.dart';
-import '../cubit/tools_page_cubit.dart';
-import '../cubit/tools_page_state.dart';
+import '../../../shared/widgets/appy_nav_bar.dart';
 import '../models/tools_mock_data.dart';
 import '../widgets/tool_section.dart';
 import '../widgets/tools_top_bar.dart';
 
 /// Tools page — catalogue of wellness activities grouped into sections.
-/// Pure UI on mock data ([ToolsMockData]).
+/// Pure UI on mock data ([ToolsMockData]); hosted by the shared AppyShell, so
+/// the bottom nav is driven by the shell's [AppNavCubit].
 class ToolsPage extends StatelessWidget {
   const ToolsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ToolsPageCubit(),
-      child: const _ToolsView(),
-    );
-  }
-}
-
-class _ToolsView extends StatelessWidget {
-  const _ToolsView();
 
   // Scene header height and how much the sections panel pulls up over it.
   static const _headerHeight = 200.0;
@@ -74,20 +60,7 @@ class _ToolsView extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BlocBuilder<ToolsPageCubit, ToolsPageState>(
-        buildWhen: (p, c) => p.navIndex != c.navIndex,
-        builder: (context, state) => AppGlassNavBar(
-          selectedIndex: state.navIndex,
-          onTabSelected: (index) {
-            // Home tab returns to the previous (home) page.
-            if (index == 0) {
-              Navigator.of(context).maybePop();
-              return;
-            }
-            context.read<ToolsPageCubit>().selectTab(index);
-          },
-        ),
-      ),
+      bottomNavigationBar: const AppyNavBar(),
     );
   }
 }

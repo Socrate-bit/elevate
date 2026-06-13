@@ -2071,6 +2071,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Community'**
   String get navCommunity;
+
+  /// No description provided for @chatPageCalmMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm mode'**
+  String get chatPageCalmMode;
+
+  /// No description provided for @chatPageCompanionName.
+  ///
+  /// In en, this message translates to:
+  /// **'Forest Friend'**
+  String get chatPageCompanionName;
+
+  /// No description provided for @chatPageCompanionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your mindful companion'**
+  String get chatPageCompanionSubtitle;
+
+  /// No description provided for @chatPageToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get chatPageToday;
+
+  /// No description provided for @chatPageStartConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a conversation'**
+  String get chatPageStartConversation;
+
+  /// No description provided for @chatPageSuggestTalkDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Talk about my day'**
+  String get chatPageSuggestTalkDay;
+
+  /// No description provided for @chatPageSuggestComfort.
+  ///
+  /// In en, this message translates to:
+  /// **'I need comfort'**
+  String get chatPageSuggestComfort;
+
+  /// No description provided for @chatPageSuggestReflect.
+  ///
+  /// In en, this message translates to:
+  /// **'Help me reflect'**
+  String get chatPageSuggestReflect;
+
+  /// No description provided for @chatPageComposerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your message'**
+  String get chatPageComposerHint;
+
+  /// No description provided for @journalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal'**
+  String get journalTitle;
+
+  /// No description provided for @journalMonthlyInsight.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Insight'**
+  String get journalMonthlyInsight;
+
+  /// No description provided for @journalInputCues.
+  ///
+  /// In en, this message translates to:
+  /// **'Input Cues'**
+  String get journalInputCues;
 }
 
 class _AppLocalizationsDelegate

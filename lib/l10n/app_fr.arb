@@ -392,5 +392,18 @@
   "@homePageXp": { "placeholders": { "xp": { "type": "int" } } },
   "navJournal": "Journal",
   "navTools": "Outils",
-  "navCommunity": "Communauté"
+  "navCommunity": "Communauté",
+  "chatPageCalmMode": "Mode calme",
+  "chatPageCompanionName": "Ami de la forêt",
+  "chatPageCompanionSubtitle": "Votre compagnon bienveillant",
+  "chatPageToday": "Aujourd'hui",
+  "chatPageStartConversation": "Démarrer une conversation",
+  "chatPageSuggestTalkDay": "Parler de ma journée",
+  "chatPageSuggestComfort": "J'ai besoin de réconfort",
+  "chatPageSuggestReflect": "M'aider à réfléchir",
+  "chatPageComposerHint": "Votre message",
+
+  "journalTitle": "Journal",
+  "journalMonthlyInsight": "Bilan du mois",
+  "journalInputCues": "Pistes d'écriture"
 }

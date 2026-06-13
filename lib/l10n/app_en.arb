@@ -392,5 +392,18 @@
   "@homePageXp": { "placeholders": { "xp": { "type": "int" } } },
   "navJournal": "Journal",
   "navTools": "Tools",
-  "navCommunity": "Community"
+  "navCommunity": "Community",
+  "chatPageCalmMode": "Calm mode",
+  "chatPageCompanionName": "Forest Friend",
+  "chatPageCompanionSubtitle": "Your mindful companion",
+  "chatPageToday": "Today",
+  "chatPageStartConversation": "Start a conversation",
+  "chatPageSuggestTalkDay": "Talk about my day",
+  "chatPageSuggestComfort": "I need comfort",
+  "chatPageSuggestReflect": "Help me reflect",
+  "chatPageComposerHint": "Your message",
+
+  "journalTitle": "Journal",
+  "journalMonthlyInsight": "Monthly Insight",
+  "journalInputCues": "Input Cues"
 }
