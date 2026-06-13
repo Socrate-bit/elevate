@@ -72,7 +72,9 @@ Future<HomeAction?> showHomeActionSheet(BuildContext context) {
                     ),
                     Container(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 14.w, vertical: 6.h),
+                        horizontal: 14.w,
+                        vertical: 6.h,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withAlpha(45),
                         borderRadius: BorderRadius.circular(20.r),

@@ -1993,6 +1993,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I just completed it!'**
   String get chatActionCompleted;
+
+  /// No description provided for @homePageGreeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon, {name} 🌿'**
+  String homePageGreeting(String name);
+
+  /// No description provided for @homePageHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re doing great today!'**
+  String get homePageHeadline;
+
+  /// No description provided for @homePageMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get homePageMessage;
+
+  /// No description provided for @homePageCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get homePageCall;
+
+  /// No description provided for @homePageCrisisMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Crisis Mode'**
+  String get homePageCrisisMode;
+
+  /// No description provided for @homePageQuestProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} / {total}'**
+  String homePageQuestProgress(int done, int total);
+
+  /// No description provided for @homePageTodaysPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Plan'**
+  String get homePageTodaysPlan;
+
+  /// No description provided for @homePageTodaysPlanSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Small steps, big changes.'**
+  String get homePageTodaysPlanSubtitle;
+
+  /// No description provided for @homePageEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get homePageEdit;
+
+  /// No description provided for @homePageXp.
+  ///
+  /// In en, this message translates to:
+  /// **'+ {xp} XP'**
+  String homePageXp(int xp);
+
+  /// No description provided for @navJournal.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal'**
+  String get navJournal;
+
+  /// No description provided for @navTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools'**
+  String get navTools;
+
+  /// No description provided for @navCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get navCommunity;
 }
 
 class _AppLocalizationsDelegate

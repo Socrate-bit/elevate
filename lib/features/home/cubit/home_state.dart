@@ -39,15 +39,12 @@ class HomeState {
     List<Activity>? completedActivities,
     int? totalActivities,
     bool? loading,
-  }) =>
-      HomeState(
-        currentStreak: currentStreak ?? this.currentStreak,
-        weekDays: weekDays ?? this.weekDays,
-        lastActivity:
-            clearLastActivity ? null : lastActivity ?? this.lastActivity,
-        completedActivities:
-            completedActivities ?? this.completedActivities,
-        totalActivities: totalActivities ?? this.totalActivities,
-        loading: loading ?? this.loading,
-      );
+  }) => HomeState(
+    currentStreak: currentStreak ?? this.currentStreak,
+    weekDays: weekDays ?? this.weekDays,
+    lastActivity: clearLastActivity ? null : lastActivity ?? this.lastActivity,
+    completedActivities: completedActivities ?? this.completedActivities,
+    totalActivities: totalActivities ?? this.totalActivities,
+    loading: loading ?? this.loading,
+  );
 }
