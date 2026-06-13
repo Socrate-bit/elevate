@@ -1063,4 +1063,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navCommunity => 'Community';
+
+  @override
+  String get chatPageCalmMode => 'Calm mode';
+
+  @override
+  String get chatPageCompanionName => 'Forest Friend';
+
+  @override
+  String get chatPageCompanionSubtitle => 'Your mindful companion';
+
+  @override
+  String get chatPageToday => 'Today';
+
+  @override
+  String get chatPageStartConversation => 'Start a conversation';
+
+  @override
+  String get chatPageSuggestTalkDay => 'Talk about my day';
+
+  @override
+  String get chatPageSuggestComfort => 'I need comfort';
+
+  @override
+  String get chatPageSuggestReflect => 'Help me reflect';
+
+  @override
+  String get chatPageComposerHint => 'Your message';
 }
