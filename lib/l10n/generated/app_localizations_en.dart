@@ -1090,4 +1090,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatPageComposerHint => 'Your message';
+
+  @override
+  String get journalTitle => 'Journal';
+
+  @override
+  String get journalMonthlyInsight => 'Monthly Insight';
+
+  @override
+  String get journalInputCues => 'Input Cues';
 }

@@ -2125,6 +2125,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your message'**
   String get chatPageComposerHint;
+
+  /// No description provided for @journalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Journal'**
+  String get journalTitle;
+
+  /// No description provided for @journalMonthlyInsight.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Insight'**
+  String get journalMonthlyInsight;
+
+  /// No description provided for @journalInputCues.
+  ///
+  /// In en, this message translates to:
+  /// **'Input Cues'**
+  String get journalInputCues;
 }
 
 class _AppLocalizationsDelegate

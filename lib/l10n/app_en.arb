@@ -401,5 +401,9 @@
   "chatPageSuggestTalkDay": "Talk about my day",
   "chatPageSuggestComfort": "I need comfort",
   "chatPageSuggestReflect": "Help me reflect",
-  "chatPageComposerHint": "Your message"
+  "chatPageComposerHint": "Your message",
+
+  "journalTitle": "Journal",
+  "journalMonthlyInsight": "Monthly Insight",
+  "journalInputCues": "Input Cues"
 }
