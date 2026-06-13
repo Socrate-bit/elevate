@@ -106,6 +106,12 @@ class HomePalette {
   // Bottom nav
   static const navActivePill = Color(0xFFD7ECE6);
   static const navInactive = Color(0xFF525A59);
+
+  // Tools page — translucent sections panel + section accent titles.
+  static const toolsPanel = Color(0xFFF6F3E7);
+  static const toolsWellnessGreen = Color(0xFF4F7A28);
+  static const toolsJournalingAmber = Color(0xFFD99A2B);
+  static const toolsTherapyPurple = Color(0xFF8E5BC9);
 }
 
 /// Palette for the illustrated "Appy" chat page ("Forest Friend") — sampled
