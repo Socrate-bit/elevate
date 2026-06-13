@@ -392,5 +392,26 @@
   "@homePageXp": { "placeholders": { "xp": { "type": "int" } } },
   "navJournal": "Journal",
   "navTools": "Tools",
-  "navCommunity": "Community"
+  "navCommunity": "Community",
+
+  "communityTitle": "Community",
+  "communityFeed": "Feed",
+  "communityGroups": "Groups",
+  "communityMessages": "Messages",
+  "communityFilterForYou": "For you",
+  "communityFilterRecent": "Recent",
+  "communityFilterFollowing": "Following",
+  "communityFilterSupport": "Support",
+  "communityDailyInspiration": "Daily inspiration",
+  "communityCheckInTitle": "Community check-in",
+  "communityCheckInSubtitle": "How are you feeling today?",
+  "communityMoodGreat": "Great",
+  "communityMoodGood": "Good",
+  "communityMoodOkay": "Okay",
+  "communityMoodStruggling": "Struggling",
+  "communityMoodReallyHard": "Really hard",
+  "communityGroupJoin": "Join",
+  "communityGroupJoined": "Joined",
+  "communityMembersCount": "{count} members",
+  "@communityMembersCount": { "placeholders": { "count": { "type": "int" } } }
 }

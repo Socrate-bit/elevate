@@ -1071,4 +1071,63 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get navCommunity => 'Communauté';
+
+  @override
+  String get communityTitle => 'Communauté';
+
+  @override
+  String get communityFeed => 'Fil';
+
+  @override
+  String get communityGroups => 'Groupes';
+
+  @override
+  String get communityMessages => 'Messages';
+
+  @override
+  String get communityFilterForYou => 'Pour toi';
+
+  @override
+  String get communityFilterRecent => 'Récent';
+
+  @override
+  String get communityFilterFollowing => 'Suivis';
+
+  @override
+  String get communityFilterSupport => 'Soutien';
+
+  @override
+  String get communityDailyInspiration => 'Inspiration du jour';
+
+  @override
+  String get communityCheckInTitle => 'Check-in communautaire';
+
+  @override
+  String get communityCheckInSubtitle => 'Comment te sens-tu aujourd\'hui ?';
+
+  @override
+  String get communityMoodGreat => 'Super';
+
+  @override
+  String get communityMoodGood => 'Bien';
+
+  @override
+  String get communityMoodOkay => 'Ça va';
+
+  @override
+  String get communityMoodStruggling => 'Difficile';
+
+  @override
+  String get communityMoodReallyHard => 'Très dur';
+
+  @override
+  String get communityGroupJoin => 'Rejoindre';
+
+  @override
+  String get communityGroupJoined => 'Rejoint';
+
+  @override
+  String communityMembersCount(int count) {
+    return '$count membres';
+  }
 }

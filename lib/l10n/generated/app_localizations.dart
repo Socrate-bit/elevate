@@ -2071,6 +2071,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Community'**
   String get navCommunity;
+
+  /// No description provided for @communityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get communityTitle;
+
+  /// No description provided for @communityFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Feed'**
+  String get communityFeed;
+
+  /// No description provided for @communityGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get communityGroups;
+
+  /// No description provided for @communityMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages'**
+  String get communityMessages;
+
+  /// No description provided for @communityFilterForYou.
+  ///
+  /// In en, this message translates to:
+  /// **'For you'**
+  String get communityFilterForYou;
+
+  /// No description provided for @communityFilterRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get communityFilterRecent;
+
+  /// No description provided for @communityFilterFollowing.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get communityFilterFollowing;
+
+  /// No description provided for @communityFilterSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get communityFilterSupport;
+
+  /// No description provided for @communityDailyInspiration.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily inspiration'**
+  String get communityDailyInspiration;
+
+  /// No description provided for @communityCheckInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Community check-in'**
+  String get communityCheckInTitle;
+
+  /// No description provided for @communityCheckInSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How are you feeling today?'**
+  String get communityCheckInSubtitle;
+
+  /// No description provided for @communityMoodGreat.
+  ///
+  /// In en, this message translates to:
+  /// **'Great'**
+  String get communityMoodGreat;
+
+  /// No description provided for @communityMoodGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get communityMoodGood;
+
+  /// No description provided for @communityMoodOkay.
+  ///
+  /// In en, this message translates to:
+  /// **'Okay'**
+  String get communityMoodOkay;
+
+  /// No description provided for @communityMoodStruggling.
+  ///
+  /// In en, this message translates to:
+  /// **'Struggling'**
+  String get communityMoodStruggling;
+
+  /// No description provided for @communityMoodReallyHard.
+  ///
+  /// In en, this message translates to:
+  /// **'Really hard'**
+  String get communityMoodReallyHard;
+
+  /// No description provided for @communityGroupJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Join'**
+  String get communityGroupJoin;
+
+  /// No description provided for @communityGroupJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get communityGroupJoined;
+
+  /// No description provided for @communityMembersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} members'**
+  String communityMembersCount(int count);
 }
 
 class _AppLocalizationsDelegate

@@ -69,6 +69,10 @@ class AnalyticsService {
   // Mood
   static const moodRecorded = 'mood_recorded'; // props: {mood, source}
 
+  // Community
+  static const communitySegmentSelected = 'community_segment_selected';
+  static const communityPostLiked = 'community_post_liked';
+
   // Chat
   static const chatConversationCreated = 'chat_conversation_created';
   static const chatConversationDeleted = 'chat_conversation_deleted';

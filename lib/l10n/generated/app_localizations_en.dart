@@ -1063,4 +1063,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navCommunity => 'Community';
+
+  @override
+  String get communityTitle => 'Community';
+
+  @override
+  String get communityFeed => 'Feed';
+
+  @override
+  String get communityGroups => 'Groups';
+
+  @override
+  String get communityMessages => 'Messages';
+
+  @override
+  String get communityFilterForYou => 'For you';
+
+  @override
+  String get communityFilterRecent => 'Recent';
+
+  @override
+  String get communityFilterFollowing => 'Following';
+
+  @override
+  String get communityFilterSupport => 'Support';
+
+  @override
+  String get communityDailyInspiration => 'Daily inspiration';
+
+  @override
+  String get communityCheckInTitle => 'Community check-in';
+
+  @override
+  String get communityCheckInSubtitle => 'How are you feeling today?';
+
+  @override
+  String get communityMoodGreat => 'Great';
+
+  @override
+  String get communityMoodGood => 'Good';
+
+  @override
+  String get communityMoodOkay => 'Okay';
+
+  @override
+  String get communityMoodStruggling => 'Struggling';
+
+  @override
+  String get communityMoodReallyHard => 'Really hard';
+
+  @override
+  String get communityGroupJoin => 'Join';
+
+  @override
+  String get communityGroupJoined => 'Joined';
+
+  @override
+  String communityMembersCount(int count) {
+    return '$count members';
+  }
 }
