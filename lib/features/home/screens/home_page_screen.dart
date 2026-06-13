@@ -4,8 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/widgets/app_glass_nav_bar.dart';
-import '../../journal/screens/journal_page_screen.dart';
+import '../../../shared/widgets/appy_nav_bar.dart';
 import '../cubit/home_page_cubit.dart';
 import '../cubit/home_page_state.dart';
 import '../models/home_mock_data.dart';
@@ -134,7 +133,7 @@ class _HomeViewState extends State<_HomeView> {
           ],
         ),
       ),
-      bottomNavigationBar: const _HomeNavBar(),
+      bottomNavigationBar: const AppyNavBar(),
     );
   }
 }
@@ -232,32 +231,6 @@ class _SceneBackground extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Bottom navigation bar. Selecting the Journal tab opens the Journal page.
-class _HomeNavBar extends StatelessWidget {
-  const _HomeNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<HomePageCubit, HomePageState>(
-      buildWhen: (p, c) => p.navIndex != c.navIndex,
-      builder: (context, state) {
-        return AppGlassNavBar(
-          selectedIndex: state.navIndex,
-          onTabSelected: (index) {
-            context.read<HomePageCubit>().selectTab(index);
-            // Journal tab routes to the Journal page; others are selection-only.
-            if (index == 2) {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const JournalPage()),
-              );
-            }
-          },
-        );
-      },
     );
   }
 }

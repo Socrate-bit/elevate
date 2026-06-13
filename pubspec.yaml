@@ -86,6 +86,7 @@ flutter:
   assets:
     - shorebird.yaml
     - assets/home/
+    - assets/chat/
     - assets/journal/
   uses-material-design: true
   fonts:

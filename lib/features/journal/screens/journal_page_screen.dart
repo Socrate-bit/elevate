@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/widgets/app_glass_nav_bar.dart';
-import '../cubit/journal_cubit.dart';
-import '../cubit/journal_state.dart';
+import '../../../shared/widgets/appy_nav_bar.dart';
 import '../widgets/journal_date_pill.dart';
 import '../widgets/journal_entry_card.dart';
 import '../widgets/journal_header.dart';
@@ -13,21 +10,10 @@ import '../widgets/journal_input_cues.dart';
 import '../widgets/journal_insight_card.dart';
 import '../widgets/journal_quote_card.dart';
 
-/// Journal page ("Appy" design) — pure UI on mock data.
+/// Journal page ("Appy" design) — pure UI on mock data. Hosted by [AppyShell],
+/// which provides the shared nav state; the bar swaps between sibling pages.
 class JournalPage extends StatelessWidget {
   const JournalPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => JournalCubit(),
-      child: const _JournalView(),
-    );
-  }
-}
-
-class _JournalView extends StatelessWidget {
-  const _JournalView();
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +50,7 @@ class _JournalView extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const _JournalNavBar(),
+      bottomNavigationBar: const AppyNavBar(),
     );
   }
 }
@@ -101,31 +87,6 @@ class _JournalBackground extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Bottom navigation bar. Selecting Home returns to the previous page.
-class _JournalNavBar extends StatelessWidget {
-  const _JournalNavBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<JournalCubit, JournalState>(
-      buildWhen: (p, c) => p.navIndex != c.navIndex,
-      builder: (context, state) {
-        return AppGlassNavBar(
-          selectedIndex: state.navIndex,
-          onTabSelected: (index) {
-            // Home tab pops back to the Home page; others are selection-only.
-            if (index == 0) {
-              Navigator.of(context).maybePop();
-              return;
-            }
-            context.read<JournalCubit>().selectTab(index);
-          },
-        );
-      },
     );
   }
 }

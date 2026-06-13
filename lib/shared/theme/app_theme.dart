@@ -108,6 +108,38 @@ class HomePalette {
   static const navInactive = Color(0xFF525A59);
 }
 
+/// Palette for the illustrated "Appy" chat page ("Forest Friend") — sampled
+/// from the design. Translucent surfaces float over the cozy-room background.
+class ChatPalette {
+  // Appy (assistant) bubble — near-opaque white.
+  static const appyBubble = Color(0xF2FFFFFF);
+  static const appyText = Color(0xFF3A4440);
+
+  // User bubble — soft translucent sage green.
+  static const userBubble = Color(0xE6A8C677);
+  static const userText = Color(0xFF2C3D18);
+  static const timestamp = Color(0xFF5E6A52);
+
+  // Header / "Today" — frosted dark pills with white content.
+  static const glassPill = Color(0x40000000);
+  static const headerTitle = Color(0xFF2C3D18);
+  static const headerSubtitle = Color(0xFF5E6A52);
+
+  // "Start a conversation" frosted panel.
+  static const panel = Color(0x59343C28);
+  static const panelText = Colors.white;
+  static const suggestion = Color(0xF2FFFFFF);
+  static const suggestionText = Color(0xFF3A4440);
+
+  // Composer bar.
+  static const composer = Color(0xF2FFFFFF);
+  static const composerHint = Color(0xFF9AA08F);
+  static const composerText = Color(0xFF3A4440);
+
+  // Round action buttons (composer +, send/call) — leafy green.
+  static const accent = Color(0xFF7BAE3F);
+}
+
 /// Palette for the illustrated Journal page (sampled from the design).
 class JournalPalette {
   // Soft scrim that fades the scene background into a readable surface for the
