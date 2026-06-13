@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
+import '../../../shared/widgets/appy_nav_bar.dart';
 import '../cubit/community_cubit.dart';
 import '../cubit/community_state.dart';
 import '../models/community_mock_data.dart';
@@ -34,6 +35,7 @@ class _CommunityView extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: CommunityPalette.background,
+      extendBody: true,
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: CommunityPalette.background,
@@ -79,6 +81,7 @@ class _CommunityView extends StatelessWidget {
           child: Icon(Icons.add_rounded, color: Colors.white, size: 30.sp),
         ),
       ),
+      bottomNavigationBar: const AppyNavBar(),
       body: Column(
         children: [
           Padding(

@@ -86,6 +86,9 @@ flutter:
   assets:
     - shorebird.yaml
     - assets/home/
+    - assets/activities/
+    - assets/chat/
+    - assets/journal/
     - assets/community/
     - assets/community/profil_avatar/
     - assets/mood tracking/
