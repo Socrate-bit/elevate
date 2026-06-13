@@ -1071,4 +1071,31 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get navCommunity => 'Communauté';
+
+  @override
+  String get chatPageCalmMode => 'Mode calme';
+
+  @override
+  String get chatPageCompanionName => 'Ami de la forêt';
+
+  @override
+  String get chatPageCompanionSubtitle => 'Votre compagnon bienveillant';
+
+  @override
+  String get chatPageToday => 'Aujourd\'hui';
+
+  @override
+  String get chatPageStartConversation => 'Démarrer une conversation';
+
+  @override
+  String get chatPageSuggestTalkDay => 'Parler de ma journée';
+
+  @override
+  String get chatPageSuggestComfort => 'J\'ai besoin de réconfort';
+
+  @override
+  String get chatPageSuggestReflect => 'M\'aider à réfléchir';
+
+  @override
+  String get chatPageComposerHint => 'Votre message';
 }
