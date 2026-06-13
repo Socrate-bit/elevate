@@ -1071,4 +1071,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get navCommunity => 'Communauté';
+
+  @override
+  String get journalTitle => 'Journal';
+
+  @override
+  String get journalMonthlyInsight => 'Bilan du mois';
+
+  @override
+  String get journalInputCues => 'Pistes d\'écriture';
 }

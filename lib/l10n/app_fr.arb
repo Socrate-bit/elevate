@@ -392,5 +392,9 @@
   "@homePageXp": { "placeholders": { "xp": { "type": "int" } } },
   "navJournal": "Journal",
   "navTools": "Outils",
-  "navCommunity": "Communauté"
+  "navCommunity": "Communauté",
+
+  "journalTitle": "Journal",
+  "journalMonthlyInsight": "Bilan du mois",
+  "journalInputCues": "Pistes d'écriture"
 }

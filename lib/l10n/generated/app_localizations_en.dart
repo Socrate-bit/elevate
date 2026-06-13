@@ -1063,4 +1063,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navCommunity => 'Community';
+
+  @override
+  String get journalTitle => 'Journal';
+
+  @override
+  String get journalMonthlyInsight => 'Monthly Insight';
+
+  @override
+  String get journalInputCues => 'Input Cues';
 }

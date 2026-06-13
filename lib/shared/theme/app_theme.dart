@@ -108,6 +108,39 @@ class HomePalette {
   static const navInactive = Color(0xFF525A59);
 }
 
+/// Palette for the illustrated Journal page (sampled from the design).
+class JournalPalette {
+  // Soft scrim that fades the scene background into a readable surface for the
+  // lower cards.
+  static const scrim = Color(0xFFFCF5EC);
+
+  // Quote card — translucent sky-blue with a teal quote glyph.
+  static const quoteCardBg = Color(0xFFCDE8F0);
+  static const quoteGlyph = Color(0xFF6FB8C4);
+
+  // Monthly Insight card.
+  static const insightCardBg = Color(0xFFFBF6EA);
+  static const insightBody = Color(0xFF5C6B57);
+
+  // Entry icon tiles (pastel circles behind the emoji).
+  static const tilePink = Color(0xFFFBE0E3);
+  static const tileAmber = Color(0xFFFCEFC9);
+
+  // Category chips (background + text) per entry type.
+  static const chipConversationBg = Color(0xFFDDEBFB);
+  static const chipConversationText = Color(0xFF4C7BB8);
+  static const chipReflectionBg = Color(0xFFEAE2F7);
+  static const chipReflectionText = Color(0xFF8266B0);
+  static const chipWinBg = Color(0xFFFBEFCB);
+  static const chipWinText = Color(0xFFB98417);
+  static const chipPatternBg = Color(0xFFE6F0CF);
+  static const chipPatternText = Color(0xFF6B8C2F);
+
+  // Insight tag chips.
+  static const tagBg = Color(0xFFEFF1DE);
+  static const tagText = Color(0xFF5C6B57);
+}
+
 class AppTheme {
   static ThemeData get light {
     const bg = Color(0xFFF2F2F7);
