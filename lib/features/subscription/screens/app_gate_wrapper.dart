@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
@@ -7,7 +8,7 @@ import '../../alarms/cubit/alarm_state.dart';
 import '../../alarms/services/alarm_service.dart';
 import '../cubit/subscription_cubit.dart';
 import '../cubit/subscription_state.dart';
-import '../../../shared/bottom_nav_shell.dart';
+import '../../home/screens/home_page_screen.dart';
 
 /// Subscription gate. Loads user_type once, drives [AlarmCubit.sync] only
 /// when the user has access, and renders BottomNavShell — wrapped in a
@@ -79,14 +80,20 @@ class _AppGateWrapperState extends State<AppGateWrapper> {
               // }
               if (sub.hasAccess) {
                 alarmCubit.restoreSubscriptionDisabled();
-                return const BottomNavShell();
+                return const HomePage();
               }
 
               alarmCubit.disableAllForSubscription();
+              // In debug builds, let the home page be used without a sub so the
+              // UI can be developed/tested. Production still gates with the
+              // tap-catching paywall overlay.
+              if (kDebugMode) {
+                return const HomePage();
+              }
               Superwall.shared.registerPlacement('app_start');
               return Stack(
                 children: [
-                  const BottomNavShell(),
+                  const HomePage(),
                   Positioned.fill(
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,

@@ -1026,4 +1026,49 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get chatActionCompleted => 'Je viens de le faire !';
+
+  @override
+  String homePageGreeting(String name) {
+    return 'Bon après-midi, $name 🌿';
+  }
+
+  @override
+  String get homePageHeadline => 'Tu t\'en sors très bien aujourd\'hui !';
+
+  @override
+  String get homePageMessage => 'Message';
+
+  @override
+  String get homePageCall => 'Appel';
+
+  @override
+  String get homePageCrisisMode => 'Mode Crise';
+
+  @override
+  String homePageQuestProgress(int done, int total) {
+    return '$done / $total';
+  }
+
+  @override
+  String get homePageTodaysPlan => 'Plan du jour';
+
+  @override
+  String get homePageTodaysPlanSubtitle => 'Petits pas, grands changements.';
+
+  @override
+  String get homePageEdit => 'Modifier';
+
+  @override
+  String homePageXp(int xp) {
+    return '+ $xp XP';
+  }
+
+  @override
+  String get navJournal => 'Journal';
+
+  @override
+  String get navTools => 'Outils';
+
+  @override
+  String get navCommunity => 'Communauté';
 }

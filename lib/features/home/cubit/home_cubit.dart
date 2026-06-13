@@ -12,8 +12,8 @@ import 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit({required RoutineCubit routineCubit})
-      : _routineCubit = routineCubit,
-        super(const HomeState()) {
+    : _routineCubit = routineCubit,
+      super(const HomeState()) {
     _subscribe();
   }
 
@@ -35,8 +35,9 @@ class HomeCubit extends Cubit<HomeState> {
     _profileReady = false;
     _routinesReady = false;
 
-    _activitiesSub =
-        ActivityService.watchActivities(limit: 500).listen((activities) {
+    _activitiesSub = ActivityService.watchActivities(limit: 500).listen((
+      activities,
+    ) {
       _allActivities = activities;
       _activitiesReady = true;
       _recomputeIfReady();
@@ -74,24 +75,24 @@ class HomeCubit extends Cubit<HomeState> {
   void _recompute() {
     if (isClosed) return;
 
-    final completed =
-        _allActivities.where((a) => a.completed).toList();
-    final lastActivity =
-        completed.isEmpty ? null : completed.first;
+    final completed = _allActivities.where((a) => a.completed).toList();
+    final lastActivity = completed.isEmpty ? null : completed.first;
     final result = StreakService.computeStreak(
       activities: _allActivities,
       routines: _routines,
     );
 
-    emit(state.copyWith(
-      currentStreak: result.streak,
-      weekDays: result.weekDays,
-      lastActivity: lastActivity,
-      clearLastActivity: lastActivity == null,
-      completedActivities: completed,
-      totalActivities: _profile.totalActivities,
-      loading: false,
-    ));
+    emit(
+      state.copyWith(
+        currentStreak: result.streak,
+        weekDays: result.weekDays,
+        lastActivity: lastActivity,
+        clearLastActivity: lastActivity == null,
+        completedActivities: completed,
+        totalActivities: _profile.totalActivities,
+        loading: false,
+      ),
+    );
 
     _loadCompleter?.complete();
     _loadCompleter = null;

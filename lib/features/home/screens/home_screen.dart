@@ -221,14 +221,17 @@ class _StartChatCardState extends State<_StartChatCard> {
                         height: 20.w,
                         child: const CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       ),
                     )
                   : Container(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 14.w, vertical: 6.h),
+                        horizontal: 14.w,
+                        vertical: 6.h,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withAlpha(45),
                         borderRadius: BorderRadius.circular(20.r),
@@ -263,13 +266,9 @@ class _RoutineSections extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final actions = routines
-        .where((r) => r.type == RoutineType.action)
-        .toList()
+    final actions = routines.where((r) => r.type == RoutineType.action).toList()
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    final habits = routines
-        .where((r) => r.type == RoutineType.habit)
-        .toList()
+    final habits = routines.where((r) => r.type == RoutineType.habit).toList()
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     final today = DateTime.now();
@@ -434,8 +433,11 @@ class _TopBar extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(Icons.local_fire_department_rounded,
-                  size: 18.sp, color: c.primary),
+              Icon(
+                Icons.local_fire_department_rounded,
+                size: 18.sp,
+                color: c.primary,
+              ),
               SizedBox(width: 4.w),
               Text(
                 '$streak',
@@ -496,10 +498,7 @@ class _WeekRow extends StatelessWidget {
               color: c.card,
               borderRadius: BorderRadius.circular(20.r),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(10),
-                  blurRadius: 8,
-                ),
+                BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 8),
               ],
             ),
             child: Column(
@@ -557,7 +556,9 @@ class _WeekRow extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                  color: c.textSecondary.withAlpha(50), width: 2.5),
+                color: c.textSecondary.withAlpha(50),
+                width: 2.5,
+              ),
             ),
             child: Center(
               child: Text(
@@ -589,10 +590,7 @@ class _WeekRow extends StatelessWidget {
           children: [
             Text(
               label,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: c.textSecondary,
-              ),
+              style: TextStyle(fontSize: 12.sp, color: c.textSecondary),
             ),
             SizedBox(height: 6.h),
             circle,
@@ -644,6 +642,5 @@ class _DashedCirclePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DashedCirclePainter oldDelegate) =>
-      color != oldDelegate.color ||
-      strokeWidth != oldDelegate.strokeWidth;
+      color != oldDelegate.color || strokeWidth != oldDelegate.strokeWidth;
 }

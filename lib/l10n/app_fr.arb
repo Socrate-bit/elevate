@@ -375,5 +375,22 @@
   "@chatRoutineDeleted": { "placeholders": { "name": { "type": "String" } } },
   "chatActionStartNow": "Commencer maintenant",
   "chatActionDone": "Terminé",
-  "chatActionCompleted": "Je viens de le faire !"
+  "chatActionCompleted": "Je viens de le faire !",
+
+  "homePageGreeting": "Bon après-midi, {name} 🌿",
+  "@homePageGreeting": { "placeholders": { "name": { "type": "String" } } },
+  "homePageHeadline": "Tu t'en sors très bien aujourd'hui !",
+  "homePageMessage": "Message",
+  "homePageCall": "Appel",
+  "homePageCrisisMode": "Mode Crise",
+  "homePageQuestProgress": "{done} / {total}",
+  "@homePageQuestProgress": { "placeholders": { "done": { "type": "int" }, "total": { "type": "int" } } },
+  "homePageTodaysPlan": "Plan du jour",
+  "homePageTodaysPlanSubtitle": "Petits pas, grands changements.",
+  "homePageEdit": "Modifier",
+  "homePageXp": "+ {xp} XP",
+  "@homePageXp": { "placeholders": { "xp": { "type": "int" } } },
+  "navJournal": "Journal",
+  "navTools": "Outils",
+  "navCommunity": "Communauté"
 }

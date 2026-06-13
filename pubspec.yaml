@@ -85,4 +85,9 @@ flutter:
   generate: true
   assets:
     - shorebird.yaml
+    - assets/home/
   uses-material-design: true
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/Nunito-VariableFont_wght.ttf

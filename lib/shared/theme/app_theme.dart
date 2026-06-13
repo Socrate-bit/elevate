@@ -59,6 +59,55 @@ class AppColors {
   }
 }
 
+/// Palette for the illustrated "Appy" home page (sampled from the design).
+class HomePalette {
+  // Scene — grass/skyFill match the bottom/top edges of
+  // background_static.png so the fills around the image blend seamlessly.
+  static const sky = Color(0xFFCAE6E7);
+  static const skyFill = Color(0xFFB4DFE9);
+  static const grass = Color(0xFF8CAD43);
+
+  // Text
+  static const textDarkGreen = Color(0xFF0C3718);
+  static const headlineGreen = Color(0xFF0C3718);
+  static const titleDark = Color(0xFF3A4440);
+  static const subtitleGrey = Color(0xFF8C9189);
+
+  // Surfaces
+  static const cream = Color(0xFFFCF5EC);
+  static const cardWhite = Color(0xFFFFFFFC);
+  static const navCream = Color(0xFFFDFBF7);
+
+  // Accents
+  static const teal = Color(0xFF1EA49A);
+  static const tealDark = Color(0xFF15837C);
+  static const crisisRed = Color(0xFFEC5B3A);
+  static const crisisRedDark = Color(0xFFC94B2E);
+  static const badgeRed = Color(0xFFF03E3E);
+  static const checkGreen = Color(0xFF76A93F);
+  static const incompleteOrange = Color(0xFFFA8C2C);
+  static const progressYellow = Color(0xFFFEB114);
+  static const progressBrown = Color(0xFFA05B23);
+
+  // Today's plan row icon tiles
+  static const tileYellow = Color(0xFFFCE6B7);
+  static const tileBlue = Color(0xFFD4E8FA);
+  static const tileGreen = Color(0xFFEAF0CE);
+  static const timeline = Color(0xFFC9CDB4);
+
+  // Edit pill
+  static const editPillBg = Color(0xFFF0F2CF);
+  static const editGreen = Color(0xFF4F7A28);
+
+  // Task card check button (Finch-style grey rounded square)
+  static const checkButtonBg = Color(0xFFEDEDE6);
+  static const checkButtonBorder = Color(0xFFDDDDD4);
+
+  // Bottom nav
+  static const navActivePill = Color(0xFFD7ECE6);
+  static const navInactive = Color(0xFF525A59);
+}
+
 class AppTheme {
   static ThemeData get light {
     const bg = Color(0xFFF2F2F7);
@@ -68,6 +117,7 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Nunito',
       scaffoldBackgroundColor: bg,
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.brand,
@@ -143,6 +193,7 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Nunito',
       scaffoldBackgroundColor: darkBg,
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.brand,

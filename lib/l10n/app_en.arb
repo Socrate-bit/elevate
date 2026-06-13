@@ -375,5 +375,22 @@
   "@chatRoutineDeleted": { "placeholders": { "name": { "type": "String" } } },
   "chatActionStartNow": "Start now",
   "chatActionDone": "Done",
-  "chatActionCompleted": "I just completed it!"
+  "chatActionCompleted": "I just completed it!",
+
+  "homePageGreeting": "Good afternoon, {name} 🌿",
+  "@homePageGreeting": { "placeholders": { "name": { "type": "String" } } },
+  "homePageHeadline": "You're doing great today!",
+  "homePageMessage": "Message",
+  "homePageCall": "Call",
+  "homePageCrisisMode": "Crisis Mode",
+  "homePageQuestProgress": "{done} / {total}",
+  "@homePageQuestProgress": { "placeholders": { "done": { "type": "int" }, "total": { "type": "int" } } },
+  "homePageTodaysPlan": "Today's Plan",
+  "homePageTodaysPlanSubtitle": "Small steps, big changes.",
+  "homePageEdit": "Edit",
+  "homePageXp": "+ {xp} XP",
+  "@homePageXp": { "placeholders": { "xp": { "type": "int" } } },
+  "navJournal": "Journal",
+  "navTools": "Tools",
+  "navCommunity": "Community"
 }
