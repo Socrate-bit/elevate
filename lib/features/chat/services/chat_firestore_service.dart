@@ -84,8 +84,7 @@ class ChatFirestoreService implements ChatRepository {
 
   @override
   Future<List<ChatMessage>> getMessages(String conversationId) async {
-    final snap =
-        await _messages(conversationId).orderBy('createdAtMs').get();
+    final snap = await _messages(conversationId).orderBy('createdAtMs').get();
     return snap.docs
         .map((d) => ChatMessage.fromMap(d.id, conversationId, d.data()))
         .toList();
@@ -136,28 +135,25 @@ class ChatFirestoreService implements ChatRepository {
     String conversationId,
     String messageId,
     int selectedIndex,
-  ) =>
-      _messages(conversationId).doc(messageId).update({
-        'form.selectedIndex': selectedIndex,
-      });
+  ) => _messages(
+    conversationId,
+  ).doc(messageId).update({'form.selectedIndex': selectedIndex});
 
   @override
   Future<void> updateMessageMissionSuggestion(
     String conversationId,
     String messageId,
     bool accepted,
-  ) =>
-      _messages(conversationId).doc(messageId).update({
-        'missionSuggestion.accepted': accepted,
-      });
+  ) => _messages(
+    conversationId,
+  ).doc(messageId).update({'missionSuggestion.accepted': accepted});
 
   @override
   Future<void> updateMessageMoodCheckIn(
     String conversationId,
     String messageId,
     String selectedMood,
-  ) =>
-      _messages(conversationId).doc(messageId).update({
-        'moodCheckIn.selectedMood': selectedMood,
-      });
+  ) => _messages(
+    conversationId,
+  ).doc(messageId).update({'moodCheckIn.selectedMood': selectedMood});
 }

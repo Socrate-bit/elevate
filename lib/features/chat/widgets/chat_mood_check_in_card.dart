@@ -60,9 +60,10 @@ class ChatMoodCheckInCard extends StatelessWidget {
                   onTap: answered
                       ? null
                       : withHaptic(
-                          () => context
-                              .read<ChatCubit>()
-                              .selectMood(messageId, mood),
+                          () => context.read<ChatCubit>().selectMood(
+                            messageId,
+                            mood,
+                          ),
                         ),
                   child: Opacity(
                     opacity: isDisabled ? 0.3 : 1.0,

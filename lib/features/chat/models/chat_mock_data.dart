@@ -34,7 +34,10 @@ class ChatMockData {
       isUser: false,
       text: "You don't need to figure everything out at once.",
     ),
-    ChatBubbleMessage(isUser: false, text: 'What would you like to talk about?'),
+    ChatBubbleMessage(
+      isUser: false,
+      text: 'What would you like to talk about?',
+    ),
     ChatBubbleMessage(
       isUser: true,
       text: 'I had a stressful day.',

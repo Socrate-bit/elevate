@@ -15,24 +15,27 @@ class ChatForm extends Equatable {
     this.selectedIndex,
   });
 
-  ChatForm copyWith({String? question, List<String>? options, int? selectedIndex}) =>
-      ChatForm(
-        question: question ?? this.question,
-        options: options ?? this.options,
-        selectedIndex: selectedIndex ?? this.selectedIndex,
-      );
+  ChatForm copyWith({
+    String? question,
+    List<String>? options,
+    int? selectedIndex,
+  }) => ChatForm(
+    question: question ?? this.question,
+    options: options ?? this.options,
+    selectedIndex: selectedIndex ?? this.selectedIndex,
+  );
 
   Map<String, dynamic> toMap() => {
-        'question': question,
-        'options': options,
-        if (selectedIndex != null) 'selectedIndex': selectedIndex,
-      };
+    'question': question,
+    'options': options,
+    if (selectedIndex != null) 'selectedIndex': selectedIndex,
+  };
 
   static ChatForm fromMap(Map<String, dynamic> m) => ChatForm(
-        question: m['question'] as String? ?? '',
-        options: List<String>.from(m['options'] as List? ?? const []),
-        selectedIndex: m['selectedIndex'] as int?,
-      );
+    question: m['question'] as String? ?? '',
+    options: List<String>.from(m['options'] as List? ?? const []),
+    selectedIndex: m['selectedIndex'] as int?,
+  );
 
   @override
   List<Object?> get props => [question, options, selectedIndex];

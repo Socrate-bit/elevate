@@ -31,15 +31,15 @@ class ChatRoutineMutation extends Equatable {
   });
 
   Map<String, dynamic> toMap() => {
-        'kind': kind.name,
-        'routineType': routineType.name,
-        'routineId': routineId,
-        'routineName': routineName,
-        'iconKey': iconKey,
-        'colorKey': colorKey,
-        if (scheduledDate != null)
-          'scheduledDate': scheduledDate!.toIso8601String(),
-      };
+    'kind': kind.name,
+    'routineType': routineType.name,
+    'routineId': routineId,
+    'routineName': routineName,
+    'iconKey': iconKey,
+    'colorKey': colorKey,
+    if (scheduledDate != null)
+      'scheduledDate': scheduledDate!.toIso8601String(),
+  };
 
   static ChatRoutineMutation fromMap(Map<String, dynamic> m) {
     final kindStr = m['kind'] as String? ?? 'created';
@@ -55,8 +55,7 @@ class ChatRoutineMutation extends Equatable {
       routineName: m['routineName'] as String? ?? '',
       iconKey: m['iconKey'] as String? ?? 'star',
       colorKey: m['colorKey'] as String? ?? 'blue',
-      scheduledDate:
-          dateRaw != null ? DateTime.tryParse(dateRaw) : null,
+      scheduledDate: dateRaw != null ? DateTime.tryParse(dateRaw) : null,
     );
   }
 
@@ -69,6 +68,13 @@ class ChatRoutineMutation extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [kind, routineType, routineId, routineName, iconKey, colorKey, scheduledDate];
+  List<Object?> get props => [
+    kind,
+    routineType,
+    routineId,
+    routineName,
+    iconKey,
+    colorKey,
+    scheduledDate,
+  ];
 }

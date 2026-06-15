@@ -40,8 +40,7 @@ class CommunityFeedView extends StatelessWidget {
                           onLike: () =>
                               context.read<CommunityCubit>().toggleLike(i),
                         ),
-                        if (i != state.posts.length - 1)
-                          SizedBox(height: 12.h),
+                        if (i != state.posts.length - 1) SizedBox(height: 12.h),
                       ],
                     ],
                   );

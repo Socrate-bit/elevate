@@ -23,6 +23,14 @@ class CommunityCheckInCard extends StatelessWidget {
       l10n.communityMoodStruggling,
       l10n.communityMoodReallyHard,
     ];
+    // Soft pastel tile behind each mood face, keyed by position.
+    const tileColors = [
+      CommunityPalette.moodTileGreen,
+      CommunityPalette.moodTileYellow,
+      CommunityPalette.moodTileOrange,
+      CommunityPalette.moodTilePink,
+      CommunityPalette.moodTilePurple,
+    ];
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
@@ -67,6 +75,7 @@ class CommunityCheckInCard extends StatelessWidget {
                   (i) => _MoodFace(
                     asset: CommunityMockData.moodAssets[i],
                     label: labels[i],
+                    tileColor: tileColors[i],
                     selected: state.selectedMood == i,
                     onTap: () => context.read<CommunityCubit>().selectMood(i),
                   ),
@@ -84,12 +93,14 @@ class CommunityCheckInCard extends StatelessWidget {
 class _MoodFace extends StatelessWidget {
   final String asset;
   final String label;
+  final Color tileColor;
   final bool selected;
   final VoidCallback onTap;
 
   const _MoodFace({
     required this.asset,
     required this.label,
+    required this.tileColor,
     required this.selected,
     required this.onTap,
   });
@@ -103,7 +114,17 @@ class _MoodFace extends StatelessWidget {
           AnimatedScale(
             scale: selected ? 1.12 : 1,
             duration: const Duration(milliseconds: 150),
-            child: Image.asset(asset, width: 40.w, height: 40.w),
+            // Soft colored rounded-square tile behind the face.
+            child: Container(
+              width: 56.w,
+              height: 56.w,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: tileColor,
+                borderRadius: BorderRadius.circular(18.r),
+              ),
+              child: Image.asset(asset, width: 42.w, height: 42.w),
+            ),
           ),
           SizedBox(height: 4.h),
           SizedBox(

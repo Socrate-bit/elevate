@@ -54,9 +54,7 @@ class ChatFormCard extends StatelessWidget {
                       vertical: 12.h,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? c.primary
-                          : c.background,
+                      color: isSelected ? c.primary : c.background,
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
                         color: isSelected ? c.primary : c.separator,

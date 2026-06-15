@@ -130,7 +130,8 @@ class CommunityMockData {
       username: 'mindful_mo',
       tag: 'Anxiety',
       timeAgo: '2h',
-      body: 'Had a tough morning, but taking 10 deep breaths really helped '
+      body:
+          'Had a tough morning, but taking 10 deep breaths really helped '
           'me reset. Small steps 🌱',
       likes: 24,
       comments: 8,
@@ -141,7 +142,8 @@ class CommunityMockData {
       username: 'brave_bird',
       tag: 'Depression',
       timeAgo: '5h',
-      body: 'Reminder to be gentle with yourself today. You\'re doing better '
+      body:
+          'Reminder to be gentle with yourself today. You\'re doing better '
           'than you think you are 💛',
       likes: 32,
       comments: 12,
@@ -152,7 +154,8 @@ class CommunityMockData {
       username: 'calm_cloud',
       tag: 'Mindfulness',
       timeAgo: '8h',
-      body: 'Five minutes of journaling before bed has changed my sleep. '
+      body:
+          'Five minutes of journaling before bed has changed my sleep. '
           'Highly recommend giving it a try ✍️',
       likes: 18,
       comments: 5,
@@ -163,7 +166,8 @@ class CommunityMockData {
       username: 'steady_sam',
       tag: 'Recovery',
       timeAgo: '1d',
-      body: 'One month sober today. Grateful for this community for keeping '
+      body:
+          'One month sober today. Grateful for this community for keeping '
           'me grounded 🙏',
       likes: 96,
       comments: 41,
