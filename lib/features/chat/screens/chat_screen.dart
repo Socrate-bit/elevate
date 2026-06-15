@@ -27,11 +27,7 @@ class ChatScreen extends StatefulWidget {
   final VoidCallback onNewChat;
   final String? initialMessage;
 
-  const ChatScreen({
-    super.key,
-    required this.onNewChat,
-    this.initialMessage,
-  });
+  const ChatScreen({super.key, required this.onNewChat, this.initialMessage});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -78,8 +74,11 @@ class _ChatScreenState extends State<ChatScreen> {
           backgroundColor: c.background,
           appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_rounded,
-                  size: 20.sp, color: c.textPrimary),
+              icon: Icon(
+                Icons.arrow_back_ios_rounded,
+                size: 20.sp,
+                color: c.textPrimary,
+              ),
               onPressed: withHaptic(() => Navigator.of(context).pop()),
             ),
             centerTitle: true,
@@ -102,16 +101,19 @@ class _ChatScreenState extends State<ChatScreen> {
           body: Column(
             children: [
               Expanded(
-                child: state.messages.isEmpty && !state.isLoading && !state.isSending
+                child:
+                    state.messages.isEmpty &&
+                        !state.isLoading &&
+                        !state.isSending
                     ? _GreetingHero()
                     : state.isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _MessagesList(
-                            scrollController: _scrollController,
-                            messages: state.messages,
-                            isSending: state.isSending,
-                            bottomPadding: bottomInset + 80.h,
-                          ),
+                    ? const Center(child: CircularProgressIndicator())
+                    : _MessagesList(
+                        scrollController: _scrollController,
+                        messages: state.messages,
+                        isSending: state.isSending,
+                        bottomPadding: bottomInset + 80.h,
+                      ),
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, bottomInset),
@@ -142,9 +144,9 @@ class _ChatScreenState extends State<ChatScreen> {
       await context.read<ChatCubit>().sendText(text);
     } catch (_) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.chatSendFailed)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.chatSendFailed)));
     }
   }
 
@@ -163,14 +165,14 @@ class _ChatScreenState extends State<ChatScreen> {
         _bindPartialUpdates(cubit);
       } on VoiceUnavailableException {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.chatVoiceUnavailable)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.chatVoiceUnavailable)));
       } catch (_) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.chatVoicePermissionDenied)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.chatVoicePermissionDenied)));
       }
     }
   }
@@ -184,9 +186,7 @@ class _ChatScreenState extends State<ChatScreen> {
         );
       }
     });
-    cubit.stream
-        .firstWhere((s) => !s.isListening)
-        .then((_) => sub.cancel());
+    cubit.stream.firstWhere((s) => !s.isListening).then((_) => sub.cancel());
   }
 
   void _scrollToBottom() {
@@ -227,8 +227,7 @@ class _MessagesList extends StatelessWidget {
         if (m.form != null && m.role == ChatRole.model) {
           return ChatFormCard(
             form: m.form!,
-            onAnswer: (idx) =>
-                context.read<ChatCubit>().answerForm(m.id, idx),
+            onAnswer: (idx) => context.read<ChatCubit>().answerForm(m.id, idx),
           );
         }
         if (m.missionSuggestion != null && m.role == ChatRole.model) {
@@ -237,8 +236,9 @@ class _MessagesList extends StatelessWidget {
             onAccept: () async {
               await context.read<ChatCubit>().acceptMissionSuggestion(m.id);
               if (!context.mounted) return;
-              final missionType =
-                  missionTypeFromString(m.missionSuggestion!.missionType);
+              final missionType = missionTypeFromString(
+                m.missionSuggestion!.missionType,
+              );
               final l10n = AppLocalizations.of(context)!;
               final cubit = context.read<ChatCubit>();
               Navigator.of(context).push(
@@ -260,10 +260,7 @@ class _MessagesList extends StatelessWidget {
           );
         }
         if (m.moodCheckIn != null && m.role == ChatRole.model) {
-          return ChatMoodCheckInCard(
-            messageId: m.id,
-            checkIn: m.moodCheckIn!,
-          );
+          return ChatMoodCheckInCard(messageId: m.id, checkIn: m.moodCheckIn!);
         }
         if (m.routineMutation != null && m.role == ChatRole.model) {
           final mutation = m.routineMutation!;
@@ -275,7 +272,9 @@ class _MessagesList extends StatelessWidget {
               final chatCubit = context.read<ChatCubit>();
               try {
                 await routineCubit.validate(mutation.routineId);
-                debugPrint('[ChatScreen] action validated: ${mutation.routineId}');
+                debugPrint(
+                  '[ChatScreen] action validated: ${mutation.routineId}',
+                );
               } catch (e) {
                 debugPrint('[ChatScreen] validate failed: $e');
               }

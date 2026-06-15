@@ -137,10 +137,10 @@ class ChatPalette {
   static const suggestion = Color(0xF2FFFFFF);
   static const suggestionText = Color(0xFF3A4440);
 
-  // Composer bar.
-  static const composer = Color(0xF2FFFFFF);
-  static const composerHint = Color(0xFF9AA08F);
-  static const composerText = Color(0xFF3A4440);
+  // Composer bar — minimalist translucent frosted glass over the scene.
+  static const composer = Color(0x33FFFFFF);
+  static const composerHint = Color(0xCCFFFFFF);
+  static const composerText = Color(0xFFFFFFFF);
 
   // Round action buttons (composer +, send/call) — leafy green.
   static const accent = Color(0xFF7BAE3F);
@@ -204,6 +204,16 @@ class CommunityPalette {
   // Tag pill (post category)
   static const tagBg = Color(0xFFEFE7DD);
   static const tagText = Color(0xFF8A7A6A);
+
+  // Segmented control bar (translucent track holding the three segments).
+  static const segmentTrack = Color(0x73FFFFFF);
+
+  // Mood check-in: soft pastel rounded-square tile behind each face.
+  static const moodTileGreen = Color(0xFFD9EFCB);
+  static const moodTileYellow = Color(0xFFFAEFC6);
+  static const moodTileOrange = Color(0xFFFBE2CB);
+  static const moodTilePink = Color(0xFFFAD9DC);
+  static const moodTilePurple = Color(0xFFE8DDF4);
 
   // Accents
   static const fab = Color(0xFFF39C3D);

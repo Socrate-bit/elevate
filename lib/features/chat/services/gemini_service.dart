@@ -257,8 +257,8 @@ Use plain prose replies for everything else.
     final instruction = (memoryContext == null || memoryContext.isEmpty)
         ? _systemInstruction
         : '$_systemInstruction\n\n'
-            '--- What you already know about this user ---\n'
-            '$memoryContext';
+              '--- What you already know about this user ---\n'
+              '$memoryContext';
     return FirebaseAI.googleAI().generativeModel(
       model: _modelName,
       systemInstruction: Content.system(instruction),
@@ -283,12 +283,14 @@ Use plain prose replies for everything else.
             'focus, wake up, build a habit, or try something active.',
             parameters: {
               'mission_type': Schema.string(
-                description: 'One of: pushUps, squats, shakePhone, math, affirmation, '
+                description:
+                    'One of: pushUps, squats, shakePhone, math, affirmation, '
                     'breathing, skyPhoto, makeBed, objectHunt, petHunt, natureHunt, '
                     'touchGrass, random.',
               ),
               'reason': Schema.string(
-                description: 'One short sentence explaining why this mission fits right now.',
+                description:
+                    'One short sentence explaining why this mission fits right now.',
               ),
             },
           ),
@@ -297,7 +299,8 @@ Use plain prose replies for everything else.
             'Check in on how the user is feeling when their emotional state is relevant.',
             parameters: {
               'question': Schema.string(
-                description: 'Short contextual question to display, e.g. "How are you feeling right now?"',
+                description:
+                    'Short contextual question to display, e.g. "How are you feeling right now?"',
               ),
             },
           ),
@@ -351,9 +354,7 @@ Use plain prose replies for everything else.
             'new_life_events': Schema.array(
               items: Schema.object(
                 properties: {
-                  'title': Schema.string(
-                    description: 'Short event title.',
-                  ),
+                  'title': Schema.string(description: 'Short event title.'),
                   'description': Schema.string(
                     description: 'One sentence describing what happened.',
                   ),
@@ -367,8 +368,7 @@ Use plain prose replies for everything else.
                   'Notable events mentioned by the user. Skip duplicates of existing events.',
             ),
             'summary': Schema.string(
-              description:
-                  '1–3 sentence neutral recap of what was discussed.',
+              description: '1–3 sentence neutral recap of what was discussed.',
             ),
           },
         ),
@@ -379,7 +379,9 @@ Use plain prose replies for everything else.
   static Map<String, Schema> _routineSchema({required bool includeId}) {
     return {
       if (includeId)
-        'routine_id': Schema.string(description: 'Id of the routine to update.'),
+        'routine_id': Schema.string(
+          description: 'Id of the routine to update.',
+        ),
       'type': Schema.string(
         description: '"action" (one-shot) or "habit" (recurring).',
       ),
@@ -413,8 +415,7 @@ Use plain prose replies for everything else.
             'Habit-only: 7-element array, index 0 = Sunday … 6 = Saturday.',
       ),
       'scheduled_minute': Schema.integer(
-        description:
-            'Minutes since midnight (0-1439). Use -1 for no time set.',
+        description: 'Minutes since midnight (0-1439). Use -1 for no time set.',
       ),
       'has_alarm': Schema.boolean(
         description: 'True to ring an alarm at the scheduled time.',
@@ -430,8 +431,9 @@ Use plain prose replies for everything else.
   }) async {
     try {
       final contents = _buildContents(history, userText);
-      final response =
-          await _buildChatModel(memoryContext).generateContent(contents);
+      final response = await _buildChatModel(
+        memoryContext,
+      ).generateContent(contents);
 
       final calls = response.functionCalls.toList();
       if (calls.isNotEmpty) {
@@ -487,9 +489,9 @@ Use plain prose replies for everything else.
           'Write a 3 to 6 word title for a chat that starts with this user message. '
           'Reply with just the title — no quotes, no punctuation at the end.\n\n'
           'Message: $firstUserMessage';
-      final response = await _buildChatModel(null).generateContent([
-        Content.text(prompt),
-      ]);
+      final response = await _buildChatModel(
+        null,
+      ).generateContent([Content.text(prompt)]);
       final text = response.text?.trim() ?? '';
       if (text.isEmpty) return _fallbackTitle(firstUserMessage);
       return text.replaceAll('"', '').replaceAll("'", '').trim();
@@ -510,13 +512,14 @@ Use plain prose replies for everything else.
       final factsBlock = existingFacts.isEmpty
           ? '(none)'
           : existingFacts.entries
-              .map((e) => '- ${e.key}: ${e.value}')
-              .join('\n');
+                .map((e) => '- ${e.key}: ${e.value}')
+                .join('\n');
       final eventsBlock = existingEventTitles.isEmpty
           ? '(none)'
           : existingEventTitles.map((t) => '- $t').join('\n');
 
-      final prompt = 'Conversation transcript:\n$transcript\n\n'
+      final prompt =
+          'Conversation transcript:\n$transcript\n\n'
           'Existing profile facts (do not repeat unchanged):\n$factsBlock\n\n'
           'Already-extracted life events (do not duplicate):\n$eventsBlock\n\n'
           'Return JSON per the schema.';
@@ -566,11 +569,13 @@ Use plain prose replies for everything else.
           final iso = e['occurred_at_iso']?.toString().trim() ?? '';
           DateTime? occurred;
           if (iso.isNotEmpty) occurred = DateTime.tryParse(iso);
-          events.add(ExtractedLifeEvent(
-            title: title,
-            description: desc,
-            occurredAt: occurred,
-          ));
+          events.add(
+            ExtractedLifeEvent(
+              title: title,
+              description: desc,
+              occurredAt: occurred,
+            ),
+          );
         }
       }
     }
@@ -646,29 +651,33 @@ Use plain prose replies for everything else.
           final status = suggestion.accepted == true
               ? 'User accepted.'
               : suggestion.accepted == false
-                  ? 'User declined.'
-                  : 'Awaiting response.';
-          out.add(Content.model([
-            TextPart(
-              'I suggested the "${suggestion.missionType}" mission: '
-              '"${suggestion.reason}". $status',
-            ),
-          ]));
+              ? 'User declined.'
+              : 'Awaiting response.';
+          out.add(
+            Content.model([
+              TextPart(
+                'I suggested the "${suggestion.missionType}" mission: '
+                '"${suggestion.reason}". $status',
+              ),
+            ]),
+          );
         } else if (m.moodCheckIn != null) {
           final checkIn = m.moodCheckIn!;
           final status = checkIn.selectedMood != null
               ? 'User selected: ${checkIn.selectedMood!.name}.'
               : 'Awaiting response.';
-          out.add(Content.model([
-            TextPart('I asked "${checkIn.question}". $status'),
-          ]));
+          out.add(
+            Content.model([TextPart('I asked "${checkIn.question}". $status')]),
+          );
         } else if (mutation != null) {
-          out.add(Content.model([
-            TextPart(
-              'I ${mutation.kind.name} the ${mutation.routineType.name} '
-              '"${mutation.routineName}" (id ${mutation.routineId}).',
-            ),
-          ]));
+          out.add(
+            Content.model([
+              TextPart(
+                'I ${mutation.kind.name} the ${mutation.routineType.name} '
+                '"${mutation.routineName}" (id ${mutation.routineId}).',
+              ),
+            ]),
+          );
         } else if (m.text.isNotEmpty) {
           out.add(Content.model([TextPart(m.text)]));
         }

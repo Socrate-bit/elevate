@@ -17,15 +17,9 @@ class JournalInsightCard extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 14.h),
         decoration: BoxDecoration(
-          color: JournalPalette.insightCardBg,
+          // Translucent like the quote ("citation") card above.
+          color: JournalPalette.insightCardBg.withValues(alpha: 0.82),
           borderRadius: BorderRadius.circular(20.r),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x14000000),
-              blurRadius: 6,
-              offset: Offset(0, 3),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

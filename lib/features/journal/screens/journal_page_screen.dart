@@ -17,35 +17,51 @@ class JournalPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Top inset (status bar) so the scroll content clears the floating app bar.
+    final topInset = MediaQuery.paddingOf(context).top;
     return Scaffold(
       backgroundColor: JournalPalette.scrim,
       extendBody: true,
+      extendBodyBehindAppBar: true,
+      // Fixed, floating header: "Journal" title + settings gear stay in place
+      // while the content scrolls beneath, gaining a soft scrim once scrolled.
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        toolbarHeight: 52.h,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: WidgetStateColor.resolveWith(
+          (states) => states.contains(WidgetState.scrolledUnder)
+              ? JournalPalette.scrim.withValues(alpha: 0.92)
+              : JournalPalette.scrim.withValues(alpha: 0.0),
+        ),
+        title: const JournalHeader(),
+      ),
       body: Stack(
         children: [
           // Forest scene at the top, fading into a soft surface for the cards.
           const Positioned.fill(child: _JournalBackground()),
-          SafeArea(
-            bottom: false,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  SizedBox(height: 8.h),
-                  const JournalHeader(),
-                  SizedBox(height: 12.h),
-                  const JournalDatePill(),
-                  SizedBox(height: 16.h),
-                  const JournalQuoteCard(),
-                  SizedBox(height: 14.h),
-                  const JournalInsightCard(),
-                  SizedBox(height: 18.h),
-                  const JournalInputCues(),
-                  SizedBox(height: 18.h),
-                  const JournalEntryList(),
-                  // Clear the floating bottom nav bar.
-                  SizedBox(height: 90.h),
-                ],
-              ),
+          SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                // Clear the floating app bar (status bar + toolbar).
+                SizedBox(height: topInset + 52.h + 8.h),
+                const JournalDatePill(),
+                SizedBox(height: 64.h),
+                const JournalQuoteCard(),
+                SizedBox(height: 14.h),
+                const JournalInsightCard(),
+                SizedBox(height: 18.h),
+                const JournalInputCues(),
+                SizedBox(height: 18.h),
+                const JournalEntryList(),
+                // Clear the floating bottom nav bar.
+                SizedBox(height: 90.h),
+              ],
             ),
           ),
         ],
@@ -65,10 +81,14 @@ class _JournalBackground extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        Image.asset(
-          'assets/journal/page_background.png',
-          fit: BoxFit.cover,
-          alignment: Alignment.topCenter,
+        // Nudged up 50px so the scene sits a little higher behind the content.
+        Transform.translate(
+          offset: Offset(0, -100.h),
+          child: Image.asset(
+            'assets/journal/page_background.png',
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+          ),
         ),
         // Transparent over the top scene, opaque scrim behind the content.
         DecoratedBox(

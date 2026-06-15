@@ -7,8 +7,8 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
-/// Frosted message composer: "+" action, text field and a green call/send
-/// button. Reports the typed text through [onSend].
+/// Minimalist composer: a translucent frosted "+" circle, a frosted pill with
+/// the text field, and a trailing call/send icon. Reports text via [onSend].
 class ChatComposerBar extends StatefulWidget {
   final ValueChanged<String> onSend;
 
@@ -35,71 +35,96 @@ class _ChatComposerBarState extends State<ChatComposerBar> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(100.r),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
-          decoration: BoxDecoration(
-            color: ChatPalette.composer,
+    return Row(
+      children: [
+        // Leading "+" — its own frosted translucent circle.
+        _FrostedCircle(icon: Icons.add_rounded, onTap: () {}),
+        SizedBox(width: 10.w),
+        // Translucent pill holding the text field + call/send icon.
+        Expanded(
+          child: ClipRRect(
             borderRadius: BorderRadius.circular(100.r),
-          ),
-          child: Row(
-            children: [
-              _RoundButton(icon: Icons.add_rounded, onTap: () {}),
-              SizedBox(width: 8.w),
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  onSubmitted: (_) => _send(),
-                  textInputAction: TextInputAction.send,
-                  style: TextStyle(
-                    color: ChatPalette.composerText,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    border: InputBorder.none,
-                    hintText: l10n.chatPageComposerHint,
-                    hintStyle: TextStyle(
-                      color: ChatPalette.composerHint,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                padding: EdgeInsets.only(left: 18.w, right: 8.w),
+                decoration: BoxDecoration(
+                  color: ChatPalette.composer,
+                  borderRadius: BorderRadius.circular(100.r),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        onSubmitted: (_) => _send(),
+                        textInputAction: TextInputAction.send,
+                        style: TextStyle(
+                          color: ChatPalette.composerText,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(vertical: 14.h),
+                          border: InputBorder.none,
+                          hintText: l10n.chatPageComposerHint,
+                          hintStyle: TextStyle(
+                            color: ChatPalette.composerHint,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(width: 6.w),
+                    GestureDetector(
+                      onTap: withHaptic(_send),
+                      child: Padding(
+                        padding: EdgeInsets.all(6.w),
+                        child: Icon(
+                          Icons.call_rounded,
+                          color: ChatPalette.composerText,
+                          size: 22.sp,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(width: 8.w),
-              _RoundButton(icon: Icons.call_rounded, onTap: _send),
-            ],
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
 
-/// Green circular action button.
-class _RoundButton extends StatelessWidget {
+/// Translucent frosted circular action button.
+class _FrostedCircle extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const _RoundButton({required this.icon, required this.onTap});
+  const _FrostedCircle({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: withHaptic(onTap),
-      child: Container(
-        width: 40.w,
-        height: 40.w,
-        decoration: const BoxDecoration(
-          color: ChatPalette.accent,
-          shape: BoxShape.circle,
+      child: ClipOval(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            width: 48.w,
+            height: 48.w,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: ChatPalette.composer,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: ChatPalette.composerText, size: 24.sp),
+          ),
         ),
-        child: Icon(icon, color: Colors.white, size: 22.sp),
       ),
     );
   }

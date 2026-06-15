@@ -2081,7 +2081,7 @@ abstract class AppLocalizations {
   /// No description provided for @chatPageCompanionName.
   ///
   /// In en, this message translates to:
-  /// **'Forest Friend'**
+  /// **'Jean'**
   String get chatPageCompanionName;
 
   /// No description provided for @chatPageCompanionSubtitle.

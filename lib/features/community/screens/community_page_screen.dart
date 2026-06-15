@@ -62,23 +62,27 @@ class _CommunityView extends StatelessWidget {
           SizedBox(width: 16.w),
         ],
       ),
-      floatingActionButton: GestureDetector(
-        onTap: withHaptic(() {}),
-        child: Container(
-          width: 56.w,
-          height: 56.w,
-          decoration: BoxDecoration(
-            color: CommunityPalette.fab,
-            shape: BoxShape.circle,
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x33000000),
-                blurRadius: 8,
-                offset: Offset(0, 3),
-              ),
-            ],
+      floatingActionButton: Transform.translate(
+        // Nudged a little down and to the left from the default corner.
+        offset: Offset(-14.w, 16.h),
+        child: GestureDetector(
+          onTap: withHaptic(() {}),
+          child: Container(
+            width: 56.w,
+            height: 56.w,
+            decoration: BoxDecoration(
+              color: CommunityPalette.fab,
+              shape: BoxShape.circle,
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x33000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Icon(Icons.add_rounded, color: Colors.white, size: 30.sp),
           ),
-          child: Icon(Icons.add_rounded, color: Colors.white, size: 30.sp),
         ),
       ),
       bottomNavigationBar: const AppyNavBar(),

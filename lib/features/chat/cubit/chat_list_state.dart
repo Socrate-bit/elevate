@@ -18,12 +18,11 @@ class ChatListState extends Equatable {
     List<ChatConversation>? conversations,
     String? searchQuery,
     bool? isLoading,
-  }) =>
-      ChatListState(
-        conversations: conversations ?? this.conversations,
-        searchQuery: searchQuery ?? this.searchQuery,
-        isLoading: isLoading ?? this.isLoading,
-      );
+  }) => ChatListState(
+    conversations: conversations ?? this.conversations,
+    searchQuery: searchQuery ?? this.searchQuery,
+    isLoading: isLoading ?? this.isLoading,
+  );
 
   /// Conversations filtered by [searchQuery] against title only.
   List<ChatConversation> get filtered {

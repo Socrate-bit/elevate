@@ -43,28 +43,27 @@ class ChatMessage extends Equatable {
     ChatMoodCheckIn? moodCheckIn,
     ChatRoutineMutation? routineMutation,
     DateTime? createdAt,
-  }) =>
-      ChatMessage(
-        id: id ?? this.id,
-        conversationId: conversationId ?? this.conversationId,
-        role: role ?? this.role,
-        text: text ?? this.text,
-        form: form ?? this.form,
-        missionSuggestion: missionSuggestion ?? this.missionSuggestion,
-        moodCheckIn: moodCheckIn ?? this.moodCheckIn,
-        routineMutation: routineMutation ?? this.routineMutation,
-        createdAt: createdAt ?? this.createdAt,
-      );
+  }) => ChatMessage(
+    id: id ?? this.id,
+    conversationId: conversationId ?? this.conversationId,
+    role: role ?? this.role,
+    text: text ?? this.text,
+    form: form ?? this.form,
+    missionSuggestion: missionSuggestion ?? this.missionSuggestion,
+    moodCheckIn: moodCheckIn ?? this.moodCheckIn,
+    routineMutation: routineMutation ?? this.routineMutation,
+    createdAt: createdAt ?? this.createdAt,
+  );
 
   Map<String, dynamic> toMap() => {
-        'role': role.name,
-        'text': text,
-        'form': form?.toMap(),
-        'missionSuggestion': missionSuggestion?.toMap(),
-        'moodCheckIn': moodCheckIn?.toMap(),
-        'routineMutation': routineMutation?.toMap(),
-        'createdAtMs': createdAt.millisecondsSinceEpoch,
-      };
+    'role': role.name,
+    'text': text,
+    'form': form?.toMap(),
+    'missionSuggestion': missionSuggestion?.toMap(),
+    'moodCheckIn': moodCheckIn?.toMap(),
+    'routineMutation': routineMutation?.toMap(),
+    'createdAtMs': createdAt.millisecondsSinceEpoch,
+  };
 
   static ChatMessage fromMap(
     String id,
@@ -82,11 +81,13 @@ class ChatMessage extends Equatable {
       role: roleStr == 'model' ? ChatRole.model : ChatRole.user,
       text: m['text'] as String? ?? '',
       form: formMap == null ? null : ChatForm.fromMap(formMap),
-      missionSuggestion:
-          missionMap == null ? null : ChatMissionSuggestion.fromMap(missionMap),
+      missionSuggestion: missionMap == null
+          ? null
+          : ChatMissionSuggestion.fromMap(missionMap),
       moodCheckIn: moodMap == null ? null : ChatMoodCheckIn.fromMap(moodMap),
-      routineMutation:
-          routineMap == null ? null : ChatRoutineMutation.fromMap(routineMap),
+      routineMutation: routineMap == null
+          ? null
+          : ChatRoutineMutation.fromMap(routineMap),
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         m['createdAtMs'] as int? ?? 0,
       ),
@@ -95,14 +96,14 @@ class ChatMessage extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        conversationId,
-        role,
-        text,
-        form,
-        missionSuggestion,
-        moodCheckIn,
-        routineMutation,
-        createdAt,
-      ];
+    id,
+    conversationId,
+    role,
+    text,
+    form,
+    missionSuggestion,
+    moodCheckIn,
+    routineMutation,
+    createdAt,
+  ];
 }

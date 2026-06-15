@@ -44,32 +44,18 @@ class ChatTopBar extends StatelessWidget {
               ],
             ),
           ),
-          // Center: companion title + subtitle.
+          // Center: companion name.
           Expanded(
-            child: Column(
-              children: [
-                Text(
-                  '${l10n.chatPageCompanionName} 🌿',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: ChatPalette.headerTitle,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                SizedBox(height: 1.h),
-                Text(
-                  l10n.chatPageCompanionSubtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: ChatPalette.headerSubtitle,
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+            child: Text(
+              '${l10n.chatPageCompanionName} 🌿',
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: ChatPalette.headerTitle,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
           // Right: settings gear.
