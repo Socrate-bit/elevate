@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:elevate/features/chat/cubit/chat_cubit.dart';
-import 'package:elevate/features/chat/cubit/chat_list_cubit.dart';
-import 'package:elevate/features/chat/cubit/chat_list_state.dart';
-import 'package:elevate/features/chat/screens/chat_screen.dart';
-import 'package:elevate/features/chat/services/chat_conversation.dart';
-import 'package:elevate/features/chat/services/chat_firestore_service.dart';
-import 'package:elevate/features/chat/services/chat_form.dart';
-import 'package:elevate/features/chat/services/chat_message.dart';
-import 'package:elevate/features/chat/services/gemini_service.dart';
-import 'package:elevate/features/chat/services/voice_service.dart';
-import 'package:elevate/features/chat/widgets/chat_history_sheet.dart';
+import 'package:elevate/sk_features/chat/cubit/chat_cubit.dart';
+import 'package:elevate/sk_features/chat/cubit/chat_list_cubit.dart';
+import 'package:elevate/sk_features/chat/cubit/chat_list_state.dart';
+import 'package:elevate/sk_features/chat/screens/chat_screen.dart';
+import 'package:elevate/sk_features/chat/services/chat_conversation.dart';
+import 'package:elevate/sk_features/chat/services/chat_firestore_service.dart';
+import 'package:elevate/sk_features/chat/services/chat_form.dart';
+import 'package:elevate/sk_features/chat/services/chat_message.dart';
+import 'package:elevate/sk_features/chat/services/gemini_service.dart';
+import 'package:elevate/sk_features/chat/services/voice_service.dart';
+import 'package:elevate/sk_features/chat/widgets/chat_history_sheet.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import 'package:elevate/shared/theme/app_theme.dart';
 import 'package:flutter/material.dart';

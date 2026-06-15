@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../features/chat/screens/chat_page_screen.dart';
-import '../features/community/screens/community_page_screen.dart';
-import '../features/home/screens/home_page_screen.dart';
-import '../features/journal/screens/journal_page_screen.dart';
-import '../features/tools/screens/tools_page_screen.dart';
+import '../chat/screens/chat_page_screen.dart';
+import '../community/screens/community_page_screen.dart';
+import '../home/screens/home_page_screen.dart';
+import '../journal/screens/journal_page_screen.dart';
+import '../tools/screens/tools_page_screen.dart';
 import 'app_nav_cubit.dart';
 
 /// Hosts the Appy pages behind a single shared bottom nav. Tapping a tab swaps

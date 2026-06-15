@@ -1,5 +1,5 @@
-import 'package:elevate/features/chat/services/chat_message.dart';
-import 'package:elevate/features/chat/widgets/message_bubble.dart';
+import 'package:elevate/sk_features/chat/services/chat_message.dart';
+import 'package:elevate/sk_features/chat/widgets/message_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

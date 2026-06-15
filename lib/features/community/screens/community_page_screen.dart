@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
-import '../../../shared/widgets/appy_nav_bar.dart';
+import 'package:elevate/features/shell/widgets/appy_nav_bar.dart';
 import '../cubit/community_cubit.dart';
 import '../cubit/community_state.dart';
 import '../models/community_mock_data.dart';

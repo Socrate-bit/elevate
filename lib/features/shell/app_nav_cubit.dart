@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../features/subscription/services/analytics_service.dart';
+import 'package:elevate/sk_features/subscription/services/analytics_service.dart';
 
 /// Holds the selected bottom-nav tab index, shared across the Appy pages
 /// (Home, Chat, …) so a single nav bar can drive the [AppyShell].

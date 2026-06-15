@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../subscription/services/analytics_service.dart';
+import 'package:elevate/sk_features/subscription/services/analytics_service.dart';
 import '../models/community_mock_data.dart';
 import 'community_state.dart';
 

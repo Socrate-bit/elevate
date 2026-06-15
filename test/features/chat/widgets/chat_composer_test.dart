@@ -1,4 +1,4 @@
-import 'package:elevate/features/chat/widgets/chat_composer.dart';
+import 'package:elevate/sk_features/chat/widgets/chat_composer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

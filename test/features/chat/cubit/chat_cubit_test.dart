@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:bloc_test/bloc_test.dart';
-import 'package:elevate/features/chat/cubit/chat_cubit.dart';
-import 'package:elevate/features/chat/cubit/chat_state.dart';
-import 'package:elevate/features/chat/services/chat_firestore_service.dart';
-import 'package:elevate/features/chat/services/chat_form.dart';
-import 'package:elevate/features/chat/services/chat_message.dart';
-import 'package:elevate/features/chat/services/gemini_service.dart';
-import 'package:elevate/features/chat/services/voice_service.dart';
+import 'package:elevate/sk_features/chat/cubit/chat_cubit.dart';
+import 'package:elevate/sk_features/chat/cubit/chat_state.dart';
+import 'package:elevate/sk_features/chat/services/chat_firestore_service.dart';
+import 'package:elevate/sk_features/chat/services/chat_form.dart';
+import 'package:elevate/sk_features/chat/services/chat_message.dart';
+import 'package:elevate/sk_features/chat/services/gemini_service.dart';
+import 'package:elevate/sk_features/chat/services/voice_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid/data.dart';

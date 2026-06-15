@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/widgets/appy_nav_bar.dart';
+import 'package:elevate/features/shell/widgets/appy_nav_bar.dart';
 import '../models/tools_mock_data.dart';
 import '../widgets/tool_section.dart';
 import '../widgets/tools_top_bar.dart';

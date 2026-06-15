@@ -1,5 +1,5 @@
-import 'package:elevate/features/chat/services/chat_conversation.dart';
-import 'package:elevate/features/chat/widgets/conversation_tile.dart';
+import 'package:elevate/sk_features/chat/services/chat_conversation.dart';
+import 'package:elevate/sk_features/chat/widgets/conversation_tile.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../helpers/test_harness.dart';

@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/widgets/appy_nav_bar.dart';
+import 'package:elevate/features/shell/widgets/appy_nav_bar.dart';
 import '../cubit/home_page_cubit.dart';
 import '../cubit/home_page_state.dart';
 import '../models/home_mock_data.dart';

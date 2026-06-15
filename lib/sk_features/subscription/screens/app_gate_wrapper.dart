@@ -8,7 +8,7 @@ import '../../alarms/cubit/alarm_state.dart';
 import '../../alarms/services/alarm_service.dart';
 import '../cubit/subscription_cubit.dart';
 import '../cubit/subscription_state.dart';
-import '../../../shared/appy_shell.dart';
+import 'package:elevate/features/shell/appy_shell.dart';
 
 /// Subscription gate. Loads user_type once, drives [AlarmCubit.sync] only
 /// when the user has access, and renders BottomNavShell — wrapped in a

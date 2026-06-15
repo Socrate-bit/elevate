@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'features/auth/auth_wrapper.dart';
+import 'sk_features/auth/auth_wrapper.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:device_preview/device_preview.dart';
 
 import 'config/app_config.dart';
-import 'features/alarms/cubit/alarm_cubit.dart';
-import 'features/mood/cubit/mood_cubit.dart';
-import 'features/alarms/screens/alarm_stop_screen.dart';
-import 'features/chat/cubit/chat_list_cubit.dart';
-import 'features/memory/cubit/memory_cubit.dart';
-import 'features/onboarding/cubit/onboarding_cubit.dart';
-import 'features/routines/cubit/routine_cubit.dart';
-import 'features/settings/cubit/settings_cubit.dart';
-import 'features/settings/cubit/settings_state.dart';
-import 'features/subscription/cubit/subscription_cubit.dart';
+import 'sk_features/alarms/cubit/alarm_cubit.dart';
+import 'sk_features/mood/cubit/mood_cubit.dart';
+import 'sk_features/alarms/screens/alarm_stop_screen.dart';
+import 'sk_features/chat/cubit/chat_list_cubit.dart';
+import 'sk_features/memory/cubit/memory_cubit.dart';
+import 'sk_features/onboarding/cubit/onboarding_cubit.dart';
+import 'sk_features/routines/cubit/routine_cubit.dart';
+import 'sk_features/settings/cubit/settings_cubit.dart';
+import 'sk_features/settings/cubit/settings_state.dart';
+import 'sk_features/subscription/cubit/subscription_cubit.dart';
 import 'shared/theme/app_theme.dart';
 
 class SkeletonApp extends StatelessWidget {

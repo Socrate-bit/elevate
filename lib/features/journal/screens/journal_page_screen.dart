@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/widgets/appy_nav_bar.dart';
+import 'package:elevate/features/shell/widgets/appy_nav_bar.dart';
 import '../widgets/journal_date_pill.dart';
 import '../widgets/journal_entry_card.dart';
 import '../widgets/journal_header.dart';

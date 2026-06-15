@@ -4,23 +4,23 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:liquid_glass_bar/liquid_glass_bar.dart';
 import 'theme/app_theme.dart';
 import 'utils/haptic_utils.dart';
-import 'package:elevate/features/chat/cubit/chat_cubit.dart';
-import 'package:elevate/features/chat/cubit/chat_list_cubit.dart';
-import 'package:elevate/features/chat/screens/chat_screen.dart';
-import 'package:elevate/features/memory/cubit/memory_cubit.dart';
-import 'package:elevate/features/mood/cubit/mood_cubit.dart';
-import 'package:elevate/features/routines/cubit/routine_cubit.dart';
-import 'package:elevate/features/routines/screens/routine_form_screen.dart';
-import 'package:elevate/features/routines/models/routine.dart';
-import 'package:elevate/features/mood/widgets/mood_picker_sheet.dart';
-import 'package:elevate/features/missions/screens/mission_picker_screen.dart';
-import 'package:elevate/features/home/widgets/home_action_sheet.dart';
+import 'package:elevate/sk_features/chat/cubit/chat_cubit.dart';
+import 'package:elevate/sk_features/chat/cubit/chat_list_cubit.dart';
+import 'package:elevate/sk_features/chat/screens/chat_screen.dart';
+import 'package:elevate/sk_features/memory/cubit/memory_cubit.dart';
+import 'package:elevate/sk_features/mood/cubit/mood_cubit.dart';
+import 'package:elevate/sk_features/routines/cubit/routine_cubit.dart';
+import 'package:elevate/sk_features/routines/screens/routine_form_screen.dart';
+import 'package:elevate/sk_features/routines/models/routine.dart';
+import 'package:elevate/sk_features/mood/widgets/mood_picker_sheet.dart';
+import 'package:elevate/sk_features/missions/screens/mission_picker_screen.dart';
+import 'package:elevate/sk_features/home/widgets/home_action_sheet.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
-import '../features/home/screens/home_screen.dart';
-import '../features/insights/screens/insights_screen.dart';
-import '../features/settings/screens/settings_screen.dart';
-import '../features/subscription/services/analytics_service.dart';
+import '../sk_features/home/screens/home_screen.dart';
+import '../sk_features/insights/screens/insights_screen.dart';
+import '../sk_features/settings/screens/settings_screen.dart';
+import '../sk_features/subscription/services/analytics_service.dart';
 
 class BottomNavShell extends StatefulWidget {
   final int initialIndex;

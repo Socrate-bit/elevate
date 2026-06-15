@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:elevate/features/alarms/cubit/alarm_cubit.dart';
+import 'package:elevate/sk_features/alarms/cubit/alarm_cubit.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../services/alarm_cascade_controller.dart';
 import '../../activity/services/activity_service.dart';

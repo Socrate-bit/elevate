@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/widgets/appy_nav_bar.dart';
+import 'package:elevate/features/shell/widgets/appy_nav_bar.dart';
 import '../cubit/chat_page_cubit.dart';
 import '../cubit/chat_page_state.dart';
 import '../widgets/chat_composer_bar.dart';

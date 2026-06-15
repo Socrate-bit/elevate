@@ -5,8 +5,8 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../app_nav_cubit.dart';
-import '../theme/app_theme.dart';
-import '../utils/haptic_utils.dart';
+import 'package:elevate/shared/theme/app_theme.dart';
+import 'package:elevate/shared/utils/haptic_utils.dart';
 
 /// Liquid-glass bottom navigation bar (5 tabs) driven by [AppNavCubit].
 /// Shared by the Appy Home and Chat pages.
