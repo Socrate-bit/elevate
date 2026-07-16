@@ -73,6 +73,10 @@ class AnalyticsService {
   static const communitySegmentSelected = 'community_segment_selected';
   static const communityPostLiked = 'community_post_liked';
 
+  // Tools
+  static const toolSessionStarted = 'tool_session_started'; // props: {tool}
+  static const toolSessionCompleted = 'tool_session_completed'; // props: {tool}
+
   // Chat
   static const chatConversationCreated = 'chat_conversation_created';
   static const chatConversationDeleted = 'chat_conversation_deleted';

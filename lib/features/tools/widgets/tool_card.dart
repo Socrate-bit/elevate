@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
+import '../../missions/screens/breathing_mission_screen.dart';
 import '../models/tools_mock_data.dart';
+import '../screens/video_tool_session_screen.dart';
 
 /// A single tool/activity card: square asset icon on the left, title + subtitle
 /// stacked on the right. Sized to fill its grid cell.
@@ -12,11 +14,30 @@ class ToolCard extends StatelessWidget {
 
   const ToolCard({super.key, required this.item});
 
+  /// Routes the tapped tool to its guided session (or nowhere for [ToolAction.none]).
+  void _open(BuildContext context) {
+    switch (item.action) {
+      case ToolAction.breathing:
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => const BreathingMissionScreen(isPreview: true),
+        ));
+      case ToolAction.video:
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => VideoToolSessionScreen(
+            title: item.title,
+            videoUrl: item.videoUrl!,
+          ),
+        ));
+      case ToolAction.none:
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // Not linked to a destination yet — selection only.
-      onTap: withHaptic(() {}),
+      // Launch the tool's guided session; cards with no action stay selection-only.
+      onTap: withHaptic(() => _open(context)),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
         decoration: BoxDecoration(

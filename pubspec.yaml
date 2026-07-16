@@ -61,6 +61,7 @@ dependencies:
   google_mlkit_pose_detection: ^0.14.0
   shake: ^2.2.0
   liquid_glass_widgets: ^0.15.7
+  video_player: ^2.11.1
 
 dev_dependencies:
   flutter_test:

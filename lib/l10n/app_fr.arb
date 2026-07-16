@@ -318,6 +318,9 @@
   "breathingRoundLabel": "Cycle {current} / {total}",
   "@breathingRoundLabel": { "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } } },
 
+  "toolSessionDone": "Terminé",
+  "toolSessionLoadError": "Échec du chargement. Touchez pour réessayer.",
+
   "moodPickerTitle": "Comment vas-tu ?",
   "moodPickerRad": "génial",
   "moodPickerGood": "bien",

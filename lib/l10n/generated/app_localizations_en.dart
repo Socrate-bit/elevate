@@ -863,6 +863,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get toolSessionDone => 'Done';
+
+  @override
+  String get toolSessionLoadError => 'Couldn\'t load. Tap to retry.';
+
+  @override
   String get moodPickerTitle => 'How are you?';
 
   @override
