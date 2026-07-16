@@ -34,15 +34,18 @@ class JournalInputCues extends StatelessWidget {
             ],
           ),
           SizedBox(height: 12.h),
-          // Three prompt cards side by side.
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (var i = 0; i < JournalMockData.cues.length; i++) ...[
-                if (i > 0) SizedBox(width: 10.w),
-                Expanded(child: _CueCard(cue: JournalMockData.cues[i])),
+          // IntrinsicHeight lets CrossAxisAlignment.stretch work inside an
+          // unbounded-height context (SingleChildScrollView).
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < JournalMockData.cues.length; i++) ...[
+                  if (i > 0) SizedBox(width: 10.w),
+                  Expanded(child: _CueCard(cue: JournalMockData.cues[i])),
+                ],
               ],
-            ],
+            ),
           ),
         ],
       ),
