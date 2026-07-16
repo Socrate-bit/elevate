@@ -318,6 +318,9 @@
   "breathingRoundLabel": "Round {current} / {total}",
   "@breathingRoundLabel": { "placeholders": { "current": { "type": "int" }, "total": { "type": "int" } } },
 
+  "toolSessionDone": "Done",
+  "toolSessionLoadError": "Couldn't load. Tap to retry.",
+
   "moodPickerTitle": "How are you?",
   "moodPickerRad": "rad",
   "moodPickerGood": "good",

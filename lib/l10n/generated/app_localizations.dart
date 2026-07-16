@@ -1700,6 +1700,18 @@ abstract class AppLocalizations {
   /// **'Round {current} / {total}'**
   String breathingRoundLabel(int current, int total);
 
+  /// No description provided for @toolSessionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get toolSessionDone;
+
+  /// No description provided for @toolSessionLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load. Tap to retry.'**
+  String get toolSessionLoadError;
+
   /// No description provided for @moodPickerTitle.
   ///
   /// In en, this message translates to:

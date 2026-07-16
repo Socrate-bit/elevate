@@ -869,6 +869,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get toolSessionDone => 'Terminé';
+
+  @override
+  String get toolSessionLoadError =>
+      'Échec du chargement. Touchez pour réessayer.';
+
+  @override
   String get moodPickerTitle => 'Comment vas-tu ?';
 
   @override
