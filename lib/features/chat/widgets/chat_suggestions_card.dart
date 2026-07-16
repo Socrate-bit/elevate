@@ -73,19 +73,24 @@ class ChatSuggestionsCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 12.h),
-                // Three suggestion buttons.
-                Row(
-                  children: [
-                    for (var i = 0; i < suggestions.length; i++) ...[
-                      if (i > 0) SizedBox(width: 10.w),
-                      Expanded(
-                        child: _SuggestionButton(
-                          suggestion: suggestions[i],
-                          onTap: () => onPick(suggestions[i].label),
+                // Three suggestion buttons — IntrinsicHeight makes them all
+                // match the tallest one, so content never overflows and the
+                // cards stay equal-sized whatever the label length.
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (var i = 0; i < suggestions.length; i++) ...[
+                        if (i > 0) SizedBox(width: 10.w),
+                        Expanded(
+                          child: _SuggestionButton(
+                            suggestion: suggestions[i],
+                            onTap: () => onPick(suggestions[i].label),
+                          ),
                         ),
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -107,8 +112,7 @@ class _SuggestionButton extends StatelessWidget {
     return GestureDetector(
       onTap: withHaptic(onTap),
       child: Container(
-        height: 78.h,
-        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
         decoration: BoxDecoration(
           color: ChatPalette.suggestion,
           borderRadius: BorderRadius.circular(16.r),
@@ -121,7 +125,6 @@ class _SuggestionButton extends StatelessWidget {
             Text(
               suggestion.label,
               textAlign: TextAlign.center,
-              maxLines: 2,
               style: TextStyle(
                 color: ChatPalette.suggestionText,
                 fontSize: 11.sp,

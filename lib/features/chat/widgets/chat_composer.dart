@@ -45,10 +45,7 @@ class ChatComposer extends StatelessWidget {
               style: TextStyle(fontSize: 15.sp, color: c.textPrimary),
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: TextStyle(
-                  fontSize: 15.sp,
-                  color: c.textSecondary,
-                ),
+                hintStyle: TextStyle(fontSize: 15.sp, color: c.textSecondary),
                 border: InputBorder.none,
                 isCollapsed: true,
               ),
@@ -58,7 +55,9 @@ class ChatComposer extends StatelessWidget {
           _IconButton(
             icon: isListening ? Icons.stop_rounded : Icons.mic_rounded,
             color: isListening ? c.primary : c.textSecondary,
-            background: isListening ? c.primary.withAlpha(30) : Colors.transparent,
+            background: isListening
+                ? c.primary.withAlpha(30)
+                : Colors.transparent,
             onTap: onMicTap,
           ),
           SizedBox(width: 6.w),
@@ -92,10 +91,7 @@ class _IconButton extends StatelessWidget {
       child: Container(
         width: 36.w,
         height: 36.w,
-        decoration: BoxDecoration(
-          color: background,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: background, shape: BoxShape.circle),
         child: Icon(icon, size: 22.sp, color: color),
       ),
     );

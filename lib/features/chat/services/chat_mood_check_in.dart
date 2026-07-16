@@ -16,14 +16,14 @@ class ChatMoodCheckIn extends Equatable {
       );
 
   Map<String, dynamic> toMap() => {
-        'question': question,
-        'selectedMood': selectedMood?.name,
-      };
+    'question': question,
+    'selectedMood': selectedMood?.name,
+  };
 
   factory ChatMoodCheckIn.fromMap(Map<String, dynamic> m) => ChatMoodCheckIn(
-        question: m['question'] as String? ?? '',
-        selectedMood: MoodValueX.fromName(m['selectedMood'] as String?),
-      );
+    question: m['question'] as String? ?? '',
+    selectedMood: MoodValueX.fromName(m['selectedMood'] as String?),
+  );
 
   @override
   List<Object?> get props => [question, selectedMood];

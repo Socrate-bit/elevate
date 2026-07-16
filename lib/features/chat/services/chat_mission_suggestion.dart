@@ -22,18 +22,17 @@ class ChatMissionSuggestion extends Equatable {
     String? missionType,
     String? reason,
     bool? accepted,
-  }) =>
-      ChatMissionSuggestion(
-        missionType: missionType ?? this.missionType,
-        reason: reason ?? this.reason,
-        accepted: accepted ?? this.accepted,
-      );
+  }) => ChatMissionSuggestion(
+    missionType: missionType ?? this.missionType,
+    reason: reason ?? this.reason,
+    accepted: accepted ?? this.accepted,
+  );
 
   Map<String, dynamic> toMap() => {
-        'missionType': missionType,
-        'reason': reason,
-        if (accepted != null) 'accepted': accepted,
-      };
+    'missionType': missionType,
+    'reason': reason,
+    if (accepted != null) 'accepted': accepted,
+  };
 
   static ChatMissionSuggestion fromMap(Map<String, dynamic> m) =>
       ChatMissionSuggestion(

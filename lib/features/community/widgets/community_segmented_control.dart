@@ -9,129 +9,149 @@ import '../cubit/community_cubit.dart';
 import '../cubit/community_state.dart';
 import '../models/community_mock_data.dart';
 
-/// Feed / Groups / Messages pill row. The selected segment is filled dark
-/// brown; the Groups segment shows an orange count badge.
+/// Feed / Groups / Messages selector — a rounded track with a dark-brown pill
+/// that slides to the selected segment. Each segment is fully tappable; the
+/// Groups segment shows an orange count badge.
 class CommunitySegmentedControl extends StatelessWidget {
   const CommunitySegmentedControl({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final items = <(CommunitySegment, IconData, String, int?)>[
+      (CommunitySegment.feed, Icons.dashboard_rounded, l10n.communityFeed, null),
+      (
+        CommunitySegment.groups,
+        Icons.groups_rounded,
+        l10n.communityGroups,
+        CommunityMockData.groupsCount,
+      ),
+      (CommunitySegment.messages, Icons.mail_rounded, l10n.communityMessages, null),
+    ];
+
     return BlocBuilder<CommunityCubit, CommunityState>(
       buildWhen: (p, c) => p.segment != c.segment,
       builder: (context, state) {
-        return Row(
-          children: [
-            Expanded(
-              child: _SegmentTab(
-                icon: Icons.dashboard_rounded,
-                label: l10n.communityFeed,
-                selected: state.segment == CommunitySegment.feed,
-                onTap: () => context
-                    .read<CommunityCubit>()
-                    .selectSegment(CommunitySegment.feed),
-              ),
-            ),
-            SizedBox(width: 8.w),
-            Expanded(
-              child: _SegmentTab(
-                icon: Icons.groups_rounded,
-                label: l10n.communityGroups,
-                selected: state.segment == CommunitySegment.groups,
-                badge: CommunityMockData.groupsCount,
-                onTap: () => context
-                    .read<CommunityCubit>()
-                    .selectSegment(CommunitySegment.groups),
-              ),
-            ),
-            SizedBox(width: 8.w),
-            Expanded(
-              child: _SegmentTab(
-                icon: Icons.mail_rounded,
-                label: l10n.communityMessages,
-                selected: state.segment == CommunitySegment.messages,
-                onTap: () => context
-                    .read<CommunityCubit>()
-                    .selectSegment(CommunitySegment.messages),
-              ),
-            ),
-          ],
+        final index = items.indexWhere((e) => e.$1 == state.segment);
+        return Container(
+          height: 48.h,
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(
+            color: CommunityPalette.segmentTrack,
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final segWidth = constraints.maxWidth / items.length;
+              return Stack(
+                children: [
+                  // Sliding selection pill (behind the labels).
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 240),
+                    curve: Curves.easeOutCubic,
+                    left: index * segWidth,
+                    top: 0,
+                    bottom: 0,
+                    width: segWidth,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: CommunityPalette.segmentSelected,
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                  ),
+                  // Fully tappable segments on top.
+                  Row(
+                    children: [
+                      for (final (segment, icon, label, badge) in items)
+                        Expanded(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: withHaptic(
+                              () => context
+                                  .read<CommunityCubit>()
+                                  .selectSegment(segment),
+                            ),
+                            child: _SegmentContent(
+                              icon: icon,
+                              label: label,
+                              badge: badge,
+                              selected: state.segment == segment,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
         );
       },
     );
   }
 }
 
-/// A single segment pill.
-class _SegmentTab extends StatelessWidget {
+/// Centered icon + label (+ optional badge) filling its segment cell. Text is
+/// white over the selected pill, brown otherwise.
+class _SegmentContent extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool selected;
   final int? badge;
-  final VoidCallback onTap;
 
-  const _SegmentTab({
+  const _SegmentContent({
     required this.icon,
     required this.label,
     required this.selected,
-    required this.onTap,
     this.badge,
   });
 
   @override
   Widget build(BuildContext context) {
     final fg = selected ? Colors.white : CommunityPalette.segmentText;
-    return GestureDetector(
-      onTap: withHaptic(onTap),
-      child: Container(
-        height: 42.h,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected
-              ? CommunityPalette.segmentSelected
-              : CommunityPalette.card,
-          borderRadius: BorderRadius.circular(14.r),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 16.sp, color: fg),
+    return Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 17.sp, color: fg),
+          SizedBox(width: 5.w),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w700,
+                color: fg,
+              ),
+            ),
+          ),
+          if (badge != null) ...[
             SizedBox(width: 5.w),
-            Flexible(
+            Container(
+              width: 18.w,
+              height: 18.w,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: CommunityPalette.groupsBadge,
+                shape: BoxShape.circle,
+              ),
               child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                '$badge',
                 style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
-                  color: fg,
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  height: 1,
                 ),
               ),
             ),
-            if (badge != null) ...[
-              SizedBox(width: 5.w),
-              Container(
-                width: 18.w,
-                height: 18.w,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: CommunityPalette.groupsBadge,
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  '$badge',
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    height: 1,
-                  ),
-                ),
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     );
   }

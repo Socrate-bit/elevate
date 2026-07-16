@@ -91,8 +91,10 @@ class _ChatRoutineCardState extends State<ChatRoutineCard> {
                         widget.mutation.routineType == RoutineType.action
                             ? l10n.routineTypeAction
                             : l10n.routineTypeHabit,
-                        style:
-                            TextStyle(fontSize: 12.sp, color: c.textSecondary),
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: c.textSecondary,
+                        ),
                       ),
                     ],
                   ),
@@ -128,8 +130,11 @@ class _ChatRoutineCardState extends State<ChatRoutineCard> {
               SizedBox(height: 10.h),
               Row(
                 children: [
-                  Icon(Icons.check_circle_outline_rounded,
-                      size: 14.sp, color: c.textSecondary),
+                  Icon(
+                    Icons.check_circle_outline_rounded,
+                    size: 14.sp,
+                    color: c.textSecondary,
+                  ),
                   SizedBox(width: 4.w),
                   Text(
                     l10n.chatActionDone,

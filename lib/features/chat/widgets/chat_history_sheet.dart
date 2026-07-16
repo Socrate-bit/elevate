@@ -21,10 +21,8 @@ Future<ChatConversation?> showChatHistorySheet(BuildContext context) {
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
     ),
-    builder: (_) => BlocProvider.value(
-      value: cubit,
-      child: const _ChatHistorySheet(),
-    ),
+    builder: (_) =>
+        BlocProvider.value(value: cubit, child: const _ChatHistorySheet()),
   );
 }
 
@@ -57,8 +55,9 @@ class _ChatHistorySheetState extends State<_ChatHistorySheet> {
       builder: (sheetCtx, scroll) => BlocBuilder<ChatListCubit, ChatListState>(
         builder: (blocCtx, state) {
           // Hide empty-title conversations (created but never sent to).
-          final items =
-              state.filtered.where((conv) => conv.title.isNotEmpty).toList();
+          final items = state.filtered
+              .where((conv) => conv.title.isNotEmpty)
+              .toList();
           return Column(
             children: [
               _Handle(),
@@ -166,10 +165,7 @@ class _SearchField extends StatelessWidget {
               style: TextStyle(fontSize: 15.sp, color: c.textPrimary),
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: TextStyle(
-                  fontSize: 15.sp,
-                  color: c.textSecondary,
-                ),
+                hintStyle: TextStyle(fontSize: 15.sp, color: c.textSecondary),
                 border: InputBorder.none,
                 isCollapsed: true,
                 contentPadding: EdgeInsets.symmetric(vertical: 10.h),
@@ -196,8 +192,11 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.chat_bubble_outline,
-                size: 48.sp, color: c.textSecondary),
+            Icon(
+              Icons.chat_bubble_outline,
+              size: 48.sp,
+              color: c.textSecondary,
+            ),
             SizedBox(height: 12.h),
             Text(
               l10n.chatHistoryEmpty,

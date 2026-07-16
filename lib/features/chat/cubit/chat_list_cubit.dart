@@ -12,9 +12,9 @@ import 'chat_list_state.dart';
 /// Owns the live list of conversations and the history search query.
 class ChatListCubit extends Cubit<ChatListState> {
   ChatListCubit({ChatRepository? repository, Uuid? uuid})
-      : _repo = repository ?? ChatFirestoreService.instance,
-        _uuid = uuid ?? const Uuid(),
-        super(const ChatListState());
+    : _repo = repository ?? ChatFirestoreService.instance,
+      _uuid = uuid ?? const Uuid(),
+      super(const ChatListState());
 
   final ChatRepository _repo;
   final Uuid _uuid;
@@ -64,10 +64,13 @@ class ChatListCubit extends Cubit<ChatListState> {
       AnalyticsService.capture(AnalyticsService.chatConversationCreated);
     } catch (e) {
       debugPrint('[ChatListCubit] createConversation failed: $e');
-      emit(state.copyWith(
-        conversations:
-            state.conversations.where((c) => c.id != conv.id).toList(),
-      ));
+      emit(
+        state.copyWith(
+          conversations: state.conversations
+              .where((c) => c.id != conv.id)
+              .toList(),
+        ),
+      );
       rethrow;
     }
     return conv;
@@ -75,9 +78,11 @@ class ChatListCubit extends Cubit<ChatListState> {
 
   Future<void> deleteConversation(String id) async {
     final previous = state.conversations;
-    emit(state.copyWith(
-      conversations: state.conversations.where((c) => c.id != id).toList(),
-    ));
+    emit(
+      state.copyWith(
+        conversations: state.conversations.where((c) => c.id != id).toList(),
+      ),
+    );
     try {
       await _repo.deleteConversation(id);
       debugPrint('[ChatListCubit] deleted conversation $id');

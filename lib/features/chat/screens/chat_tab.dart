@@ -179,8 +179,9 @@ class _PreChatView extends StatelessWidget {
                           height: 20.w,
                           child: const CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : Text(

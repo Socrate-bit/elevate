@@ -28,23 +28,22 @@ class ChatState extends Equatable {
     bool? isSending,
     bool? isListening,
     String? voicePartial,
-  }) =>
-      ChatState(
-        conversationId: conversationId ?? this.conversationId,
-        messages: messages ?? this.messages,
-        isLoading: isLoading ?? this.isLoading,
-        isSending: isSending ?? this.isSending,
-        isListening: isListening ?? this.isListening,
-        voicePartial: voicePartial ?? this.voicePartial,
-      );
+  }) => ChatState(
+    conversationId: conversationId ?? this.conversationId,
+    messages: messages ?? this.messages,
+    isLoading: isLoading ?? this.isLoading,
+    isSending: isSending ?? this.isSending,
+    isListening: isListening ?? this.isListening,
+    voicePartial: voicePartial ?? this.voicePartial,
+  );
 
   @override
   List<Object?> get props => [
-        conversationId,
-        messages,
-        isLoading,
-        isSending,
-        isListening,
-        voicePartial,
-      ];
+    conversationId,
+    messages,
+    isLoading,
+    isSending,
+    isListening,
+    voicePartial,
+  ];
 }

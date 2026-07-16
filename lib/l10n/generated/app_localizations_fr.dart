@@ -1076,7 +1076,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chatPageCalmMode => 'Mode calme';
 
   @override
-  String get chatPageCompanionName => 'Ami de la forêt';
+  String get chatPageCompanionName => 'Jean';
 
   @override
   String get chatPageCompanionSubtitle => 'Votre compagnon bienveillant';

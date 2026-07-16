@@ -1,10 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/appy_nav_bar.dart';
 import '../cubit/chat_page_cubit.dart';
@@ -69,8 +66,8 @@ class _ChatView extends StatelessWidget {
                 SizedBox(height: 6.h),
                 const ChatTopBar(),
                 SizedBox(height: 10.h),
-                const _TodayPill(),
-                // Conversation fills the remaining space.
+                // Conversation fills the remaining space. The "Today" pill now
+                // scrolls with the messages rather than sitting in the top bar.
                 Expanded(
                   child: BlocBuilder<ChatPageCubit, ChatPageState>(
                     buildWhen: (p, c) => p.messages != c.messages,
@@ -91,9 +88,20 @@ class _ChatView extends StatelessWidget {
                         )
                       : const SizedBox.shrink(),
                 ),
-                // Composer, lifted clear of the floating glass nav bar.
+                // Composer: snug above the keyboard when open, clear of the
+                // floating nav bar when closed. As the keyboard retracts the
+                // padding grows smoothly to 96 instead of snapping — so the
+                // composer never dips behind the nav bar mid-animation.
                 Padding(
-                  padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 96.h),
+                  padding: EdgeInsets.fromLTRB(
+                    12.w,
+                    0,
+                    12.w,
+                    (96.h - MediaQuery.viewInsetsOf(context).bottom).clamp(
+                      8.h,
+                      96.h,
+                    ),
+                  ),
                   child: ChatComposerBar(onSend: cubit.sendMessage),
                 ),
               ],
@@ -102,37 +110,6 @@ class _ChatView extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: const AppyNavBar(),
-    );
-  }
-}
-
-/// Centered frosted "Today" date separator.
-class _TodayPill extends StatelessWidget {
-  const _TodayPill();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(100.r),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
-          decoration: BoxDecoration(
-            color: ChatPalette.glassPill,
-            borderRadius: BorderRadius.circular(100.r),
-          ),
-          child: Text(
-            l10n.chatPageToday,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 11.sp,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

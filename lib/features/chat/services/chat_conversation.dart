@@ -33,25 +33,24 @@ class ChatConversation extends Equatable {
     String? summary,
     DateTime? summaryAt,
     bool? memoryExtracted,
-  }) =>
-      ChatConversation(
-        id: id ?? this.id,
-        title: title ?? this.title,
-        createdAt: createdAt ?? this.createdAt,
-        lastMessageAt: lastMessageAt ?? this.lastMessageAt,
-        summary: summary ?? this.summary,
-        summaryAt: summaryAt ?? this.summaryAt,
-        memoryExtracted: memoryExtracted ?? this.memoryExtracted,
-      );
+  }) => ChatConversation(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    createdAt: createdAt ?? this.createdAt,
+    lastMessageAt: lastMessageAt ?? this.lastMessageAt,
+    summary: summary ?? this.summary,
+    summaryAt: summaryAt ?? this.summaryAt,
+    memoryExtracted: memoryExtracted ?? this.memoryExtracted,
+  );
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'createdAtMs': createdAt.millisecondsSinceEpoch,
-        'lastMessageAtMs': lastMessageAt.millisecondsSinceEpoch,
-        'summary': summary,
-        'summaryAtMs': summaryAt?.millisecondsSinceEpoch,
-        'memoryExtracted': memoryExtracted,
-      };
+    'title': title,
+    'createdAtMs': createdAt.millisecondsSinceEpoch,
+    'lastMessageAtMs': lastMessageAt.millisecondsSinceEpoch,
+    'summary': summary,
+    'summaryAtMs': summaryAt?.millisecondsSinceEpoch,
+    'memoryExtracted': memoryExtracted,
+  };
 
   static ChatConversation fromMap(String id, Map<String, dynamic> m) {
     final summaryMs = m['summaryAtMs'];
@@ -74,12 +73,12 @@ class ChatConversation extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        createdAt,
-        lastMessageAt,
-        summary,
-        summaryAt,
-        memoryExtracted,
-      ];
+    id,
+    title,
+    createdAt,
+    lastMessageAt,
+    summary,
+    summaryAt,
+    memoryExtracted,
+  ];
 }

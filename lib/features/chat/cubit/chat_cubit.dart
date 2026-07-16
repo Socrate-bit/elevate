@@ -32,18 +32,21 @@ class ChatCubit extends Cubit<ChatState> {
     GeminiClient? gemini,
     VoiceController? voice,
     Uuid? uuid,
-  })  : _repo = repository ?? ChatFirestoreService.instance,
-        _gemini = gemini ?? GeminiService.instance,
-        _voice = voice ?? VoiceService.instance,
-        _routineCubit = routineCubit,
-        _memoryCubit = memoryCubit,
-        _moodCubit = moodCubit,
-        _uuid = uuid ?? const Uuid(),
-        super(ChatState(
-          conversationId: conversationId,
-          isLoading: true,
-          isSending: autoStart, // show typing indicator from the very first frame
-        )) {
+  }) : _repo = repository ?? ChatFirestoreService.instance,
+       _gemini = gemini ?? GeminiService.instance,
+       _voice = voice ?? VoiceService.instance,
+       _routineCubit = routineCubit,
+       _memoryCubit = memoryCubit,
+       _moodCubit = moodCubit,
+       _uuid = uuid ?? const Uuid(),
+       super(
+         ChatState(
+           conversationId: conversationId,
+           isLoading: true,
+           isSending:
+               autoStart, // show typing indicator from the very first frame
+         ),
+       ) {
     _subscribe();
     if (autoStart) unawaited(_doStart());
   }
@@ -60,15 +63,17 @@ class ChatCubit extends Cubit<ChatState> {
 
   void _subscribe() {
     _sub?.cancel();
-    _sub = _repo.watchMessages(state.conversationId).listen(
-      (messages) {
-        emit(state.copyWith(messages: messages, isLoading: false));
-      },
-      onError: (e) {
-        debugPrint('[ChatCubit] watchMessages error: $e');
-        emit(state.copyWith(isLoading: false));
-      },
-    );
+    _sub = _repo
+        .watchMessages(state.conversationId)
+        .listen(
+          (messages) {
+            emit(state.copyWith(messages: messages, isLoading: false));
+          },
+          onError: (e) {
+            debugPrint('[ChatCubit] watchMessages error: $e');
+            emit(state.copyWith(isLoading: false));
+          },
+        );
   }
 
   /// Sends [text] as a user message, then asks Gemini for a reply.
@@ -86,19 +91,20 @@ class ChatCubit extends Cubit<ChatState> {
       createdAt: now,
     );
 
-    emit(state.copyWith(
-      messages: [...state.messages, userMsg],
-      isSending: true,
-    ));
+    emit(
+      state.copyWith(messages: [...state.messages, userMsg], isSending: true),
+    );
 
     try {
       await _repo.saveMessage(userMsg);
     } catch (e) {
       debugPrint('[ChatCubit] saveMessage user failed: $e');
-      emit(state.copyWith(
-        messages: state.messages.where((m) => m.id != userMsg.id).toList(),
-        isSending: false,
-      ));
+      emit(
+        state.copyWith(
+          messages: state.messages.where((m) => m.id != userMsg.id).toList(),
+          isSending: false,
+        ),
+      );
       rethrow;
     }
 
@@ -184,12 +190,13 @@ class ChatCubit extends Cubit<ChatState> {
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     final todayIndex = DateTime.now().weekday % 7;
-    final moodLines = (weekMoods.entries.toList()..sort((a, b) => a.key.compareTo(b.key)))
-        .map((e) {
-          final tag = e.key == todayIndex ? ' (today)' : '';
-          return '- ${dayNames[e.key]}: ${e.value.name} ${e.value.emoji}$tag';
-        })
-        .join('\n');
+    final moodLines =
+        (weekMoods.entries.toList()..sort((a, b) => a.key.compareTo(b.key)))
+            .map((e) {
+              final tag = e.key == todayIndex ? ' (today)' : '';
+              return '- ${dayNames[e.key]}: ${e.value.name} ${e.value.emoji}$tag';
+            })
+            .join('\n');
     final moodSection = "This week's mood check-ins:\n$moodLines";
 
     if (memory == null || memory.isEmpty) return moodSection;
@@ -296,10 +303,10 @@ class ChatCubit extends Cubit<ChatState> {
     Map<String, dynamic> args, {
     required Routine? existing,
   }) {
-    final typeStr = args['type']?.toString() ??
+    final typeStr =
+        args['type']?.toString() ??
         (existing?.type == RoutineType.habit ? 'habit' : 'action');
-    final type =
-        typeStr == 'habit' ? RoutineType.habit : RoutineType.action;
+    final type = typeStr == 'habit' ? RoutineType.habit : RoutineType.action;
     final name = args['name']?.toString().trim();
     if ((name == null || name.isEmpty) && existing == null) return null;
 
@@ -330,7 +337,7 @@ class ChatCubit extends Cubit<ChatState> {
     final scheduledDays = (daysRaw is List && daysRaw.length == 7)
         ? daysRaw.map((e) => e == true).toList()
         : (existing?.scheduledDays ??
-            const [false, false, false, false, false, false, false]);
+              const [false, false, false, false, false, false, false]);
 
     int? scheduledMinute = existing?.scheduledMinute;
     final minRaw = args['scheduled_minute'];
@@ -344,8 +351,8 @@ class ChatCubit extends Cubit<ChatState> {
     final hasAlarm = args['has_alarm'] == true
         ? true
         : args['has_alarm'] == false
-            ? false
-            : (existing?.hasAlarm ?? false);
+        ? false
+        : (existing?.hasAlarm ?? false);
 
     return Routine(
       id: existing?.id ?? '',
@@ -414,7 +421,9 @@ class ChatCubit extends Cubit<ChatState> {
 
     try {
       await _repo.updateMessageMissionSuggestion(
-        state.conversationId, messageId, true,
+        state.conversationId,
+        messageId,
+        true,
       );
       AnalyticsService.capture(AnalyticsService.chatMissionAccepted, {
         'mission_type': suggestion.missionType,
@@ -439,7 +448,9 @@ class ChatCubit extends Cubit<ChatState> {
 
     try {
       await _repo.updateMessageMissionSuggestion(
-        state.conversationId, messageId, false,
+        state.conversationId,
+        messageId,
+        false,
       );
       AnalyticsService.capture(AnalyticsService.chatMissionDeclined, {
         'mission_type': suggestion.missionType,
@@ -463,7 +474,8 @@ class ChatCubit extends Cubit<ChatState> {
     final updated = msg.copyWith(
       moodCheckIn: checkIn.copyWith(selectedMood: mood),
     );
-    final updatedMessages = List<ChatMessage>.from(state.messages)..[idx] = updated;
+    final updatedMessages = List<ChatMessage>.from(state.messages)
+      ..[idx] = updated;
     emit(state.copyWith(messages: updatedMessages));
 
     try {
@@ -473,10 +485,10 @@ class ChatCubit extends Cubit<ChatState> {
         mood.name,
       );
       await MoodService.saveMood(mood);
-      AnalyticsService.capture(
-        AnalyticsService.moodRecorded,
-        {'mood': mood.name, 'source': 'chat'},
-      );
+      AnalyticsService.capture(AnalyticsService.moodRecorded, {
+        'mood': mood.name,
+        'source': 'chat',
+      });
       debugPrint('[ChatCubit] mood selected in chat: ${mood.name}');
     } catch (e) {
       debugPrint('[ChatCubit] selectMood failed: $e');

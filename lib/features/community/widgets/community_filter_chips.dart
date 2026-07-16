@@ -18,7 +18,11 @@ class CommunityFilterChips extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final chips = <(CommunityFilter, IconData, String)>[
       (CommunityFilter.forYou, Icons.auto_awesome, l10n.communityFilterForYou),
-      (CommunityFilter.recent, Icons.schedule_rounded, l10n.communityFilterRecent),
+      (
+        CommunityFilter.recent,
+        Icons.schedule_rounded,
+        l10n.communityFilterRecent,
+      ),
       (
         CommunityFilter.following,
         Icons.person_outline_rounded,
@@ -83,9 +87,10 @@ class _FilterChip extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 14.w),
         alignment: Alignment.center,
         decoration: BoxDecoration(
+          // Translucent chips so the page tint shows through.
           color: selected
-              ? CommunityPalette.chipSelected
-              : CommunityPalette.chipUnselected,
+              ? CommunityPalette.chipSelected.withValues(alpha: 0.7)
+              : CommunityPalette.card.withValues(alpha: 0.45),
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Row(
