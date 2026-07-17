@@ -37,7 +37,8 @@ class _VideoToolSessionScreenState extends State<VideoToolSessionScreen> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    // Allow landscape so the video can adapt to the phone's orientation.
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     AnalyticsService.capture(
       AnalyticsService.toolSessionStarted,
       {'tool': widget.title},
@@ -54,6 +55,7 @@ class _VideoToolSessionScreenState extends State<VideoToolSessionScreen> {
       controller.addListener(_onControllerUpdate);
       await controller.initialize();
       await controller.setLooping(true);
+      await controller.setVolume(_muted ? 0 : 1);
       await controller.play();
       if (mounted) setState(() => _initialized = true);
     } catch (e) {
@@ -123,7 +125,8 @@ class _VideoToolSessionScreenState extends State<VideoToolSessionScreen> {
   void dispose() {
     _controller?.removeListener(_onControllerUpdate);
     _controller?.dispose();
-    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    // Restore portrait for the rest of the app.
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.dispose();
   }
 
@@ -149,15 +152,14 @@ class _VideoToolSessionScreenState extends State<VideoToolSessionScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Full-bleed video (cover), tap toggles play/pause.
+          // Full video shown uncropped (letterboxed), tap toggles play/pause.
           if (_initialized && controller != null && !_error)
             GestureDetector(
               onTap: _togglePlay,
-              child: FittedBox(
-                fit: BoxFit.cover,
-                child: SizedBox(
-                  width: controller.value.size.width,
-                  height: controller.value.size.height,
+              behavior: HitTestBehavior.opaque,
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: controller.value.aspectRatio,
                   child: VideoPlayer(controller),
                 ),
               ),
