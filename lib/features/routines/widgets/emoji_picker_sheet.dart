@@ -7,11 +7,11 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../models/routine_palette.dart';
 
-/// Modal bottom sheet grid for picking a routine icon. Returns the chosen
-/// icon key via `Navigator.pop`.
-Future<String?> showIconPickerSheet(
+/// Modal bottom sheet grid for picking a routine emoji. Returns the chosen
+/// emoji via `Navigator.pop`.
+Future<String?> showEmojiPickerSheet(
   BuildContext context, {
-  required String selectedKey,
+  required String selectedEmoji,
   required Color tint,
 }) {
   final c = AppColors.of(context);
@@ -29,7 +29,7 @@ Future<String?> showIconPickerSheet(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context)!.routineFormIconLabel,
+              AppLocalizations.of(context)!.routineFormEmojiLabel,
               style: TextStyle(
                 fontSize: 17.sp,
                 fontWeight: FontWeight.w600,
@@ -43,21 +43,21 @@ Future<String?> showIconPickerSheet(
               crossAxisCount: 6,
               mainAxisSpacing: 12.h,
               crossAxisSpacing: 12.w,
-              children: kRoutineIcons.entries.map((entry) {
-                final selected = entry.key == selectedKey;
+              children: kRoutineEmojis.map((emoji) {
+                final selected = emoji == selectedEmoji;
                 return GestureDetector(
-                  onTap: withHaptic(() => Navigator.pop(ctx, entry.key)),
+                  onTap: withHaptic(() => Navigator.pop(ctx, emoji)),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 150),
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: selected ? tint : c.background,
+                      color: selected ? tint.withAlpha(50) : c.background,
                       shape: BoxShape.circle,
+                      border: selected
+                          ? Border.all(color: tint, width: 2)
+                          : null,
                     ),
-                    child: Icon(
-                      entry.value,
-                      color: selected ? Colors.white : c.textPrimary,
-                      size: 22.sp,
-                    ),
+                    child: Text(emoji, style: TextStyle(fontSize: 22.sp)),
                   ),
                 );
               }).toList(),

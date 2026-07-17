@@ -234,7 +234,8 @@ to the conversation, call the `ask_mood` tool to check in — reactively only, n
 When the user asks to add, change, or remove a habit or one-off action,
 call the routine tools (`create_routine`, `update_routine`, `delete_routine`).
 An "action" is a one-shot to-do that disappears once validated; a "habit" recurs on
-specific weekdays. Pick reasonable defaults (icon_key, color_key) — see allowed values.
+specific weekdays. Pick a fitting `emoji`, a `color_key` (see allowed values), and an
+`xp` reward (small tasks ~10, bigger ones up to 50).
 
 Use plain prose replies for everything else.
 ''';
@@ -389,16 +390,17 @@ Use plain prose replies for everything else.
       'description': Schema.string(
         description: 'Optional longer description, may be empty.',
       ),
-      'icon_key': Schema.string(
+      'emoji': Schema.string(
         description:
-            'One of: star, running, walking, cycling, water, coffee, food, '
-            'book, pencil, study, meditation, sleep, sun, leaf, gym, yoga, '
-            'brush, music, paint, home, cleaning, shower, tooth, pill, heart, '
-            'phone, work, plant, pet, check.',
+            'A single emoji shown on the routine tile, e.g. 🧘 for meditation, '
+            '💧 for hydration, 🏃 for a run.',
       ),
       'color_key': Schema.string(
         description:
             'One of: orange, blue, green, purple, red, pink, yellow, teal.',
+      ),
+      'xp': Schema.integer(
+        description: 'Points awarded for completing it (5–50). Default 10.',
       ),
       'object_check': Schema.string(
         description:

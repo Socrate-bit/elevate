@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../auth/auth_service.dart';
 import '../models/routine.dart';
+import '../models/routine_palette.dart';
 
 /// Firestore-backed persistence for routines.
 /// Path: `users/{uid}/routines/{routineId}`.
@@ -16,8 +17,9 @@ class RoutineFirestoreService {
         'type': r.type.name,
         'name': r.name,
         'description': r.description,
-        'iconKey': r.iconKey,
+        'emoji': r.emoji,
         'colorKey': r.colorKey,
+        'xp': r.xp,
         'objectCheck': r.objectCheck,
         'scheduledDateMs': r.scheduledDate?.millisecondsSinceEpoch,
         'scheduledDays': r.scheduledDays,
@@ -49,8 +51,9 @@ class RoutineFirestoreService {
       type: typeStr == 'habit' ? RoutineType.habit : RoutineType.action,
       name: d['name'] as String? ?? '',
       description: d['description'] as String?,
-      iconKey: d['iconKey'] as String? ?? 'star',
+      emoji: d['emoji'] as String? ?? kDefaultRoutineEmoji,
       colorKey: d['colorKey'] as String? ?? 'blue',
+      xp: (d['xp'] as num?)?.toInt() ?? 10,
       objectCheck: d['objectCheck'] as String?,
       scheduledDate: d['scheduledDateMs'] != null
           ? DateTime.fromMillisecondsSinceEpoch(d['scheduledDateMs'] as int)

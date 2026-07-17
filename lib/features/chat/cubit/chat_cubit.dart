@@ -255,7 +255,7 @@ class ChatCubit extends Cubit<ChatState> {
             routineType: saved.type,
             routineId: saved.id,
             routineName: saved.name,
-            iconKey: saved.iconKey,
+            emoji: saved.emoji,
             colorKey: saved.colorKey,
             scheduledDate: saved.scheduledDate,
           );
@@ -273,7 +273,7 @@ class ChatCubit extends Cubit<ChatState> {
             routineType: draft.type,
             routineId: draft.id,
             routineName: draft.name,
-            iconKey: draft.iconKey,
+            emoji: draft.emoji,
             colorKey: draft.colorKey,
           );
         case 'delete_routine':
@@ -289,7 +289,7 @@ class ChatCubit extends Cubit<ChatState> {
             routineType: r.type,
             routineId: r.id,
             routineName: r.name,
-            iconKey: r.iconKey,
+            emoji: r.emoji,
             colorKey: r.colorKey,
           );
       }
@@ -310,12 +310,16 @@ class ChatCubit extends Cubit<ChatState> {
     final name = args['name']?.toString().trim();
     if ((name == null || name.isEmpty) && existing == null) return null;
 
-    final iconKey = (args['icon_key']?.toString() ?? '').isNotEmpty
-        ? args['icon_key'].toString()
-        : (existing?.iconKey ?? kDefaultRoutineIconKey);
+    final emoji = (args['emoji']?.toString() ?? '').isNotEmpty
+        ? args['emoji'].toString()
+        : (existing?.emoji ?? kDefaultRoutineEmoji);
     final colorKey = (args['color_key']?.toString() ?? '').isNotEmpty
         ? args['color_key'].toString()
         : (existing?.colorKey ?? kDefaultRoutineColorKey);
+
+    int xp = existing?.xp ?? 10;
+    final xpRaw = args['xp'];
+    if (xpRaw is num) xp = xpRaw.toInt();
 
     final descRaw = args['description']?.toString();
     final description = (descRaw == null || descRaw.trim().isEmpty)
@@ -359,8 +363,9 @@ class ChatCubit extends Cubit<ChatState> {
       type: type,
       name: name ?? existing!.name,
       description: description,
-      iconKey: iconKey,
+      emoji: emoji,
       colorKey: colorKey,
+      xp: xp,
       objectCheck: objectCheck,
       scheduledDate: type == RoutineType.action ? scheduledDate : null,
       scheduledDays: type == RoutineType.habit

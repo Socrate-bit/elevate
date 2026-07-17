@@ -11,7 +11,10 @@ import '../cubit/routine_cubit.dart';
 import '../models/routine.dart';
 import '../models/routine_palette.dart';
 import '../widgets/color_swatch_row.dart';
-import '../widgets/icon_picker_sheet.dart';
+import '../widgets/emoji_picker_sheet.dart';
+
+/// XP presets offered in the routine form.
+const _kXpPresets = [10, 20, 30, 50];
 
 class RoutineFormScreen extends StatefulWidget {
   /// Non-null = edit mode.
@@ -35,8 +38,9 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
   late final TextEditingController _descCtrl;
   late final TextEditingController _objectCtrl;
   late RoutineType _type;
-  late String _iconKey;
+  late String _emoji;
   late String _colorKey;
+  late int _xp;
   late List<bool> _scheduledDays;
   DateTime? _scheduledDate;
   int? _scheduledMinute;
@@ -54,8 +58,9 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
       _descCtrl = TextEditingController(text: r.description ?? '');
       _objectCtrl = TextEditingController(text: r.objectCheck ?? '');
       _type = r.type;
-      _iconKey = r.iconKey;
+      _emoji = r.emoji;
       _colorKey = r.colorKey;
+      _xp = r.xp;
       _scheduledDays = List<bool>.from(r.scheduledDays);
       _scheduledDate = r.scheduledDate;
       _scheduledMinute = r.scheduledMinute;
@@ -65,8 +70,9 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
       _descCtrl = TextEditingController();
       _objectCtrl = TextEditingController();
       _type = widget.initialType;
-      _iconKey = kDefaultRoutineIconKey;
+      _emoji = kDefaultRoutineEmoji;
       _colorKey = kDefaultRoutineColorKey;
+      _xp = 10;
       _scheduledDays = _type == RoutineType.habit
           ? [false, true, true, true, true, true, false]
           : [false, false, false, false, false, false, false];
@@ -257,19 +263,38 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
                       onDelete: _isEditing ? _confirmDelete : null,
                     ),
                     SizedBox(height: 20.h),
-                    _IconColorRow(
-                      iconKey: _iconKey,
+                    _EmojiTile(
+                      emoji: _emoji,
                       tint: tint,
-                      onPickIcon: () async {
-                        final picked = await showIconPickerSheet(
+                      onPick: () async {
+                        final picked = await showEmojiPickerSheet(
                           context,
-                          selectedKey: _iconKey,
+                          selectedEmoji: _emoji,
                           tint: tint,
                         );
-                        if (picked != null) setState(() => _iconKey = picked);
+                        if (picked != null) setState(() => _emoji = picked);
                       },
                     ),
                     SizedBox(height: 16.h),
+                    _FormCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.routineFormXpLabel,
+                            style: TextStyle(
+                                fontSize: 13.sp, color: c.textSecondary),
+                          ),
+                          SizedBox(height: 12.h),
+                          _XpChips(
+                            selected: _xp,
+                            tint: tint,
+                            onChanged: (v) => setState(() => _xp = v),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
                     _FormCard(
                       child: TextField(
                         controller: _nameCtrl,
@@ -520,7 +545,7 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
               id: '',
               type: _type,
               name: '',
-              iconKey: _iconKey,
+              emoji: _emoji,
               colorKey: _colorKey,
             ))
         .copyWith(
@@ -528,8 +553,9 @@ class _RoutineFormScreenState extends State<RoutineFormScreen> {
       name: _nameCtrl.text.trim(),
       description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
       clearDescription: _descCtrl.text.trim().isEmpty,
-      iconKey: _iconKey,
+      emoji: _emoji,
       colorKey: _colorKey,
+      xp: _xp,
       objectCheck: _objectCtrl.text.trim().isEmpty
           ? null
           : _objectCtrl.text.trim(),
@@ -652,24 +678,25 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _IconColorRow extends StatelessWidget {
-  final String iconKey;
+class _EmojiTile extends StatelessWidget {
+  final String emoji;
   final Color tint;
-  final VoidCallback onPickIcon;
+  final VoidCallback onPick;
 
-  const _IconColorRow({
-    required this.iconKey,
+  const _EmojiTile({
+    required this.emoji,
     required this.tint,
-    required this.onPickIcon,
+    required this.onPick,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: withHaptic(onPickIcon),
+      onTap: withHaptic(onPick),
       child: Container(
         width: 80.w,
         height: 80.h,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: tint,
           shape: BoxShape.circle,
@@ -677,8 +704,58 @@ class _IconColorRow extends StatelessWidget {
             BoxShadow(color: tint.withAlpha(80), blurRadius: 16),
           ],
         ),
-        child: Icon(routineIcon(iconKey), color: Colors.white, size: 36.sp),
+        child: Text(emoji, style: TextStyle(fontSize: 36.sp)),
       ),
+    );
+  }
+}
+
+/// Row of XP preset chips for the routine form.
+class _XpChips extends StatelessWidget {
+  final int selected;
+  final Color tint;
+  final ValueChanged<int> onChanged;
+
+  const _XpChips({
+    required this.selected,
+    required this.tint,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+    return Row(
+      children: List.generate(_kXpPresets.length, (i) {
+        final value = _kXpPresets[i];
+        final isSelected = value == selected;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+                left: i == 0 ? 0 : 4.w, right: i == _kXpPresets.length - 1 ? 0 : 4.w),
+            child: GestureDetector(
+              onTap: withHaptic(() => onChanged(value)),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected ? tint : c.background,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
+                  '+$value',
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected ? Colors.white : c.textSecondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }

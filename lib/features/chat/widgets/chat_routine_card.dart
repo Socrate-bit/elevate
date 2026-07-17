@@ -38,7 +38,6 @@ class _ChatRoutineCardState extends State<ChatRoutineCard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final tint = routineColor(widget.mutation.colorKey);
-    final icon = routineIcon(widget.mutation.iconKey);
 
     final summary = _summaryFor(l10n);
 
@@ -65,11 +64,15 @@ class _ChatRoutineCardState extends State<ChatRoutineCard> {
                 Container(
                   width: 36.w,
                   height: 36.w,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: tint.withAlpha(40),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
-                  child: Icon(icon, color: tint, size: 18.sp),
+                  child: Text(
+                    widget.mutation.emoji,
+                    style: TextStyle(fontSize: 18.sp),
+                  ),
                 ),
                 SizedBox(width: 10.w),
                 Flexible(
