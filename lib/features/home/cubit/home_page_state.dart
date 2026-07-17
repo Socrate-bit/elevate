@@ -1,16 +1,34 @@
 import 'package:equatable/equatable.dart';
 
-import '../models/home_mock_data.dart';
+import '../../routines/models/routine.dart';
 
-/// State of the new illustrated home page.
+/// State of the new illustrated home page's "Today's Plan".
 class HomePageState extends Equatable {
-  final List<HomePlanItem> planItems;
+  /// Routines relevant today (today's habits + due/undated actions),
+  /// ordered by creation time.
+  final List<Routine> todayRoutines;
 
-  const HomePageState({this.planItems = HomeMockData.planItems});
+  /// Ids of routines completed today (matched against `Routine.id`).
+  final Set<String> completedTodayIds;
 
-  HomePageState copyWith({List<HomePlanItem>? planItems}) =>
-      HomePageState(planItems: planItems ?? this.planItems);
+  final bool loading;
+
+  const HomePageState({
+    this.todayRoutines = const [],
+    this.completedTodayIds = const {},
+    this.loading = true,
+  });
+
+  HomePageState copyWith({
+    List<Routine>? todayRoutines,
+    Set<String>? completedTodayIds,
+    bool? loading,
+  }) => HomePageState(
+    todayRoutines: todayRoutines ?? this.todayRoutines,
+    completedTodayIds: completedTodayIds ?? this.completedTodayIds,
+    loading: loading ?? this.loading,
+  );
 
   @override
-  List<Object?> get props => [planItems];
+  List<Object?> get props => [todayRoutines, completedTodayIds, loading];
 }

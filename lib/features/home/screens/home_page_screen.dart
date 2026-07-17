@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/appy_nav_bar.dart';
+import '../../routines/cubit/routine_cubit.dart';
 import '../cubit/home_page_cubit.dart';
 import '../cubit/home_page_state.dart';
 import '../models/home_mock_data.dart';
@@ -20,7 +21,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => HomePageCubit(),
+      create: (context) =>
+          HomePageCubit(routineCubit: context.read<RoutineCubit>()),
       child: const _HomeView(),
     );
   }
@@ -124,9 +126,10 @@ class _HomeViewState extends State<_HomeView> {
                 SizedBox(height: 14.h),
                 // White task cards on the green background.
                 BlocBuilder<HomePageCubit, HomePageState>(
-                  buildWhen: (p, c) => p.planItems != c.planItems,
-                  builder: (context, state) =>
-                      TodaysPlanCard(items: state.planItems),
+                  builder: (context, state) => TodaysPlanCard(
+                    routines: state.todayRoutines,
+                    completedIds: state.completedTodayIds,
+                  ),
                 ),
               ],
             ),

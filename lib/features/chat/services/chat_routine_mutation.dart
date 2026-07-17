@@ -13,7 +13,7 @@ class ChatRoutineMutation extends Equatable {
   final RoutineType routineType;
   final String routineId;
   final String routineName;
-  final String iconKey;
+  final String emoji;
   final String colorKey;
 
   /// For action-type routines: the scheduled date, if any. Used to offer a
@@ -25,7 +25,7 @@ class ChatRoutineMutation extends Equatable {
     required this.routineType,
     required this.routineId,
     required this.routineName,
-    required this.iconKey,
+    required this.emoji,
     required this.colorKey,
     this.scheduledDate,
   });
@@ -35,7 +35,7 @@ class ChatRoutineMutation extends Equatable {
     'routineType': routineType.name,
     'routineId': routineId,
     'routineName': routineName,
-    'iconKey': iconKey,
+    'emoji': emoji,
     'colorKey': colorKey,
     if (scheduledDate != null)
       'scheduledDate': scheduledDate!.toIso8601String(),
@@ -53,7 +53,7 @@ class ChatRoutineMutation extends Equatable {
       routineType: typeStr == 'habit' ? RoutineType.habit : RoutineType.action,
       routineId: m['routineId'] as String? ?? '',
       routineName: m['routineName'] as String? ?? '',
-      iconKey: m['iconKey'] as String? ?? 'star',
+      emoji: m['emoji'] as String? ?? '⭐️',
       colorKey: m['colorKey'] as String? ?? 'blue',
       scheduledDate: dateRaw != null ? DateTime.tryParse(dateRaw) : null,
     );
@@ -73,7 +73,7 @@ class ChatRoutineMutation extends Equatable {
     routineType,
     routineId,
     routineName,
-    iconKey,
+    emoji,
     colorKey,
     scheduledDate,
   ];

@@ -3,17 +3,31 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
+import 'package:elevate/l10n/l10n_helpers.dart';
+import '../../../shared/app_nav_cubit.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
-import '../cubit/home_page_cubit.dart';
-import '../models/home_mock_data.dart';
+import '../../missions/models/mission.dart';
+import '../../missions/screens/mission_picker_screen.dart';
+import '../../missions/screens/photo_mission_screen.dart';
+import '../../mood/widgets/mood_picker_sheet.dart';
+import '../../routines/cubit/routine_cubit.dart';
+import '../../routines/models/routine.dart';
+import '../../routines/models/routine_palette.dart';
+import '../../routines/screens/routine_form_screen.dart';
+import 'home_action_sheet.dart';
 
 /// "Today's Plan" section (Finch-style): a header on the green background, then
-/// each task in its own white card.
+/// each routine relevant today in its own white card. Backed by real routines.
 class TodaysPlanCard extends StatelessWidget {
-  final List<HomePlanItem> items;
+  final List<Routine> routines;
+  final Set<String> completedIds;
 
-  const TodaysPlanCard({super.key, required this.items});
+  const TodaysPlanCard({
+    super.key,
+    required this.routines,
+    required this.completedIds,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +37,7 @@ class TodaysPlanCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: sun, title + subtitle (white over green), Edit pill.
+          // Header: calendar, title + subtitle (white over green), Add button.
           Row(
             children: [
               Icon(Icons.calendar_month_rounded, color: Colors.white),
@@ -50,153 +64,299 @@ class TodaysPlanCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Plain white edit icon.
+              // Add a routine / start something.
               GestureDetector(
-                onTap: withHaptic(() {}),
-                child: Icon(
-                  Icons.add,
-                  size: 30.sp,
-                  color: Colors.white,
-                ),
+                onTap: withHaptic(() => _openAddSheet(context)),
+                child: Icon(Icons.add, size: 30.sp, color: Colors.white),
               ),
             ],
           ),
           SizedBox(height: 14.h),
-          // Hold a card to drag and reorder.
-          ReorderableListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            buildDefaultDragHandles: false,
-            itemCount: items.length,
-            onReorder: (oldIndex, newIndex) => context
-                .read<HomePageCubit>()
-                .reorderPlanItem(oldIndex, newIndex),
-            // Keep the dragged proxy looking like the card (no extra Material).
-            proxyDecorator: (child, index, animation) => child,
-            itemBuilder: (context, i) {
-              return ReorderableDelayedDragStartListener(
-                key: ValueKey(items[i].title),
-                index: i,
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 10.h),
-                  child: _TaskCard(
-                    item: items[i],
-                    onToggle: () =>
-                        context.read<HomePageCubit>().togglePlanItem(i),
-                  ),
+          if (routines.isEmpty)
+            _EmptyPlan(text: l10n.homePagePlanEmpty)
+          else
+            ...routines.map(
+              (r) => Padding(
+                padding: EdgeInsets.only(bottom: 10.h),
+                child: _TaskCard(
+                  routine: r,
+                  done: completedIds.contains(r.id),
+                  onToggle: () =>
+                      _toggle(context, r, completedIds.contains(r.id)),
+                  onEdit: () => _edit(context, r),
                 ),
-              );
-            },
-          ),
+              ),
+            ),
         ],
+      ),
+    );
+  }
+
+  /// Validates (or, with an object check, opens the photo mission first) or
+  /// un-validates the routine for today.
+  Future<void> _toggle(BuildContext context, Routine r, bool done) async {
+    final cubit = context.read<RoutineCubit>();
+    if (done) {
+      await cubit.unvalidate(r.id);
+      return;
+    }
+    final objectCheck = r.objectCheck;
+    if (objectCheck == null || objectCheck.isEmpty) {
+      await cubit.validate(r.id);
+      return;
+    }
+    final nav = Navigator.of(context);
+    await nav.push(
+      MaterialPageRoute(
+        builder: (_) => PhotoMissionScreen(
+          missionType: MissionType.objectHunt,
+          selectedItems: [objectCheck],
+          onComplete: () async {
+            nav.pop();
+            await cubit.validate(r.id);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _edit(BuildContext context, Routine r) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: context.read<RoutineCubit>(),
+          child: RoutineFormScreen(routine: r),
+        ),
+      ),
+    );
+  }
+
+  /// Opens the shared "add" sheet (Chat / Action / Habit / Mood / Mission).
+  Future<void> _openAddSheet(BuildContext context) async {
+    final routineCubit = context.read<RoutineCubit>();
+    final navCubit = context.read<AppNavCubit>();
+    final action = await showHomeActionSheet(context);
+    if (action == null || !context.mounted) return;
+    switch (action) {
+      case HomeAction.startChat:
+        navCubit.selectTab(1); // Chat tab
+      case HomeAction.action:
+        _pushForm(context, routineCubit, RoutineType.action);
+      case HomeAction.habit:
+        _pushForm(context, routineCubit, RoutineType.habit);
+      case HomeAction.mood:
+        showMoodPickerSheet(context);
+      case HomeAction.mission:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MissionPickerScreen()),
+        );
+    }
+  }
+
+  void _pushForm(BuildContext context, RoutineCubit cubit, RoutineType type) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: cubit,
+          child: RoutineFormScreen(initialType: type),
+        ),
       ),
     );
   }
 }
 
-/// One task as a white card: icon tile, title + subtitle, XP and check button.
-class _TaskCard extends StatelessWidget {
-  final HomePlanItem item;
-  final VoidCallback onToggle;
-
-  const _TaskCard({required this.item, required this.onToggle});
+/// Empty-state card shown when nothing is planned for today.
+class _EmptyPlan extends StatelessWidget {
+  final String text;
+  const _EmptyPlan({required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
       decoration: BoxDecoration(
         color: HomePalette.cardWhite,
         borderRadius: BorderRadius.circular(18.r),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 6,
-            offset: Offset(0, 3),
-          ),
-        ],
       ),
-      child: Row(
-        children: [
-          // Drag handle — affordance that the card can be reordered.
-          Icon(
-            Icons.drag_indicator,
-            size: 18.sp,
-            color: HomePalette.subtitleGrey.withValues(alpha: 0.5),
-          ),
-          SizedBox(width: 6.w),
-          // Circular icon tile.
-          Container(
-            width: 44.w,
-            height: 44.w,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: item.tileColor,
-              shape: BoxShape.circle,
-            ),
-            child: Text(item.emoji, style: TextStyle(fontSize: 22.sp)),
-          ),
-          SizedBox(width: 12.w),
-          // Title + subtitle.
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.title,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w800,
-                    color: HomePalette.titleDark,
-                  ),
-                ),
-                SizedBox(height: 1.h),
-                Text(
-                  item.subtitle,
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: HomePalette.subtitleGrey,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // XP reward: number + lightning.
-          Text(
-            '${item.xp}',
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w800,
-              color: HomePalette.titleDark,
-            ),
-          ),
-          SizedBox(width: 3.w),
-          Image.asset('assets/home/light.png', width: 16.w),
-          SizedBox(width: 10.w),
-          _CheckButton(done: item.done, onTap: onToggle),
-        ],
+      child: Center(
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 13.sp, color: HomePalette.subtitleGrey),
+        ),
       ),
     );
+  }
+}
+
+/// One routine as a white card: emoji tile, title + subtitle, XP and check.
+class _TaskCard extends StatelessWidget {
+  final Routine routine;
+  final bool done;
+  final VoidCallback onToggle;
+  final VoidCallback onEdit;
+
+  const _TaskCard({
+    required this.routine,
+    required this.done,
+    required this.onToggle,
+    required this.onEdit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tile = routineColor(routine.colorKey);
+    return GestureDetector(
+      onTap: withHaptic(onEdit),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+        decoration: BoxDecoration(
+          color: HomePalette.cardWhite,
+          borderRadius: BorderRadius.circular(18.r),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x14000000),
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Circular emoji tile, tinted by the routine's color.
+            Container(
+              width: 44.w,
+              height: 44.w,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: tile.withAlpha(40),
+                shape: BoxShape.circle,
+              ),
+              child: Text(routine.emoji, style: TextStyle(fontSize: 22.sp)),
+            ),
+            SizedBox(width: 12.w),
+            // Title + subtitle.
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    routine.name,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w800,
+                      color: HomePalette.titleDark,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 1.h),
+                  Text(
+                    _subtitle(l10n),
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: HomePalette.subtitleGrey,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            // XP reward: number + lightning.
+            Text(
+              '${routine.xp}',
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w800,
+                color: HomePalette.titleDark,
+              ),
+            ),
+            SizedBox(width: 3.w),
+            Image.asset('assets/home/light.png', width: 16.w),
+            SizedBox(width: 10.w),
+            _CheckButton(
+              done: done,
+              hasObjectCheck: routine.objectCheck != null,
+              onTap: onToggle,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Description if set, otherwise a compact schedule / hint string.
+  String _subtitle(AppLocalizations l10n) {
+    final desc = routine.description;
+    if (desc != null && desc.trim().isNotEmpty) return desc.trim();
+
+    if (routine.objectCheck != null && routine.objectCheck!.isNotEmpty) {
+      return l10n.routineCardObjectCheck(routine.objectCheck!);
+    }
+
+    final time = routine.scheduledMinute;
+    final timeStr = time == null
+        ? null
+        : '${(time ~/ 60).toString().padLeft(2, '0')}:'
+              '${(time % 60).toString().padLeft(2, '0')}';
+
+    if (routine.type == RoutineType.habit) {
+      final days = _daysLabel(l10n);
+      return timeStr == null ? days : '$days · $timeStr';
+    }
+    return timeStr ?? l10n.routineCardTapToValidate;
+  }
+
+  String _daysLabel(AppLocalizations l10n) {
+    final days = routine.scheduledDays;
+    if (days.every((d) => d)) return l10n.alarmsEveryDay;
+    if (days.every((d) => !d)) return l10n.routineHabitNoSchedule;
+    if (days.length == 7 &&
+        days[1] &&
+        days[2] &&
+        days[3] &&
+        days[4] &&
+        days[5] &&
+        !days[0] &&
+        !days[6]) {
+      return l10n.alarmsWeekdays;
+    }
+    final selected = <String>[];
+    for (var i = 0; i < days.length; i++) {
+      if (days[i]) selected.add(localizedDayShort(l10n, i));
+    }
+    return selected.join(', ');
   }
 }
 
 /// Tappable check button: grey rounded square; green check when done.
 class _CheckButton extends StatelessWidget {
   final bool done;
+  final bool hasObjectCheck;
   final VoidCallback onTap;
 
-  const _CheckButton({required this.done, required this.onTap});
+  const _CheckButton({
+    required this.done,
+    required this.hasObjectCheck,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: withHaptic(onTap),
+      onTap: withMediumHaptic(onTap),
       child: Container(
         width: 40.w,
         height: 40.w,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: done ? HomePalette.teal: HomePalette.checkButtonBg,
+          color: done ? HomePalette.teal : HomePalette.checkButtonBg,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
             color: done ? HomePalette.teal : HomePalette.checkButtonBorder,
@@ -204,7 +364,11 @@ class _CheckButton extends StatelessWidget {
           ),
         ),
         child: Icon(
-          Icons.check_rounded,
+          done
+              ? Icons.check_rounded
+              : (hasObjectCheck
+                    ? Icons.camera_alt_rounded
+                    : Icons.check_rounded),
           size: 22.sp,
           color: done ? Colors.white : HomePalette.checkButtonBorder,
         ),

@@ -1874,11 +1874,17 @@ abstract class AppLocalizations {
   /// **'Color'**
   String get routineFormColorLabel;
 
-  /// No description provided for @routineFormIconLabel.
+  /// No description provided for @routineFormEmojiLabel.
   ///
   /// In en, this message translates to:
-  /// **'Choose an icon'**
-  String get routineFormIconLabel;
+  /// **'Choose an emoji'**
+  String get routineFormEmojiLabel;
+
+  /// No description provided for @routineFormXpLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward'**
+  String get routineFormXpLabel;
 
   /// No description provided for @routineFormObjectCheckLabel.
   ///
@@ -2053,6 +2059,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Small steps, big changes.'**
   String get homePageTodaysPlanSubtitle;
+
+  /// No description provided for @homePagePlanEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing planned for today. Tap + to add a task.'**
+  String get homePagePlanEmpty;
 
   /// No description provided for @homePageEdit.
   ///

@@ -13,11 +13,14 @@ class Routine extends Equatable {
   final String name;
   final String? description;
 
-  /// Key into `kRoutineIcons` (routine_palette.dart).
-  final String iconKey;
+  /// Emoji shown on the routine's tile (e.g. '🧘'). See `kRoutineEmojis`.
+  final String emoji;
 
   /// Key into `kRoutineColors` (routine_palette.dart).
   final String colorKey;
+
+  /// Points awarded/displayed for completing this routine (display-only).
+  final int xp;
 
   /// Free-text object name for photo validation. Null = no object check.
   final String? objectCheck;
@@ -44,8 +47,9 @@ class Routine extends Equatable {
     required this.type,
     required this.name,
     this.description,
-    required this.iconKey,
+    required this.emoji,
     required this.colorKey,
+    this.xp = 10,
     this.objectCheck,
     this.scheduledDate,
     this.scheduledDays = const [false, false, false, false, false, false, false],
@@ -83,8 +87,9 @@ class Routine extends Equatable {
     String? name,
     String? description,
     bool clearDescription = false,
-    String? iconKey,
+    String? emoji,
     String? colorKey,
+    int? xp,
     String? objectCheck,
     bool clearObjectCheck = false,
     DateTime? scheduledDate,
@@ -103,8 +108,9 @@ class Routine extends Equatable {
         name: name ?? this.name,
         description:
             clearDescription ? null : (description ?? this.description),
-        iconKey: iconKey ?? this.iconKey,
+        emoji: emoji ?? this.emoji,
         colorKey: colorKey ?? this.colorKey,
+        xp: xp ?? this.xp,
         objectCheck:
             clearObjectCheck ? null : (objectCheck ?? this.objectCheck),
         scheduledDate:
@@ -125,8 +131,9 @@ class Routine extends Equatable {
         type,
         name,
         description,
-        iconKey,
+        emoji,
         colorKey,
+        xp,
         objectCheck,
         scheduledDate,
         scheduledDays,

@@ -29,7 +29,6 @@ class ActionCard extends StatelessWidget {
     final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final tint = routineColor(routine.colorKey);
-    final icon = routineIcon(routine.iconKey);
 
     final time = routine.scheduledMinute;
     final date = routine.scheduledDate;
@@ -54,11 +53,12 @@ class ActionCard extends StatelessWidget {
             Container(
               width: 46.w,
               height: 46.h,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: tint.withAlpha(40),
                 borderRadius: BorderRadius.circular(12.r),
               ),
-              child: Icon(icon, color: tint, size: 22.sp),
+              child: Text(routine.emoji, style: TextStyle(fontSize: 22.sp)),
             ),
             SizedBox(width: 14.w),
             Expanded(

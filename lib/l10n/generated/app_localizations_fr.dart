@@ -960,7 +960,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get routineFormColorLabel => 'Couleur';
 
   @override
-  String get routineFormIconLabel => 'Choisir une icône';
+  String get routineFormEmojiLabel => 'Choisir un emoji';
+
+  @override
+  String get routineFormXpLabel => 'Récompense';
 
   @override
   String get routineFormObjectCheckLabel => 'Vérification photo';
@@ -1061,6 +1064,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get homePageTodaysPlanSubtitle => 'Petits pas, grands changements.';
+
+  @override
+  String get homePagePlanEmpty =>
+      'Rien de prévu aujourd\'hui. Appuyez sur + pour ajouter une tâche.';
 
   @override
   String get homePageEdit => 'Modifier';
