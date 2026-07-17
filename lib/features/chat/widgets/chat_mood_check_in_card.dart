@@ -21,7 +21,6 @@ class ChatMoodCheckInCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
     final answered = checkIn.selectedMood != null;
 
     return Align(
@@ -31,7 +30,7 @@ class ChatMoodCheckInCard extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 4.h),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
-          color: c.card,
+          color: ChatPalette.appyBubble,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(18.r),
             topRight: Radius.circular(18.r),
@@ -46,7 +45,7 @@ class ChatMoodCheckInCard extends StatelessWidget {
               checkIn.question,
               style: TextStyle(
                 fontSize: 15.sp,
-                color: c.textPrimary,
+                color: ChatPalette.appyText,
                 height: 1.35,
               ),
             ),
@@ -76,7 +75,10 @@ class ChatMoodCheckInCard extends StatelessWidget {
                             color: mood.color,
                             shape: BoxShape.circle,
                             border: isSelected
-                                ? Border.all(color: c.textPrimary, width: 2.5)
+                                ? Border.all(
+                                    color: ChatPalette.appyText,
+                                    width: 2.5,
+                                  )
                                 : null,
                           ),
                           child: Center(

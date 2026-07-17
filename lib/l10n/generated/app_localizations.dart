@@ -2108,6 +2108,12 @@ abstract class AppLocalizations {
   /// **'Today'**
   String get chatPageToday;
 
+  /// No description provided for @chatPageYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get chatPageYesterday;
+
   /// No description provided for @chatPageStartConversation.
   ///
   /// In en, this message translates to:

@@ -15,7 +15,6 @@ class ChatFormCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
     final isAnswered = form.selectedIndex != null;
 
     return Align(
@@ -25,7 +24,7 @@ class ChatFormCard extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 4.h),
         padding: EdgeInsets.all(14.w),
         decoration: BoxDecoration(
-          color: c.card,
+          color: ChatPalette.appyBubble,
           borderRadius: BorderRadius.circular(18.r),
         ),
         child: Column(
@@ -36,7 +35,7 @@ class ChatFormCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w600,
-                color: c.textPrimary,
+                color: ChatPalette.appyText,
                 height: 1.35,
               ),
             ),
@@ -54,10 +53,14 @@ class ChatFormCard extends StatelessWidget {
                       vertical: 12.h,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected ? c.primary : c.background,
+                      color: isSelected
+                          ? ChatPalette.accent
+                          : ChatPalette.cardOption,
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: isSelected ? c.primary : c.separator,
+                        color: isSelected
+                            ? ChatPalette.accent
+                            : ChatPalette.cardBorder,
                       ),
                     ),
                     child: Text(
@@ -65,7 +68,9 @@ class ChatFormCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
-                        color: isSelected ? Colors.white : c.textPrimary,
+                        color: isSelected
+                            ? Colors.white
+                            : ChatPalette.appyText,
                       ),
                     ),
                   ),

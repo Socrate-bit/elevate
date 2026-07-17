@@ -1092,6 +1092,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chatPageToday => 'Aujourd\'hui';
 
   @override
+  String get chatPageYesterday => 'Hier';
+
+  @override
   String get chatPageStartConversation => 'Démarrer une conversation';
 
   @override
