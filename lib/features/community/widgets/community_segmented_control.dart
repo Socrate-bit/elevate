@@ -7,7 +7,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/community_cubit.dart';
 import '../cubit/community_state.dart';
-import '../models/community_mock_data.dart';
+import '../models/community_enums.dart';
 
 /// Feed / Groups / Messages selector — a rounded track with a dark-brown pill
 /// that slides to the selected segment. Each segment is fully tappable; the
@@ -18,20 +18,35 @@ class CommunitySegmentedControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final items = <(CommunitySegment, IconData, String, int?)>[
-      (CommunitySegment.feed, Icons.dashboard_rounded, l10n.communityFeed, null),
-      (
-        CommunitySegment.groups,
-        Icons.groups_rounded,
-        l10n.communityGroups,
-        CommunityMockData.groupsCount,
-      ),
-      (CommunitySegment.messages, Icons.mail_rounded, l10n.communityMessages, null),
-    ];
 
     return BlocBuilder<CommunityCubit, CommunityState>(
-      buildWhen: (p, c) => p.segment != c.segment,
+      buildWhen: (p, c) =>
+          p.segment != c.segment ||
+          p.groups.length != c.groups.length ||
+          p.unreadTotal != c.unreadTotal,
       builder: (context, state) {
+        final groupsBadge = state.groups.isEmpty ? null : state.groups.length;
+        final unreadBadge = state.unreadTotal == 0 ? null : state.unreadTotal;
+        final items = <(CommunitySegment, IconData, String, int?)>[
+          (
+            CommunitySegment.feed,
+            Icons.dashboard_rounded,
+            l10n.communityFeed,
+            null,
+          ),
+          (
+            CommunitySegment.groups,
+            Icons.groups_rounded,
+            l10n.communityGroups,
+            groupsBadge,
+          ),
+          (
+            CommunitySegment.messages,
+            Icons.mail_rounded,
+            l10n.communityMessages,
+            unreadBadge,
+          ),
+        ];
         final index = items.indexWhere((e) => e.$1 == state.segment);
         return Container(
           height: 48.h,

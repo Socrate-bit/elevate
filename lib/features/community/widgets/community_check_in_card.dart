@@ -7,7 +7,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/community_cubit.dart';
 import '../cubit/community_state.dart';
-import '../models/community_mock_data.dart';
+import '../models/community_seed.dart';
 
 /// "Community check-in" card with a row of 5 tappable mood faces.
 class CommunityCheckInCard extends StatelessWidget {
@@ -71,9 +71,9 @@ class CommunityCheckInCard extends StatelessWidget {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(
-                  CommunityMockData.moodAssets.length,
+                  CommunitySeed.moodAssets.length,
                   (i) => _MoodFace(
-                    asset: CommunityMockData.moodAssets[i],
+                    asset: CommunitySeed.moodAssets[i],
                     label: labels[i],
                     tileColor: tileColors[i],
                     selected: state.selectedMood == i,

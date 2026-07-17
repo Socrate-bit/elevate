@@ -1167,4 +1167,85 @@ class AppLocalizationsEn extends AppLocalizations {
   String communityMembersCount(int count) {
     return '$count members';
   }
+
+  @override
+  String get communityFeedEmpty =>
+      'No posts yet. Share something to get started.';
+
+  @override
+  String get communityMessagesEmpty => 'No conversations yet.';
+
+  @override
+  String get communityNewPostTitle => 'New post';
+
+  @override
+  String get communityPostHint => 'Share something with the community…';
+
+  @override
+  String get communityPostButton => 'Post';
+
+  @override
+  String get communityCategoryLabel => 'Category';
+
+  @override
+  String get communityTagAnxiety => 'Anxiety';
+
+  @override
+  String get communityTagDepression => 'Depression';
+
+  @override
+  String get communityTagMindfulness => 'Mindfulness';
+
+  @override
+  String get communityTagRecovery => 'Recovery';
+
+  @override
+  String get communityTagSleep => 'Sleep';
+
+  @override
+  String get communityTagGeneral => 'General';
+
+  @override
+  String get communityCommentsTitle => 'Comments';
+
+  @override
+  String get communityCommentHint => 'Add a comment…';
+
+  @override
+  String get communityNoComments => 'No comments yet. Be the first to share.';
+
+  @override
+  String get communitySendMessage => 'Send message';
+
+  @override
+  String get communityMessageHint => 'Message…';
+
+  @override
+  String get communityNewMessageTitle => 'New message';
+
+  @override
+  String get communitySearchUsersHint => 'Search by username';
+
+  @override
+  String get communityNoUsersFound => 'No users found';
+
+  @override
+  String get communitySetUsernameTitle => 'Choose a username';
+
+  @override
+  String get communitySetUsernameSubtitle =>
+      'Set a username to join the community.';
+
+  @override
+  String get communitySave => 'Save';
+
+  @override
+  String get onboardingUsernameTitle => 'Pick a username';
+
+  @override
+  String get onboardingUsernameSubtitle =>
+      'This is how you\'ll appear in the community.';
+
+  @override
+  String get onboardingUsernameLabel => 'Username';
 }

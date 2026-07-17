@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'auth_service.dart';
 import '../alarms/cubit/alarm_cubit.dart';
 import '../chat/cubit/chat_list_cubit.dart';
+import '../community/cubit/community_cubit.dart';
 import '../memory/cubit/memory_cubit.dart';
 import '../onboarding/cubit/onboarding_cubit.dart';
 import '../onboarding/cubit/onboarding_state.dart';
@@ -52,6 +53,7 @@ class AuthWrapper extends StatelessWidget {
                 context.read<AlarmCubit>().cancelAllNative();
                 context.read<ChatListCubit>().clear();
                 context.read<MemoryCubit>().clear();
+                context.read<CommunityCubit>().clear();
                 // hook: cancel any other user-scoped resources here
               });
               return const OnboardingScreen();
@@ -61,6 +63,7 @@ class AuthWrapper extends StatelessWidget {
               context.read<AlarmCubit>().loadAlarm();
               context.read<ChatListCubit>().start();
               context.read<MemoryCubit>().start();
+              context.read<CommunityCubit>().start();
             });
             if (ob.isInProgress) {
               return const OnboardingScreen();

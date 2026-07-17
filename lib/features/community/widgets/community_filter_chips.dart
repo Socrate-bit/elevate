@@ -7,7 +7,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/community_cubit.dart';
 import '../cubit/community_state.dart';
-import '../models/community_mock_data.dart';
+import '../models/community_enums.dart';
 
 /// Horizontal row of feed filter chips (For you / Recent / Following / Support).
 class CommunityFilterChips extends StatelessWidget {

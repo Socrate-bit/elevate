@@ -1,0 +1,81 @@
+rules_version = '2';
+
+// IMPORTANT: This repo previously had no firestore.rules file — production
+// rules were managed in the Firebase console. Reconcile this file with the
+// current console rules BEFORE deploying, or deploying will overwrite them.
+// The `users/{uid}` block below reflects the app's existing owner-only model.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isUser(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    // ---- Per-user private data (existing app pattern) ----
+    match /users/{uid}/{document=**} {
+      allow read, write: if isUser(uid);
+    }
+
+    // ---- Community: shared, multi-user collections ----
+
+    // Profiles: any signed-in user can read; only the owner writes their own.
+    match /community_profiles/{uid} {
+      allow read: if isSignedIn();
+      allow write: if isUser(uid);
+    }
+
+    // Posts: readable by all signed-in users. Only the author creates/edits/
+    // deletes the post itself; other users may only touch reaction counters
+    // (like/share/comment), enforced by an affected-keys diff.
+    match /community_posts/{postId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.authorUid == request.auth.uid;
+      allow update: if isSignedIn() && (
+        resource.data.authorUid == request.auth.uid ||
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['likedBy', 'likeCount', 'shareCount', 'commentCount'])
+      );
+      allow delete: if isSignedIn()
+        && resource.data.authorUid == request.auth.uid;
+
+      match /comments/{commentId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn()
+          && request.resource.data.authorUid == request.auth.uid;
+        allow delete: if isSignedIn()
+          && resource.data.authorUid == request.auth.uid;
+      }
+    }
+
+    // Groups: readable by all. Non-membership fields are immutable from the
+    // client; joins/leaves only touch memberUids/memberCount. `create` is open
+    // to signed-in users so the one-time seed can run.
+    match /community_groups/{groupId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['memberUids', 'memberCount']);
+    }
+
+    // Conversations: only the two participants can read or write.
+    match /community_conversations/{cid} {
+      allow read: if isSignedIn()
+        && request.auth.uid in resource.data.participantUids;
+      allow create: if isSignedIn()
+        && request.auth.uid in request.resource.data.participantUids;
+      allow update: if isSignedIn()
+        && request.auth.uid in resource.data.participantUids;
+
+      match /messages/{messageId} {
+        allow read: if isSignedIn()
+          && request.auth.uid in
+            get(/databases/$(database)/documents/community_conversations/$(cid))
+              .data.participantUids;
+        allow create: if isSignedIn()
+          && request.resource.data.senderUid == request.auth.uid;
+      }
+    }
+  }
+}

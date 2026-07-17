@@ -2275,6 +2275,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} members'**
   String communityMembersCount(int count);
+
+  /// No description provided for @communityFeedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No posts yet. Share something to get started.'**
+  String get communityFeedEmpty;
+
+  /// No description provided for @communityMessagesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No conversations yet.'**
+  String get communityMessagesEmpty;
+
+  /// No description provided for @communityNewPostTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New post'**
+  String get communityNewPostTitle;
+
+  /// No description provided for @communityPostHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share something with the community…'**
+  String get communityPostHint;
+
+  /// No description provided for @communityPostButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Post'**
+  String get communityPostButton;
+
+  /// No description provided for @communityCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get communityCategoryLabel;
+
+  /// No description provided for @communityTagAnxiety.
+  ///
+  /// In en, this message translates to:
+  /// **'Anxiety'**
+  String get communityTagAnxiety;
+
+  /// No description provided for @communityTagDepression.
+  ///
+  /// In en, this message translates to:
+  /// **'Depression'**
+  String get communityTagDepression;
+
+  /// No description provided for @communityTagMindfulness.
+  ///
+  /// In en, this message translates to:
+  /// **'Mindfulness'**
+  String get communityTagMindfulness;
+
+  /// No description provided for @communityTagRecovery.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery'**
+  String get communityTagRecovery;
+
+  /// No description provided for @communityTagSleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep'**
+  String get communityTagSleep;
+
+  /// No description provided for @communityTagGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get communityTagGeneral;
+
+  /// No description provided for @communityCommentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get communityCommentsTitle;
+
+  /// No description provided for @communityCommentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a comment…'**
+  String get communityCommentHint;
+
+  /// No description provided for @communityNoComments.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet. Be the first to share.'**
+  String get communityNoComments;
+
+  /// No description provided for @communitySendMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Send message'**
+  String get communitySendMessage;
+
+  /// No description provided for @communityMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Message…'**
+  String get communityMessageHint;
+
+  /// No description provided for @communityNewMessageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New message'**
+  String get communityNewMessageTitle;
+
+  /// No description provided for @communitySearchUsersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by username'**
+  String get communitySearchUsersHint;
+
+  /// No description provided for @communityNoUsersFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No users found'**
+  String get communityNoUsersFound;
+
+  /// No description provided for @communitySetUsernameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a username'**
+  String get communitySetUsernameTitle;
+
+  /// No description provided for @communitySetUsernameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a username to join the community.'**
+  String get communitySetUsernameSubtitle;
+
+  /// No description provided for @communitySave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get communitySave;
+
+  /// No description provided for @onboardingUsernameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a username'**
+  String get onboardingUsernameTitle;
+
+  /// No description provided for @onboardingUsernameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This is how you\'ll appear in the community.'**
+  String get onboardingUsernameSubtitle;
+
+  /// No description provided for @onboardingUsernameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get onboardingUsernameLabel;
 }
 
 class _AppLocalizationsDelegate
