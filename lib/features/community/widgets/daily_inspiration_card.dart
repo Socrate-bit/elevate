@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
-import '../models/community_mock_data.dart';
+import '../models/community_seed.dart';
 
 /// Peach inspiration card: shiba illustration + quote of the day.
 class DailyInspirationCard extends StatelessWidget {
@@ -43,7 +43,7 @@ class DailyInspirationCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        CommunityMockData.dailyInspiration,
+                        CommunitySeed.dailyInspiration,
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.w700,

@@ -21,6 +21,7 @@ import '../widgets/signature_step.dart';
 import '../widgets/survey_step.dart';
 import '../widgets/time_picker_step.dart';
 import '../widgets/trial_reminder_step.dart';
+import '../widgets/username_step.dart';
 import '../widgets/welcome_step.dart';
 
 /// Onboarding flow page indices.
@@ -40,10 +41,11 @@ import '../widgets/welcome_step.dart';
 /// 12: Signature (owns nav)
 /// 13: Loading (animated, auto-advances)
 /// 14: Sign-in (owns nav)
-/// 15: Referral
-/// 16: Paywall (owns nav)
-/// 17: Trial reminder (FINAL — calls completeOnboarding + finishOnboarding)
-const _totalPages = 18;
+/// 15: Username (community handle)
+/// 16: Referral
+/// 17: Paywall (owns nav)
+/// 18: Trial reminder (FINAL — calls completeOnboarding + finishOnboarding)
+const _totalPages = 19;
 
 const _surveyQuestions = [
   ('survey_q1', 'Question 1?'),
@@ -113,8 +115,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (_currentPage == 11) {
       InAppReview.instance.requestReview();
     }
-    // Referral page: validate any entered code before advancing.
+    // Username page: require a non-empty handle before advancing.
     if (_currentPage == 15) {
+      FocusScope.of(context).unfocus();
+      if (state.username.trim().isEmpty) return;
+    }
+    // Referral page: validate any entered code before advancing.
+    if (_currentPage == 16) {
       final code = state.referralCode.trim();
       FocusScope.of(context).unfocus();
       if (code.isNotEmpty &&
@@ -247,12 +254,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       12 => LoadingStep(onComplete: _next),
       // 14: Sign-in
       13 => SignInStep(onContinue: _next),
-      // 15: Referral
-      14 => const ReferralStep(),
-      // 16: Paywall
-      15 => PaywallStep(onContinue: _next),
-      // 17: Trial reminder (final)
-      16 => TrialReminderStep(onContinue: _completeFlow),
+      // 15: Username (community handle)
+      14 => const UsernameStep(),
+      // 16: Referral
+      15 => const ReferralStep(),
+      // 17: Paywall
+      16 => PaywallStep(onContinue: _next),
+      // 18: Trial reminder (final)
+      17 => TrialReminderStep(onContinue: _completeFlow),
       _ => const SizedBox.shrink(),
     };
   }
@@ -282,7 +291,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
         // Pages whose body owns its primary action button.
         // (currentPage indices, NOT PageView indices.)
-        const ownsNavPages = {10, 12, 13, 14, 16, 17};
+        const ownsNavPages = {10, 12, 13, 14, 17, 18};
         final ownsNav = ownsNavPages.contains(_currentPage);
 
         return Scaffold(

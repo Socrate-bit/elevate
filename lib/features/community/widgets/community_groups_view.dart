@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
-import '../models/community_mock_data.dart';
+import '../cubit/community_cubit.dart';
+import '../cubit/community_state.dart';
+import '../models/community_group.dart';
 
 /// Groups segment: a list of joinable support groups.
 class CommunityGroupsView extends StatelessWidget {
@@ -12,12 +15,22 @@ class CommunityGroupsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const groups = CommunityMockData.groups;
-    return ListView.separated(
-      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 100.h),
-      itemCount: groups.length,
-      separatorBuilder: (_, _) => SizedBox(height: 12.h),
-      itemBuilder: (context, i) => _GroupCard(group: groups[i]),
+    return BlocBuilder<CommunityCubit, CommunityState>(
+      buildWhen: (p, c) =>
+          p.groups != c.groups || p.currentUid != c.currentUid,
+      builder: (context, state) {
+        final groups = state.groups;
+        return ListView.separated(
+          padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 100.h),
+          itemCount: groups.length,
+          separatorBuilder: (_, _) => SizedBox(height: 12.h),
+          itemBuilder: (context, i) => _GroupCard(
+            group: groups[i],
+            joined: state.currentUid != null &&
+                groups[i].joinedBy(state.currentUid!),
+          ),
+        );
+      },
     );
   }
 }
@@ -25,7 +38,9 @@ class CommunityGroupsView extends StatelessWidget {
 /// A single group card.
 class _GroupCard extends StatelessWidget {
   final CommunityGroup group;
-  const _GroupCard({required this.group});
+  final bool joined;
+
+  const _GroupCard({required this.group, required this.joined});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +63,7 @@ class _GroupCard extends StatelessWidget {
           CircleAvatar(
             radius: 24.w,
             backgroundColor: CommunityPalette.background,
-            backgroundImage: AssetImage(group.avatar),
+            backgroundImage: AssetImage(group.avatarAsset),
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -65,7 +80,7 @@ class _GroupCard extends StatelessWidget {
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  l10n.communityMembersCount(group.members),
+                  l10n.communityMembersCount(group.memberCount),
                   style: TextStyle(
                     fontSize: 11.sp,
                     fontWeight: FontWeight.w700,
@@ -87,7 +102,11 @@ class _GroupCard extends StatelessWidget {
             ),
           ),
           SizedBox(width: 10.w),
-          _JoinPill(joined: group.joined),
+          _JoinPill(
+            joined: joined,
+            onTap: () =>
+                context.read<CommunityCubit>().setJoined(group, !joined),
+          ),
         ],
       ),
     );
@@ -97,13 +116,15 @@ class _GroupCard extends StatelessWidget {
 /// Join / Joined action pill.
 class _JoinPill extends StatelessWidget {
   final bool joined;
-  const _JoinPill({required this.joined});
+  final VoidCallback onTap;
+
+  const _JoinPill({required this.joined, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
-      onTap: withHaptic(() {}),
+      onTap: withHaptic(onTap),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(

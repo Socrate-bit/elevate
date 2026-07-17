@@ -72,6 +72,11 @@ class AnalyticsService {
   // Community
   static const communitySegmentSelected = 'community_segment_selected';
   static const communityPostLiked = 'community_post_liked';
+  static const communityPostCreated = 'community_post_created';
+  static const communityCommentAdded = 'community_comment_added';
+  static const communityGroupJoined = 'community_group_joined'; // props: {joined}
+  static const communityMessageSent = 'community_message_sent';
+  static const communityProfileCreated = 'community_profile_created';
 
   // Tools
   static const toolSessionStarted = 'tool_session_started'; // props: {tool}

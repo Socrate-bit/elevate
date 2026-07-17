@@ -1173,4 +1173,86 @@ class AppLocalizationsFr extends AppLocalizations {
   String communityMembersCount(int count) {
     return '$count membres';
   }
+
+  @override
+  String get communityFeedEmpty =>
+      'Aucune publication pour l\'instant. Partage quelque chose pour commencer.';
+
+  @override
+  String get communityMessagesEmpty => 'Aucune conversation pour l\'instant.';
+
+  @override
+  String get communityNewPostTitle => 'Nouvelle publication';
+
+  @override
+  String get communityPostHint => 'Partage quelque chose avec la communauté…';
+
+  @override
+  String get communityPostButton => 'Publier';
+
+  @override
+  String get communityCategoryLabel => 'Catégorie';
+
+  @override
+  String get communityTagAnxiety => 'Anxiété';
+
+  @override
+  String get communityTagDepression => 'Dépression';
+
+  @override
+  String get communityTagMindfulness => 'Pleine conscience';
+
+  @override
+  String get communityTagRecovery => 'Rétablissement';
+
+  @override
+  String get communityTagSleep => 'Sommeil';
+
+  @override
+  String get communityTagGeneral => 'Général';
+
+  @override
+  String get communityCommentsTitle => 'Commentaires';
+
+  @override
+  String get communityCommentHint => 'Ajouter un commentaire…';
+
+  @override
+  String get communityNoComments =>
+      'Aucun commentaire pour l\'instant. Sois le premier à partager.';
+
+  @override
+  String get communitySendMessage => 'Envoyer un message';
+
+  @override
+  String get communityMessageHint => 'Message…';
+
+  @override
+  String get communityNewMessageTitle => 'Nouveau message';
+
+  @override
+  String get communitySearchUsersHint => 'Rechercher par nom d\'utilisateur';
+
+  @override
+  String get communityNoUsersFound => 'Aucun utilisateur trouvé';
+
+  @override
+  String get communitySetUsernameTitle => 'Choisis un nom d\'utilisateur';
+
+  @override
+  String get communitySetUsernameSubtitle =>
+      'Définis un nom d\'utilisateur pour rejoindre la communauté.';
+
+  @override
+  String get communitySave => 'Enregistrer';
+
+  @override
+  String get onboardingUsernameTitle => 'Choisis un nom d\'utilisateur';
+
+  @override
+  String get onboardingUsernameSubtitle =>
+      'C\'est ainsi que tu apparaîtras dans la communauté.';
+
+  @override
+  String get onboardingUsernameLabel => 'Nom d\'utilisateur';
 }
