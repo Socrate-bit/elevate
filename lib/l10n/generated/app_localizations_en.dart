@@ -1075,13 +1075,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navTools => 'Tools';
 
   @override
-  String get navCommunity => 'Community';
-
-  @override
   String get chatPageCalmMode => 'Calm mode';
 
   @override
-  String get chatPageCompanionName => 'Jean';
+  String get chatPageCompanionName => 'Appy';
 
   @override
   String get chatPageCompanionSubtitle => 'Your mindful companion';
@@ -1115,144 +1112,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get journalInputCues => 'Input Cues';
-
-  @override
-  String get communityTitle => 'Community';
-
-  @override
-  String get communityFeed => 'Feed';
-
-  @override
-  String get communityGroups => 'Groups';
-
-  @override
-  String get communityMessages => 'Messages';
-
-  @override
-  String get communityFilterForYou => 'For you';
-
-  @override
-  String get communityFilterRecent => 'Recent';
-
-  @override
-  String get communityFilterFollowing => 'Following';
-
-  @override
-  String get communityFilterSupport => 'Support';
-
-  @override
-  String get communityDailyInspiration => 'Daily inspiration';
-
-  @override
-  String get communityCheckInTitle => 'Community check-in';
-
-  @override
-  String get communityCheckInSubtitle => 'How are you feeling today?';
-
-  @override
-  String get communityMoodGreat => 'Great';
-
-  @override
-  String get communityMoodGood => 'Good';
-
-  @override
-  String get communityMoodOkay => 'Okay';
-
-  @override
-  String get communityMoodStruggling => 'Struggling';
-
-  @override
-  String get communityMoodReallyHard => 'Really hard';
-
-  @override
-  String get communityGroupJoin => 'Join';
-
-  @override
-  String get communityGroupJoined => 'Joined';
-
-  @override
-  String communityMembersCount(int count) {
-    return '$count members';
-  }
-
-  @override
-  String get communityFeedEmpty =>
-      'No posts yet. Share something to get started.';
-
-  @override
-  String get communityMessagesEmpty => 'No conversations yet.';
-
-  @override
-  String get communityNewPostTitle => 'New post';
-
-  @override
-  String get communityPostHint => 'Share something with the community…';
-
-  @override
-  String get communityPostButton => 'Post';
-
-  @override
-  String get communityCategoryLabel => 'Category';
-
-  @override
-  String get communityTagAnxiety => 'Anxiety';
-
-  @override
-  String get communityTagDepression => 'Depression';
-
-  @override
-  String get communityTagMindfulness => 'Mindfulness';
-
-  @override
-  String get communityTagRecovery => 'Recovery';
-
-  @override
-  String get communityTagSleep => 'Sleep';
-
-  @override
-  String get communityTagGeneral => 'General';
-
-  @override
-  String get communityCommentsTitle => 'Comments';
-
-  @override
-  String get communityCommentHint => 'Add a comment…';
-
-  @override
-  String get communityNoComments => 'No comments yet. Be the first to share.';
-
-  @override
-  String get communitySendMessage => 'Send message';
-
-  @override
-  String get communityMessageHint => 'Message…';
-
-  @override
-  String get communityNewMessageTitle => 'New message';
-
-  @override
-  String get communitySearchUsersHint => 'Search by username';
-
-  @override
-  String get communityNoUsersFound => 'No users found';
-
-  @override
-  String get communitySetUsernameTitle => 'Choose a username';
-
-  @override
-  String get communitySetUsernameSubtitle =>
-      'Set a username to join the community.';
-
-  @override
-  String get communitySave => 'Save';
-
-  @override
-  String get onboardingUsernameTitle => 'Pick a username';
-
-  @override
-  String get onboardingUsernameSubtitle =>
-      'This is how you\'ll appear in the community.';
-
-  @override
-  String get onboardingUsernameLabel => 'Username';
 }

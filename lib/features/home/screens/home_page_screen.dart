@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/appy_nav_bar.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../cubit/home_page_cubit.dart';
 import '../cubit/home_page_state.dart';
-import '../models/home_mock_data.dart';
-import '../widgets/home_action_cards.dart';
 import '../widgets/home_top_bar.dart';
 import '../widgets/quest_banner.dart';
 import '../widgets/todays_plan_card.dart';
@@ -102,12 +99,9 @@ class _HomeViewState extends State<_HomeView> {
                     children: [
                       // Clears the transparent app bar floating over the scene.
                       SizedBox(height: 18.w + 18.h),
-                      const _Greeting(),
-                      SizedBox(height: 12.h),
-                      // Pet sits in the flow: it can never overlap the headline
-                      // above or the action cards below. Both dimensions are
-                      // fixed (the gif is square) so the first-frame paws
-                      // measurement is already final.
+                      // Pet sits in the flow: it can never overlap the content
+                      // below. Both dimensions are fixed (the gif is square) so
+                      // the first-frame paws measurement is already final.
                       Image.asset(
                         'assets/home/pet_rest_animation.gif',
                         key: _petKey,
@@ -115,8 +109,6 @@ class _HomeViewState extends State<_HomeView> {
                         height: w * _petWidthFactor,
                         gaplessPlayback: true,
                       ),
-                      SizedBox(height: 4.h),
-                      const HomeActionCards(),
                       SizedBox(height: 10.h),
                     ],
                   ),
@@ -137,49 +129,6 @@ class _HomeViewState extends State<_HomeView> {
         ),
       ),
       bottomNavigationBar: const AppyNavBar(),
-    );
-  }
-}
-
-/// Greeting line + headline flanked by leaf decorations.
-class _Greeting extends StatelessWidget {
-  const _Greeting();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Column(
-      children: [
-        Text(
-          l10n.homePageGreeting(HomeMockData.userName),
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w600,
-            color: HomePalette.textDarkGreen,
-          ),
-        ),
-        SizedBox(height: 4.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Transform.flip(
-              flipX: true,
-              child: Text('🌿', style: TextStyle(fontSize: 12.sp)),
-            ),
-            SizedBox(width: 6.w),
-            Text(
-              l10n.homePageHeadline,
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w800,
-                color: HomePalette.headlineGreen,
-              ),
-            ),
-            SizedBox(width: 6.w),
-            Text('🌿', style: TextStyle(fontSize: 12.sp)),
-          ],
-        ),
-      ],
     );
   }
 }

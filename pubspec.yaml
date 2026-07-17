@@ -90,8 +90,6 @@ flutter:
     - assets/activities/
     - assets/chat/
     - assets/journal/
-    - assets/community/
-    - assets/community/profil_avatar/
     - assets/mood tracking/
   uses-material-design: true
   fonts:

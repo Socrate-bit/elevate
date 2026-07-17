@@ -184,51 +184,6 @@ class JournalPalette {
   static const tagText = Color(0xFF5C6B57);
 }
 
-/// Palette for the Community page (warm/peach, sampled from the design).
-class CommunityPalette {
-  // Page + surfaces
-  static const background = Color(0xFFFCEFE0);
-  static const card = Color(0xFFFFFBF5);
-  static const inspirationCard = Color(0xFFFBE6CC);
-
-  // Text
-  static const textDark = Color(0xFF4A3526);
-  static const textBrown = Color(0xFF8A6A4F);
-  static const subtitleGrey = Color(0xFF9B8B7B);
-
-  // Segmented control
-  static const segmentSelected = Color(0xFF5A3A20);
-  static const segmentText = Color(0xFF8A6A4F);
-  static const groupsBadge = Color(0xFFF2994A);
-
-  // Filter chips
-  static const chipSelected = Color(0xFFFBE2C8);
-  static const chipUnselected = Color(0xFFFFFBF5);
-  static const chipSelectedText = Color(0xFF9A5B21);
-
-  // Tag pill (post category)
-  static const tagBg = Color(0xFFEFE7DD);
-  static const tagText = Color(0xFF8A7A6A);
-
-  // Segmented control bar (translucent track holding the three segments).
-  static const segmentTrack = Color(0x73FFFFFF);
-
-  // Mood check-in: soft pastel rounded-square tile behind each face.
-  static const moodTileGreen = Color(0xFFD9EFCB);
-  static const moodTileYellow = Color(0xFFFAEFC6);
-  static const moodTileOrange = Color(0xFFFBE2CB);
-  static const moodTilePink = Color(0xFFFAD9DC);
-  static const moodTilePurple = Color(0xFFE8DDF4);
-
-  // Accents
-  static const fab = Color(0xFFF39C3D);
-  static const heart = Color(0xFFEC5B6A);
-  static const reactionGrey = Color(0xFF9B8B7B);
-  static const joinPill = Color(0xFFF39C3D);
-  static const joinedPill = Color(0xFFEFE7DD);
-  static const unreadDot = Color(0xFFF39C3D);
-}
-
 class AppTheme {
   static ThemeData get light {
     const bg = Color(0xFFF2F2F7);

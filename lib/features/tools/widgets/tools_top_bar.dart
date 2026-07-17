@@ -3,10 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/utils/haptic_utils.dart';
 
-/// Tools page top bar: "Tools" title + info dot on the left, settings gear on
-/// the right.
+/// Tools page top bar: just the "Tools" title.
 class ToolsTopBar extends StatelessWidget {
   const ToolsTopBar({super.key});
 
@@ -23,31 +21,6 @@ class ToolsTopBar extends StatelessWidget {
               fontSize: 26.sp,
               fontWeight: FontWeight.w800,
               color: HomePalette.textDarkGreen,
-            ),
-          ),
-          SizedBox(width: 6.w),
-          Icon(
-            Icons.info_outline_rounded,
-            size: 16.sp,
-            color: HomePalette.textDarkGreen.withValues(alpha: 0.55),
-          ),
-          const Spacer(),
-          // Settings gear in a soft translucent circle.
-          GestureDetector(
-            onTap: withHaptic(() {}),
-            child: Container(
-              width: 38.w,
-              height: 38.w,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.5),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.settings_rounded,
-                size: 22.sp,
-                color: HomePalette.textDarkGreen.withValues(alpha: 0.7),
-              ),
             ),
           ),
         ],
