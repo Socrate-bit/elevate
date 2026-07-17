@@ -87,6 +87,7 @@ flutter:
   assets:
     - shorebird.yaml
     - assets/home/
+    - assets/home_page/
     - assets/activities/
     - assets/chat/
     - assets/journal/
