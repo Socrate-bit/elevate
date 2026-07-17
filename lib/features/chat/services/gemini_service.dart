@@ -431,9 +431,11 @@ Use plain prose replies for everything else.
   }) async {
     try {
       final contents = _buildContents(history, userText);
-      final response = await _buildChatModel(
-        memoryContext,
-      ).generateContent(contents);
+      // Bound the request so a stalled network call surfaces as an error
+      // (graceful empty state / snackbar) instead of an endless typing state.
+      final response = await _buildChatModel(memoryContext)
+          .generateContent(contents)
+          .timeout(const Duration(seconds: 45));
 
       final calls = response.functionCalls.toList();
       if (calls.isNotEmpty) {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -91,8 +92,11 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
     with WidgetsBindingObserver {
   String? _resolvedId;
   bool _autoStart = false;
-  bool _creating = false;
-  bool _failed = false;
+  Timer? _fallbackTimer;
+
+  /// Hard stop so the tab can never show a spinner forever: if the conversations
+  /// stream hasn't produced anything actionable in time, create one anyway.
+  static const _resolveTimeout = Duration(seconds: 6);
 
   @override
   void initState() {
@@ -100,12 +104,21 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
     WidgetsBinding.instance.addObserver(this);
     // Attempt resolution against whatever the conversations stream already has.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _tryResolve(context.read<ChatListCubit>().state);
+      if (!mounted) return;
+      _tryResolve(context.read<ChatListCubit>().state);
+    });
+    // Fallback: if nothing resolved us in time (stream stuck loading, etc.),
+    // force-create a conversation so the user is never stuck on a spinner.
+    _fallbackTimer = Timer(_resolveTimeout, () {
+      if (!mounted || _resolvedId != null) return;
+      debugPrint('[ChatPage] resolve timed out → forcing new conversation');
+      _tryResolve(context.read<ChatListCubit>().state, force: true);
     });
   }
 
   @override
   void dispose() {
+    _fallbackTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -126,43 +139,35 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
 
   /// Picks the most-recent conversation, or creates one if the user has none.
   /// Runs once — pinned via [_resolvedId] so later stream updates don't swap it.
-  void _tryResolve(ChatListState s) {
-    if (_resolvedId != null || _creating) return;
-    // Still waiting for the first conversations snapshot.
-    if (s.isLoading && s.conversations.isEmpty) return;
+  /// [force] skips the "still loading" wait (used by the timeout fallback).
+  void _tryResolve(ChatListState s, {bool force = false}) {
+    if (_resolvedId != null) return;
 
+    // Prefer an existing conversation (resume where the user left off).
     if (s.conversations.isNotEmpty) {
+      debugPrint('[ChatPage] resuming conversation ${s.conversations.first.id}');
+      _fallbackTimer?.cancel();
       setState(() {
         _resolvedId = s.conversations.first.id;
         _autoStart = false; // resume — no fresh greeting
-        _failed = false;
       });
       return;
     }
 
-    // No conversation yet — create one lazily and greet the user.
-    _creating = true;
-    _failed = false;
-    context
-        .read<ChatListCubit>()
-        .createConversation()
-        .then((conv) {
-          if (!mounted) return;
-          setState(() {
-            _resolvedId = conv.id;
-            _autoStart = true;
-            _creating = false;
-          });
-        })
-        .catchError((Object e) {
-          debugPrint('[ChatPage] createConversation failed: $e');
-          if (mounted) {
-            setState(() {
-              _creating = false;
-              _failed = true;
-            });
-          }
-        });
+    // No conversation yet. Wait for the first snapshot unless it's still loading
+    // and we haven't hit the timeout — then create one (non-blocking) and greet.
+    if (s.isLoading && !force) {
+      debugPrint('[ChatPage] waiting for conversations snapshot…');
+      return;
+    }
+
+    _fallbackTimer?.cancel();
+    final conv = context.read<ChatListCubit>().newConversation();
+    debugPrint('[ChatPage] created new conversation ${conv.id}');
+    setState(() {
+      _resolvedId = conv.id;
+      _autoStart = true;
+    });
   }
 
   @override
@@ -170,10 +175,7 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
     return BlocListener<ChatListCubit, ChatListState>(
       listener: (_, state) => _tryResolve(state),
       child: _resolvedId == null
-          ? _ResolvingPlaceholder(
-              failed: _failed,
-              onRetry: () => _tryResolve(context.read<ChatListCubit>().state),
-            )
+          ? const _ResolvingPlaceholder()
           : BlocProvider<ChatCubit>(
               create: (_) => ChatCubit(
                 conversationId: _resolvedId!,
@@ -188,47 +190,31 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
   }
 }
 
-/// Frosted loading (or tap-to-retry) shown over the scene while the single
-/// conversation is being resolved/created.
+/// Frosted spinner shown briefly over the scene while the single conversation
+/// is being resolved. A timeout in the gate guarantees this never lingers.
 class _ResolvingPlaceholder extends StatelessWidget {
-  final bool failed;
-  final VoidCallback onRetry;
-
-  const _ResolvingPlaceholder({required this.failed, required this.onRetry});
+  const _ResolvingPlaceholder();
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100.r),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: GestureDetector(
-            onTap: failed ? onRetry : null,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: ChatPalette.glassPill,
-                borderRadius: BorderRadius.circular(100.r),
+          child: Container(
+            padding: EdgeInsets.all(14.w),
+            decoration: BoxDecoration(
+              color: ChatPalette.glassPill,
+              borderRadius: BorderRadius.circular(100.r),
+            ),
+            child: SizedBox(
+              width: 20.w,
+              height: 20.w,
+              child: const CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
               ),
-              child: failed
-                  ? Text(
-                      l10n.chatSendFailed,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    )
-                  : SizedBox(
-                      width: 20.w,
-                      height: 20.w,
-                      child: const CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    ),
             ),
           ),
         ),

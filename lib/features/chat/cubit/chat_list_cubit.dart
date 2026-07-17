@@ -76,6 +76,40 @@ class ChatListCubit extends Cubit<ChatListState> {
     return conv;
   }
 
+  /// Non-blocking variant of [createConversation]: builds the conversation,
+  /// adds it to state optimistically, and persists it in the background so the
+  /// caller never awaits a Firestore write (which can hang while offline).
+  /// The persisted doc is best-effort; a failed write rolls it back out of state.
+  ChatConversation newConversation() {
+    final now = DateTime.now();
+    final conv = ChatConversation(
+      id: _uuid.v4(),
+      title: '',
+      createdAt: now,
+      lastMessageAt: now,
+    );
+    emit(state.copyWith(conversations: [conv, ...state.conversations]));
+    unawaited(_persistNewConversation(conv));
+    return conv;
+  }
+
+  Future<void> _persistNewConversation(ChatConversation conv) async {
+    try {
+      await _repo.saveConversation(conv);
+      debugPrint('[ChatListCubit] created conversation ${conv.id}');
+      AnalyticsService.capture(AnalyticsService.chatConversationCreated);
+    } catch (e) {
+      debugPrint('[ChatListCubit] newConversation persist failed: $e');
+      emit(
+        state.copyWith(
+          conversations: state.conversations
+              .where((c) => c.id != conv.id)
+              .toList(),
+        ),
+      );
+    }
+  }
+
   Future<void> deleteConversation(String id) async {
     final previous = state.conversations;
     emit(
