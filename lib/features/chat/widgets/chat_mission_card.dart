@@ -24,7 +24,6 @@ class ChatMissionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final missionType = missionTypeFromString(suggestion.missionType);
     final info = missionInfoFor(missionType);
@@ -38,7 +37,7 @@ class ChatMissionCard extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 4.h),
         padding: EdgeInsets.all(14.w),
         decoration: BoxDecoration(
-          color: c.card,
+          color: ChatPalette.appyBubble,
           borderRadius: BorderRadius.circular(18.r),
         ),
         child: Column(
@@ -63,7 +62,7 @@ class ChatMissionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w600,
-                      color: c.textPrimary,
+                      color: ChatPalette.appyText,
                     ),
                   ),
                 ),
@@ -73,22 +72,22 @@ class ChatMissionCard extends StatelessWidget {
             // AI rationale
             Text(
               suggestion.reason,
-              style: TextStyle(fontSize: 13.sp, color: c.textSecondary),
+              style: TextStyle(fontSize: 13.sp, color: ChatPalette.timestamp),
             ),
             SizedBox(height: 12.h),
             // Action area
             if (isPending) ...[
               _FilledButton(
                 label: l10n.chatMissionStart,
-                color: c.primary,
+                color: ChatPalette.accent,
                 textColor: Colors.white,
                 onTap: withMediumHaptic(onAccept)!,
               ),
               SizedBox(height: 8.h),
               _OutlinedButton(
                 label: l10n.chatMissionDecline,
-                borderColor: c.separator,
-                textColor: c.textSecondary,
+                borderColor: ChatPalette.cardBorder,
+                textColor: ChatPalette.timestamp,
                 onTap: withHaptic(onDecline)!,
               ),
             ] else
@@ -99,7 +98,7 @@ class ChatMissionCard extends StatelessWidget {
                 label: isAccepted
                     ? l10n.chatMissionAccepted
                     : l10n.chatMissionDeclined,
-                color: c.textSecondary,
+                color: ChatPalette.timestamp,
               ),
           ],
         ),

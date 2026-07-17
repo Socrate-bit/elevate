@@ -6,7 +6,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
-import '../models/chat_mock_data.dart';
+
+/// A starter suggestion chip in the "Start a conversation" card.
+class ChatSuggestion {
+  final String emoji;
+  final String label;
+
+  const ChatSuggestion({required this.emoji, required this.label});
+}
 
 /// Frosted "Start a conversation" card with a close button and three
 /// emoji starter suggestions.

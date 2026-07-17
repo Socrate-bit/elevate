@@ -3,99 +3,109 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
-/// Minimalist composer: a translucent frosted "+" circle, a frosted pill with
-/// the text field, and a trailing call/send icon. Reports text via [onSend].
-class ChatComposerBar extends StatefulWidget {
-  final ValueChanged<String> onSend;
+/// Minimalist composer over the scene: a frosted "+" circle, a frosted pill with
+/// the text field, and a trailing action. The trailing icon is a mic while the
+/// field is empty (tap → [onMic]) and a send arrow once there is text
+/// (tap → [onSend]). Controlled by the parent, which owns [controller].
+class ChatComposerBar extends StatelessWidget {
+  final TextEditingController controller;
+  final String hint;
+  final bool isListening;
+  final VoidCallback onSend;
+  final VoidCallback onMic;
 
-  const ChatComposerBar({super.key, required this.onSend});
-
-  @override
-  State<ChatComposerBar> createState() => _ChatComposerBarState();
-}
-
-class _ChatComposerBarState extends State<ChatComposerBar> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _send() {
-    widget.onSend(_controller.text);
-    _controller.clear();
-  }
+  const ChatComposerBar({
+    super.key,
+    required this.controller,
+    required this.hint,
+    required this.isListening,
+    required this.onSend,
+    required this.onMic,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Row(
-      children: [
-        // Leading "+" — its own frosted translucent circle.
-        _FrostedCircle(icon: Icons.add_rounded, onTap: () {}),
-        SizedBox(width: 10.w),
-        // Translucent pill holding the text field + call/send icon.
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(100.r),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(
-                padding: EdgeInsets.only(left: 18.w, right: 8.w),
-                decoration: BoxDecoration(
-                  color: ChatPalette.composer,
-                  borderRadius: BorderRadius.circular(100.r),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        onSubmitted: (_) => _send(),
-                        textInputAction: TextInputAction.send,
-                        style: TextStyle(
-                          color: ChatPalette.composerText,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 14.h),
-                          border: InputBorder.none,
-                          hintText: l10n.chatPageComposerHint,
-                          hintStyle: TextStyle(
-                            color: ChatPalette.composerHint,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
+    // Rebuild the trailing icon as the text changes (empty → mic, text → send).
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        final hasText = controller.text.trim().isNotEmpty;
+        return Row(
+          children: [
+            // Leading "+" — its own frosted translucent circle (no-op for now).
+            _FrostedCircle(icon: Icons.add_rounded, onTap: () {}),
+            SizedBox(width: 10.w),
+            // Translucent pill holding the text field + trailing action.
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(100.r),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    padding: EdgeInsets.only(left: 18.w, right: 8.w),
+                    decoration: BoxDecoration(
+                      color: ChatPalette.composer,
+                      borderRadius: BorderRadius.circular(100.r),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: controller,
+                            onSubmitted: (_) {
+                              if (controller.text.trim().isNotEmpty) onSend();
+                            },
+                            textInputAction: TextInputAction.send,
+                            style: TextStyle(
+                              color: ChatPalette.composerText,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            decoration: InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 14.h,
+                              ),
+                              border: InputBorder.none,
+                              hintText: hint,
+                              hintStyle: TextStyle(
+                                color: ChatPalette.composerHint,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(width: 6.w),
-                    GestureDetector(
-                      onTap: withHaptic(_send),
-                      child: Padding(
-                        padding: EdgeInsets.all(6.w),
-                        child: Icon(
-                          Icons.call_rounded,
-                          color: ChatPalette.composerText,
-                          size: 22.sp,
+                        SizedBox(width: 6.w),
+                        GestureDetector(
+                          onTap: withHaptic(hasText ? onSend : onMic),
+                          child: Padding(
+                            padding: EdgeInsets.all(6.w),
+                            child: Icon(
+                              hasText
+                                  ? Icons.arrow_upward_rounded
+                                  : (isListening
+                                        ? Icons.stop_rounded
+                                        : Icons.mic_rounded),
+                              color: hasText || isListening
+                                  ? ChatPalette.accent
+                                  : ChatPalette.composerText,
+                              size: 22.sp,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

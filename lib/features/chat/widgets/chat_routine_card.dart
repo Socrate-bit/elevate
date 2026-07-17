@@ -36,7 +36,6 @@ class _ChatRoutineCardState extends State<ChatRoutineCard> {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final tint = routineColor(widget.mutation.colorKey);
     final icon = routineIcon(widget.mutation.iconKey);
@@ -49,7 +48,7 @@ class _ChatRoutineCardState extends State<ChatRoutineCard> {
         margin: EdgeInsets.symmetric(vertical: 6.h),
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: c.card,
+          color: ChatPalette.appyBubble,
           borderRadius: BorderRadius.circular(14.r),
           border: Border.all(color: tint.withAlpha(60), width: 1.5),
           boxShadow: [
@@ -83,7 +82,7 @@ class _ChatRoutineCardState extends State<ChatRoutineCard> {
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
-                          color: c.textPrimary,
+                          color: ChatPalette.appyText,
                         ),
                       ),
                       SizedBox(height: 2.h),
@@ -93,7 +92,7 @@ class _ChatRoutineCardState extends State<ChatRoutineCard> {
                             : l10n.routineTypeHabit,
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: c.textSecondary,
+                          color: ChatPalette.timestamp,
                         ),
                       ),
                     ],
@@ -133,12 +132,12 @@ class _ChatRoutineCardState extends State<ChatRoutineCard> {
                   Icon(
                     Icons.check_circle_outline_rounded,
                     size: 14.sp,
-                    color: c.textSecondary,
+                    color: ChatPalette.timestamp,
                   ),
                   SizedBox(width: 4.w),
                   Text(
                     l10n.chatActionDone,
-                    style: TextStyle(fontSize: 12.sp, color: c.textSecondary),
+                    style: TextStyle(fontSize: 12.sp, color: ChatPalette.timestamp),
                   ),
                 ],
               ),

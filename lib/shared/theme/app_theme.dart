@@ -144,6 +144,11 @@ class ChatPalette {
 
   // Round action buttons (composer +, send/call) — leafy green.
   static const accent = Color(0xFF7BAE3F);
+
+  // Interactive cards (form / mission / mood / routine) rendered over the scene:
+  // near-opaque white panels matching the Appy bubble, with warm neutrals.
+  static const cardOption = Color(0xFFEFEDE6); // unselected option / chip fill
+  static const cardBorder = Color(0x22343C28); // subtle hairline border
 }
 
 /// Palette for the illustrated Journal page (sampled from the design).
