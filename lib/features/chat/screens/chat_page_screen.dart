@@ -96,7 +96,9 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
 
   /// Hard stop so the tab can never show a spinner forever: if the conversations
   /// stream hasn't produced anything actionable in time, create one anyway.
-  static const _resolveTimeout = Duration(seconds: 6);
+  /// Short enough that a first-time user (no conversations) isn't left waiting,
+  /// but long enough for an existing conversation to load first and be resumed.
+  static const _resolveTimeout = Duration(seconds: 3);
 
   @override
   void initState() {
