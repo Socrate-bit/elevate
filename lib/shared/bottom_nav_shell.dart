@@ -153,7 +153,7 @@ class BottomNavShellState extends State<BottomNavShell> {
                   activeColor: c.primary,
                   inactiveColor: c.textSecondary,
                   borderRadius: 28.r,
-                  height: 52.h,
+                  height: 72.h,
                   iconSize: 24.sp,
                   selectedIconScale: 1.15,
                   animationDuration: const Duration(milliseconds: 250),

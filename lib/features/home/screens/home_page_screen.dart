@@ -65,6 +65,7 @@ class _HomeViewState extends State<_HomeView> {
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        clipBehavior: Clip.none,
         automaticallyImplyLeading: false,
         titleSpacing: 0,
         toolbarHeight: 54.w + 12.h,
@@ -72,13 +73,7 @@ class _HomeViewState extends State<_HomeView> {
         scrolledUnderElevation: 0,
         shadowColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
-        // Transparent over the scene at rest; a soft sky tint once content
-        // scrolls under it.
-        backgroundColor: WidgetStateColor.resolveWith(
-          (states) => states.contains(WidgetState.scrolledUnder)
-              ? HomePalette.skyFill.withValues(alpha: 0.9)
-              : HomePalette.skyFill.withValues(alpha: 0.0),
-        ),
+        backgroundColor: Colors.transparent,
         title: const HomeTopBar(),
       ),
       body: SingleChildScrollView(

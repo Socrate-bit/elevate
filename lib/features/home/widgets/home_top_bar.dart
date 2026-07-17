@@ -14,7 +14,7 @@ class HomeTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 6.w),
+      padding: EdgeInsets.only(left: 18.w, right: 18.w, top: 24.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -26,7 +26,7 @@ class HomeTopBar extends StatelessWidget {
               Text(
                 'Appy',
                 style: TextStyle(
-                  fontSize: 24.sp,
+                  fontSize: 32.sp,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                   shadows: const [
@@ -47,8 +47,8 @@ class HomeTopBar extends StatelessWidget {
                       padding: EdgeInsets.only(right: 4.w),
                       child: Image.asset(
                         'assets/home_page/heart_icon.png',
-                        width: 20.w,
-                        height: 20.w,
+                        width: 32.w,
+                        height: 32.w,
                       ),
                     ),
                 ],

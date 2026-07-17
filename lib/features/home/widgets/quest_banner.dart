@@ -17,9 +17,24 @@ class QuestBanner extends StatelessWidget {
     const done = HomeMockData.questDone;
     const total = HomeMockData.questTotal;
 
-    return Stack(
-      clipBehavior: Clip.none,
+    return Column(
       children: [
+        Padding(
+          padding: EdgeInsets.only(right: 18.w, left: 18.w, bottom: 12.h),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Spacer(),
+              _PerchIcon(
+                asset: 'assets/home_page/quest_icon.png',
+                onTap: () {},
+              ),
+              SizedBox(width: 24.w),
+              _PerchIcon(asset: 'assets/home_page/shop_icon.png', onTap: () {}),
+            ],
+          ),
+        ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 18.w),
           child: GestureDetector(
@@ -60,19 +75,6 @@ class QuestBanner extends StatelessWidget {
             ),
           ),
         ),
-        // Shop + quest shortcuts perched on the banner's top-right corner.
-        Positioned(
-          top: -18.h,
-          right: 18.w + 4.w,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _PerchIcon(asset: 'assets/home_page/quest_icon.png', onTap: () {}),
-              SizedBox(width: 8.w),
-              _PerchIcon(asset: 'assets/home_page/shop_icon.png', onTap: () {}),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -89,7 +91,7 @@ class _PerchIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: withHaptic(onTap),
-      child: Image.asset(asset, width: 46.w, height: 46.w),
+      child: Image.asset(asset, width: 40.w, height: 40.w),
     );
   }
 }
