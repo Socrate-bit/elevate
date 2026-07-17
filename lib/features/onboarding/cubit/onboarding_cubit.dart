@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../auth/auth_service.dart';
-import '../../community/models/community_profile.dart';
-import '../../community/services/community_firestore_service.dart';
 import '../../subscription/services/analytics_service.dart';
 import '../../subscription/services/referral_service.dart';
 import '../../subscription/cubit/subscription_cubit.dart';
@@ -44,12 +42,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     );
   }
 
-  /// Records the community username chosen during onboarding. Persisted as a
-  /// community profile in [completeOnboarding].
-  void setUsername(String username) {
-    emit(state.copyWith(username: username));
-  }
-
   void setReferralCode(String code) {
     emit(state.copyWith(
       referralCode: code,
@@ -83,7 +75,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   Future<void> completeOnboarding(SubscriptionCubit subscriptionCubit) async {
     final uid = AuthService.uidOrNull;
     if (uid != null) {
-      final username = state.username.trim();
       try {
         final data = <String, dynamic>{
           ...state.surveyAnswers,
@@ -93,7 +84,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         if (state.referralCode.trim().isNotEmpty) {
           data['referralCode'] = state.referralCode.trim();
         }
-        if (username.isNotEmpty) data['username'] = username;
         await FirebaseFirestore.instance
             .collection('users')
             .doc(uid)
@@ -102,23 +92,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
             .set(data);
       } catch (e) {
         debugPrint('[OnboardingCubit] survey save failed: $e');
-      }
-
-      // Create the shared community profile (username + deterministic preset
-      // avatar) so the user can post/message immediately.
-      if (username.isNotEmpty) {
-        try {
-          await CommunityFirestoreService.instance.setProfile(
-            CommunityProfile(
-              uid: uid,
-              username: username,
-              avatarId: CommunityProfile.avatarIdForUid(uid),
-              createdAt: DateTime.now(),
-            ),
-          );
-        } catch (e) {
-          debugPrint('[OnboardingCubit] community profile save failed: $e');
-        }
       }
     }
 

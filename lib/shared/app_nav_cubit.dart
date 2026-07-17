@@ -7,7 +7,7 @@ import '../features/subscription/services/analytics_service.dart';
 class AppNavCubit extends Cubit<int> {
   AppNavCubit() : super(0);
 
-  static const _tabNames = ['home', 'chat', 'journal', 'tools', 'community'];
+  static const _tabNames = ['home', 'chat', 'journal', 'tools'];
 
   /// Selects a bottom-nav tab. Only Home and Chat are wired to pages; the
   /// remaining tabs change selection only.

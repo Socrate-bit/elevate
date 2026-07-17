@@ -62,17 +62,6 @@ class JournalEntry extends Equatable {
   ];
 }
 
-/// A writing-prompt cue shown in the "Input Cues" section.
-class JournalCue extends Equatable {
-  final String emoji;
-  final String question;
-
-  const JournalCue({required this.emoji, required this.question});
-
-  @override
-  List<Object?> get props => [emoji, question];
-}
-
 /// A small theme tag on the Monthly Insight card.
 class JournalInsightTag extends Equatable {
   final String emoji;
@@ -86,15 +75,6 @@ class JournalInsightTag extends Equatable {
 
 /// Hardcoded mock content for the Journal page — simulates backend data.
 class JournalMockData {
-  // Header date range.
-  static const dateRange = 'Jun 8 – Jun 14';
-
-  // Quote card.
-  static const quoteText =
-      "You don't have to carry everything today. One small step is still "
-      'progress.';
-  static const quoteAuthor = 'Forest Friend';
-
   // Monthly Insight card.
   static const insightBody =
       'This month, stress and self-pressure showed up often, especially '
@@ -106,13 +86,6 @@ class JournalMockData {
     JournalInsightTag(emoji: '🌀', label: 'Self-pressure'),
     JournalInsightTag(emoji: '❤️', label: 'Rest'),
     JournalInsightTag(emoji: '✨', label: 'Progress'),
-  ];
-
-  // Input cues.
-  static const cues = [
-    JournalCue(emoji: '☁️', question: 'What felt heavy today?'),
-    JournalCue(emoji: '☀️', question: 'What helped a little?'),
-    JournalCue(emoji: '🍃', question: 'What do I need tomorrow?'),
   ];
 
   // Journal entries (most recent first).

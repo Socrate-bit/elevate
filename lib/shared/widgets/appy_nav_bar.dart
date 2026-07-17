@@ -34,13 +34,9 @@ class AppyNavBar extends StatelessWidget {
               icon: const Icon(Icons.menu_book_rounded),
             ),
             GlassBottomBarTab(
+              thickness: 1,
               label: l10n.navTools,
               icon: const Icon(Icons.spa_rounded),
-            ),
-            GlassBottomBarTab(
-              thickness: 1,
-              label: l10n.navCommunity,
-              icon: const Icon(Icons.people_rounded),
             ),
           ],
           selectedIndex: selectedIndex,

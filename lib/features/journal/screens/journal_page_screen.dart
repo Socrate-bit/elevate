@@ -3,12 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/appy_nav_bar.dart';
-import '../widgets/journal_date_pill.dart';
 import '../widgets/journal_entry_card.dart';
 import '../widgets/journal_header.dart';
-import '../widgets/journal_input_cues.dart';
 import '../widgets/journal_insight_card.dart';
-import '../widgets/journal_quote_card.dart';
 
 /// Journal page ("Appy" design) — pure UI on mock data. Hosted by [AppyShell],
 /// which provides the shared nav state; the bar swaps between sibling pages.
@@ -50,13 +47,7 @@ class JournalPage extends StatelessWidget {
               children: [
                 // Clear the floating app bar (status bar + toolbar).
                 SizedBox(height: topInset + 52.h + 8.h),
-                const JournalDatePill(),
-                SizedBox(height: 64.h),
-                const JournalQuoteCard(),
-                SizedBox(height: 14.h),
                 const JournalInsightCard(),
-                SizedBox(height: 18.h),
-                const JournalInputCues(),
                 SizedBox(height: 18.h),
                 const JournalEntryList(),
                 // Clear the floating bottom nav bar.

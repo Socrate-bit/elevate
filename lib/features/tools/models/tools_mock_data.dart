@@ -81,21 +81,11 @@ class ToolsMockData {
           videoUrl: _meditationUrl,
         ),
         ToolItem(
-          iconAsset: 'assets/activities/mindfulness_icon.png',
-          title: 'Mindfulness',
-          subtitle: 'Be present now',
-        ),
-        ToolItem(
           iconAsset: 'assets/activities/stretch_icon.png',
           title: 'Stretching',
           subtitle: 'Gentle body reset',
           action: ToolAction.video,
           videoUrl: _stretchUrl,
-        ),
-        ToolItem(
-          iconAsset: 'assets/activities/gratefulness_icon.png',
-          title: 'Gratefulness',
-          subtitle: 'Notice the good',
         ),
         ToolItem(
           iconAsset: 'assets/activities/walking_icon.png',
@@ -108,58 +98,6 @@ class ToolsMockData {
           subtitle: 'Move with energy',
           action: ToolAction.video,
           videoUrl: _workoutUrl,
-        ),
-        ToolItem(
-          iconAsset: 'assets/activities/mantra_icon.png',
-          title: 'Mantra / Affirmation',
-          subtitle: 'Repeat kind thoughts',
-        ),
-      ],
-    ),
-    ToolSection(
-      emoji: '📔',
-      title: 'Journaling',
-      items: [
-        ToolItem(
-          iconAsset: 'assets/home/message.png',
-          title: 'AI Chat',
-          subtitle: 'Talk things through',
-        ),
-        ToolItem(
-          iconAsset: 'assets/activities/journaling_icon.png',
-          title: 'Free journaling',
-          subtitle: 'Write what you feel',
-        ),
-      ],
-    ),
-    ToolSection(
-      emoji: '🟣',
-      title: 'Therapy',
-      items: [
-        ToolItem(
-          iconAsset: 'assets/activities/emotionalsupport_icon.png',
-          title: 'Emotional support',
-          subtitle: 'Feel heard',
-        ),
-        ToolItem(
-          iconAsset: 'assets/activities/CBT_icon.png',
-          title: 'CBT',
-          subtitle: 'Reframe thoughts',
-        ),
-        ToolItem(
-          iconAsset: 'assets/activities/ACT_icon.png',
-          title: 'ACT',
-          subtitle: 'Accept and commit',
-        ),
-        ToolItem(
-          iconAsset: 'assets/activities/shema_icon.png',
-          title: 'Schema',
-          subtitle: 'Understand patterns',
-        ),
-        ToolItem(
-          iconAsset: 'assets/activities/trauma_icon.png',
-          title: 'Trauma',
-          subtitle: 'Gentle healing support',
         ),
       ],
     ),
