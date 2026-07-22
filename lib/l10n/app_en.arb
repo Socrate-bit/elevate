@@ -321,7 +321,6 @@
   "toolSessionDone": "Done",
   "toolSessionLoadError": "Couldn't load. Tap to retry.",
 
-  "gratitudeTitle": "Gratitude",
   "gratitudeStepPrompt": "What are 3 things this week that gave you joy?",
   "gratitudeHint": "It can be as simple as a good meal…",
   "gratitudeJoyLabel": "Joy {number}",

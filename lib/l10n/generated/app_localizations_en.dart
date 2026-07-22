@@ -869,9 +869,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toolSessionLoadError => 'Couldn\'t load. Tap to retry.';
 
   @override
-  String get gratitudeTitle => 'Gratitude';
-
-  @override
   String get gratitudeStepPrompt =>
       'What are 3 things this week that gave you joy?';
 

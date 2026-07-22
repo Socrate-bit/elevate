@@ -321,7 +321,6 @@
   "toolSessionDone": "Terminé",
   "toolSessionLoadError": "Échec du chargement. Touchez pour réessayer.",
 
-  "gratitudeTitle": "Gratitude",
   "gratitudeStepPrompt": "Quelles sont 3 choses qui t'ont apporté de la joie cette semaine ?",
   "gratitudeHint": "Ça peut être aussi simple qu'un bon repas…",
   "gratitudeJoyLabel": "Joie {number}",
