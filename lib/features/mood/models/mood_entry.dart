@@ -15,6 +15,24 @@ extension MoodValueX on MoodValue {
         const Color(0xFFE05B6E),
       ][index];
 
+  /// Illustrated mood face used by the community-style check-in UI.
+  String get asset => const [
+        'assets/mood tracking/very_good_icon.png',
+        'assets/mood tracking/good_icon.png',
+        'assets/mood tracking/neutral_icon.png',
+        'assets/mood tracking/bad_icon.png',
+        'assets/mood tracking/very_bad_icon.png',
+      ][index];
+
+  /// Soft pastel rounded-square tile behind the mood face.
+  Color get tileColor => const [
+        Color(0xFFD9EFCB), // green
+        Color(0xFFFAEFC6), // yellow
+        Color(0xFFFBE2CB), // orange
+        Color(0xFFFAD9DC), // pink
+        Color(0xFFE8DDF4), // purple
+      ][index];
+
   static MoodValue? fromName(String? name) {
     if (name == null) return null;
     try {
