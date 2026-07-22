@@ -9,6 +9,7 @@ import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/mood_cubit.dart';
 import '../cubit/mood_state.dart';
 import '../models/mood_entry.dart';
+import 'mood_face.dart';
 
 /// Opens a full-screen-style bottom sheet for picking a mood.
 void showMoodPickerSheet(BuildContext context) {
@@ -124,48 +125,23 @@ class _MoodPickerSheet extends StatelessWidget {
             BlocBuilder<MoodCubit, MoodState>(
               builder: (context, state) {
                 return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: MoodValue.values.map((mood) {
-                      return GestureDetector(
+                      return MoodFace(
+                        mood: mood,
+                        label: _moodLabel(l10n, mood),
                         onTap: state.isSaving
                             ? null
-                            : withHaptic(() async {
+                            : () async {
                                 await context
                                     .read<MoodCubit>()
                                     .saveMood(mood, source: 'modal');
                                 if (context.mounted) {
                                   Navigator.of(context).pop();
                                 }
-                              }),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 56.w,
-                              height: 56.w,
-                              decoration: BoxDecoration(
-                                color: mood.color,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  mood.emoji,
-                                  style: TextStyle(fontSize: 28.sp),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            Text(
-                              _moodLabel(l10n, mood),
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                color: c.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
+                              },
                       );
                     }).toList(),
                   ),

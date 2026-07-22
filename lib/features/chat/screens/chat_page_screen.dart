@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/utils/haptic_utils.dart';
 import '../../../shared/widgets/appy_nav_bar.dart';
 import '../../memory/cubit/memory_cubit.dart';
 import '../../mood/cubit/mood_cubit.dart';
@@ -26,7 +27,11 @@ import '../widgets/chat_top_bar.dart';
 /// and floating nav; the conversation itself is driven by the real [ChatCubit]
 /// via [_ChatConversationGate] (a single ongoing conversation that resumes).
 class ChatPage extends StatelessWidget {
-  const ChatPage({super.key});
+  /// When true, the page is shown as a standalone pushed route: the bottom nav
+  /// bar is hidden and a back button is overlaid to pop back.
+  final bool fullScreen;
+
+  const ChatPage({super.key, this.fullScreen = false});
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +75,31 @@ class ChatPage extends StatelessWidget {
               ],
             ),
           ),
+          // Full-page presentation: back button overlaid top-left, centered
+          // header untouched.
+          if (fullScreen)
+            SafeArea(
+              bottom: false,
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 4.w, top: 4.h),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: ChatPalette.headerTitle,
+                      size: 20.sp,
+                    ),
+                    onPressed: withHaptic(
+                      () => Navigator.of(context).maybePop(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
-      bottomNavigationBar: const AppyNavBar(),
+      bottomNavigationBar: fullScreen ? null : const AppyNavBar(),
     );
   }
 }
