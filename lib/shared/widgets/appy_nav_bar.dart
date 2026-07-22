@@ -27,11 +27,12 @@ class AppyNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
-      // Outer margins own the horizontal insets so the bar and the perched
-      // chat button share one row.
-      padding: EdgeInsets.only(left: 18.w, right: 18.w),
+      // Outer margins own the insets so the bar and the perched chat button
+      // share one row (dimensions mirror the reference add-button layout).
+      padding: EdgeInsets.only(bottom: 16.h, left: 24.w, right: 24.w),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
             child: BlocBuilder<AppNavCubit, int>(
@@ -59,10 +60,10 @@ class AppyNavBar extends StatelessWidget {
                   )!,
                   // Outer Padding owns the margins; let the bar fill the slot.
                   horizontalPadding: 0,
+                  verticalPadding: 0,
                   barHeight: 80.h,
                   iconSize: 35.sp,
                   labelFontSize: 11.sp,
-                  verticalPadding: 20.h,
                   iconLabelSpacing: 1,
                   selectedIconColor: HomePalette.checkGreen,
                   unselectedIconColor: HomePalette.navInactive,
@@ -103,8 +104,8 @@ class _ChatCircleButton extends StatelessWidget {
     return GestureDetector(
       onTap: withMediumHaptic(onTap),
       child: Container(
-        width: 64.w,
-        height: 64.w,
+        width: 80.w,
+        height: 80.h,
         decoration: BoxDecoration(
           color: HomePalette.checkGreen,
           shape: BoxShape.circle,
@@ -119,7 +120,7 @@ class _ChatCircleButton extends StatelessWidget {
         child: Icon(
           Icons.chat_rounded,
           color: HomePalette.navCream,
-          size: 30.sp,
+          size: 44.sp,
         ),
       ),
     );
