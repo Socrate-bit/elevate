@@ -869,6 +869,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toolSessionLoadError => 'Couldn\'t load. Tap to retry.';
 
   @override
+  String get gratitudeTitle => 'Gratitude';
+
+  @override
+  String get gratitudeStepPrompt =>
+      'What are 3 things this week that gave you joy?';
+
+  @override
+  String get gratitudeHint => 'It can be as simple as a good meal…';
+
+  @override
+  String gratitudeJoyLabel(int number) {
+    return 'Joy $number';
+  }
+
+  @override
+  String get gratitudeRememberTitle => 'Take a moment';
+
+  @override
+  String get gratitudeRememberBody =>
+      'Remember each one, and relive the feeling it gave you.';
+
+  @override
+  String get gratitudeAffirmTitle => 'Be grateful';
+
+  @override
+  String get gratitudeAffirmBody =>
+      'Hold gratitude for these moments — let it settle in.';
+
+  @override
+  String get gratitudeContinue => 'Continue';
+
+  @override
+  String get gratitudeDone => 'Done';
+
+  @override
+  String get gratitudeSaveError => 'Couldn\'t save. Please try again.';
+
+  @override
   String get moodPickerTitle => 'How are you?';
 
   @override

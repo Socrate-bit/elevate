@@ -1712,6 +1712,72 @@ abstract class AppLocalizations {
   /// **'Couldn\'t load. Tap to retry.'**
   String get toolSessionLoadError;
 
+  /// No description provided for @gratitudeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gratitude'**
+  String get gratitudeTitle;
+
+  /// No description provided for @gratitudeStepPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'What are 3 things this week that gave you joy?'**
+  String get gratitudeStepPrompt;
+
+  /// No description provided for @gratitudeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'It can be as simple as a good meal…'**
+  String get gratitudeHint;
+
+  /// No description provided for @gratitudeJoyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Joy {number}'**
+  String gratitudeJoyLabel(int number);
+
+  /// No description provided for @gratitudeRememberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a moment'**
+  String get gratitudeRememberTitle;
+
+  /// No description provided for @gratitudeRememberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember each one, and relive the feeling it gave you.'**
+  String get gratitudeRememberBody;
+
+  /// No description provided for @gratitudeAffirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Be grateful'**
+  String get gratitudeAffirmTitle;
+
+  /// No description provided for @gratitudeAffirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold gratitude for these moments — let it settle in.'**
+  String get gratitudeAffirmBody;
+
+  /// No description provided for @gratitudeContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get gratitudeContinue;
+
+  /// No description provided for @gratitudeDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get gratitudeDone;
+
+  /// No description provided for @gratitudeSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Please try again.'**
+  String get gratitudeSaveError;
+
   /// No description provided for @moodPickerTitle.
   ///
   /// In en, this message translates to:
