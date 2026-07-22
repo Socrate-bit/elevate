@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../features/chat/screens/chat_page_screen.dart';
 import '../features/home/screens/home_page_screen.dart';
 import '../features/journal/screens/journal_page_screen.dart';
-import '../features/tools/screens/tools_page_screen.dart';
+import '../features/quest/screens/quest_page_screen.dart';
 import 'app_nav_cubit.dart';
 
 /// Hosts the Appy pages behind a single shared bottom nav. Tapping a tab swaps
 /// the visible page; all stay alive (scroll/state preserved) via [IndexedStack].
-/// Home (0), Chat (1), Journal (2) and Tools (3) are wired.
+/// Home (0), Quest (1) and Journal (2) are wired; Chat opens full-page from the
+/// nav bar's side button.
 class AppyShell extends StatelessWidget {
   const AppyShell({super.key});
 
@@ -23,9 +23,8 @@ class AppyShell extends StatelessWidget {
             index: index,
             children: const [
               HomePage(),
-              ChatPage(),
+              QuestPage(),
               JournalPage(),
-              ToolsPage(),
             ],
           );
         },

@@ -2156,6 +2156,24 @@ abstract class AppLocalizations {
   /// **'Tools'**
   String get navTools;
 
+  /// No description provided for @navQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest'**
+  String get navQuest;
+
+  /// No description provided for @questPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quests'**
+  String get questPageTitle;
+
+  /// No description provided for @questPageComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Quests are coming soon.'**
+  String get questPageComingSoon;
+
   /// No description provided for @chatPageCalmMode.
   ///
   /// In en, this message translates to:
