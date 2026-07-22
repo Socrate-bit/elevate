@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 /// What a tool card opens when tapped.
-enum ToolAction { none, breathing, video }
+enum ToolAction { none, breathing, video, gratitude }
 
 /// A single tool/activity card.
 class ToolItem extends Equatable {
@@ -98,6 +98,22 @@ class ToolsMockData {
           subtitle: 'Move with energy',
           action: ToolAction.video,
           videoUrl: _workoutUrl,
+        ),
+        ToolItem(
+          iconAsset: 'assets/activities/gratefulness_icon.png',
+          title: 'Gratitude',
+          subtitle: 'Notice the good',
+          action: ToolAction.gratitude,
+        ),
+        ToolItem(
+          iconAsset: 'assets/activities/walking_icon.png',
+          title: 'Running',
+          subtitle: 'Go for a run',
+        ),
+        ToolItem(
+          iconAsset: 'assets/activities/sport_icon.png',
+          title: 'Other sport',
+          subtitle: 'Any movement counts',
         ),
       ],
     ),

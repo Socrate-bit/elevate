@@ -876,6 +876,44 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec du chargement. Touchez pour réessayer.';
 
   @override
+  String get gratitudeTitle => 'Gratitude';
+
+  @override
+  String get gratitudeStepPrompt =>
+      'Quelles sont 3 choses qui t\'ont apporté de la joie cette semaine ?';
+
+  @override
+  String get gratitudeHint => 'Ça peut être aussi simple qu\'un bon repas…';
+
+  @override
+  String gratitudeJoyLabel(int number) {
+    return 'Joie $number';
+  }
+
+  @override
+  String get gratitudeRememberTitle => 'Prends un instant';
+
+  @override
+  String get gratitudeRememberBody =>
+      'Souviens-toi de chacune, et revis le sentiment qu\'elle t\'a procuré.';
+
+  @override
+  String get gratitudeAffirmTitle => 'Sois reconnaissant';
+
+  @override
+  String get gratitudeAffirmBody =>
+      'Ressens de la gratitude pour ces moments — laisse-la s\'installer.';
+
+  @override
+  String get gratitudeContinue => 'Continuer';
+
+  @override
+  String get gratitudeDone => 'Terminé';
+
+  @override
+  String get gratitudeSaveError => 'Échec de l\'enregistrement. Réessaie.';
+
+  @override
   String get moodPickerTitle => 'Comment vas-tu ?';
 
   @override
