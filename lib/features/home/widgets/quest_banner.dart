@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
+import '../cubit/home_page_cubit.dart';
+import '../cubit/home_page_state.dart';
 import '../models/home_mock_data.dart';
 
 /// Teal quest banner with lightning icon, title and progress pill. The shop and
@@ -25,11 +28,8 @@ class QuestBanner extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Spacer(),
-              _PerchIcon(
-                asset: 'assets/home_page/quest_icon.png',
-                onTap: () {},
-              ),
+              const Spacer(),
+              const _StreakSign(),
               SizedBox(width: 24.w),
               _PerchIcon(asset: 'assets/home_page/shop_icon.png', onTap: () {}),
             ],
@@ -92,6 +92,40 @@ class _PerchIcon extends StatelessWidget {
     return GestureDetector(
       onTap: withHaptic(onTap),
       child: Image.asset(asset, width: 40.w, height: 40.w),
+    );
+  }
+}
+
+/// Streak sign perched on the banner: the flame asset with the live streak
+/// count. Reads the count from [HomePageCubit], kept reactive to profile updates.
+class _StreakSign extends StatelessWidget {
+  const _StreakSign();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HomePageCubit, HomePageState>(
+      buildWhen: (a, b) => a.currentStreak != b.currentStreak,
+      builder: (context, state) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/home_page/streak_icon.png',
+              width: 40.w,
+              height: 40.w,
+            ),
+            SizedBox(width: 4.w),
+            Text(
+              '${state.currentStreak}',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

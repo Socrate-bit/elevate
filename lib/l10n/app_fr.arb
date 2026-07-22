@@ -397,6 +397,9 @@
   "@homePageXp": { "placeholders": { "xp": { "type": "int" } } },
   "navJournal": "Journal",
   "navTools": "Outils",
+  "navQuest": "Quête",
+  "questPageTitle": "Quêtes",
+  "questPageComingSoon": "Les quêtes arrivent bientôt.",
 
   "chatPageCalmMode": "Mode calme",
   "chatPageCompanionName": "Appy",

@@ -1084,6 +1084,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navTools => 'Outils';
 
   @override
+  String get navQuest => 'Quête';
+
+  @override
+  String get questPageTitle => 'Quêtes';
+
+  @override
+  String get questPageComingSoon => 'Les quêtes arrivent bientôt.';
+
+  @override
   String get chatPageCalmMode => 'Mode calme';
 
   @override
