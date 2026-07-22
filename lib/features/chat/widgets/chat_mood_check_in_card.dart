@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/utils/haptic_utils.dart';
 import '../../mood/models/mood_entry.dart';
+import '../../mood/widgets/mood_face.dart';
 import '../cubit/chat_cubit.dart';
 import '../services/chat_mood_check_in.dart';
 
@@ -54,43 +54,17 @@ class ChatMoodCheckInCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: MoodValue.values.map((mood) {
                 final isSelected = checkIn.selectedMood == mood;
-                final isDisabled = answered && !isSelected;
-                return GestureDetector(
+                return MoodFace(
+                  mood: mood,
+                  size: 48,
+                  selected: isSelected,
+                  dimmed: answered && !isSelected,
                   onTap: answered
                       ? null
-                      : withHaptic(
-                          () => context.read<ChatCubit>().selectMood(
+                      : () => context.read<ChatCubit>().selectMood(
                             messageId,
                             mood,
                           ),
-                        ),
-                  child: Opacity(
-                    opacity: isDisabled ? 0.3 : 1.0,
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 44.w,
-                          height: 44.w,
-                          decoration: BoxDecoration(
-                            color: mood.color,
-                            shape: BoxShape.circle,
-                            border: isSelected
-                                ? Border.all(
-                                    color: ChatPalette.appyText,
-                                    width: 2.5,
-                                  )
-                                : null,
-                          ),
-                          child: Center(
-                            child: Text(
-                              mood.emoji,
-                              style: TextStyle(fontSize: 22.sp),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 );
               }).toList(),
             ),
