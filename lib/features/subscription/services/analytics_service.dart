@@ -75,6 +75,7 @@ class AnalyticsService {
   static const gratitudeCompleted = 'gratitude_completed';
 
   // Chat
+  static const chatOpened = 'chat_opened';
   static const chatConversationCreated = 'chat_conversation_created';
   static const chatConversationDeleted = 'chat_conversation_deleted';
   static const chatMessageSent = 'chat_message_sent';

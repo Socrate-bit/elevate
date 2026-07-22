@@ -5,6 +5,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../features/chat/screens/chat_page_screen.dart';
+import '../../features/subscription/services/analytics_service.dart';
 import '../app_nav_cubit.dart';
 import '../theme/app_theme.dart';
 import '../utils/haptic_utils.dart';
@@ -18,6 +19,7 @@ class AppyNavBar extends StatelessWidget {
   /// Opens the chat as a standalone full-page route. ChatPage's cubits are all
   /// app-global (provided in app.dart), so no extra provider wiring is needed.
   void _openChat(BuildContext context) {
+    AnalyticsService.capture(AnalyticsService.chatOpened);
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const ChatPage(fullScreen: true)),
     );
