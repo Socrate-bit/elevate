@@ -876,9 +876,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec du chargement. Touchez pour réessayer.';
 
   @override
-  String get gratitudeTitle => 'Gratitude';
-
-  @override
   String get gratitudeStepPrompt =>
       'Quelles sont 3 choses qui t\'ont apporté de la joie cette semaine ?';
 

@@ -1712,12 +1712,6 @@ abstract class AppLocalizations {
   /// **'Couldn\'t load. Tap to retry.'**
   String get toolSessionLoadError;
 
-  /// No description provided for @gratitudeTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Gratitude'**
-  String get gratitudeTitle;
-
   /// No description provided for @gratitudeStepPrompt.
   ///
   /// In en, this message translates to:

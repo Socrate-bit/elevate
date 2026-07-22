@@ -12,7 +12,15 @@ import 'gratitude_state.dart';
 class GratitudeCubit extends Cubit<GratitudeState> {
   GratitudeCubit({Uuid? uuid})
       : _uuid = uuid ?? const Uuid(),
-        super(const GratitudeState());
+        super(const GratitudeState()) {
+    AnalyticsService.capture(
+      AnalyticsService.toolSessionStarted,
+      {'tool': _toolName},
+    );
+  }
+
+  /// Tool identifier reported in the shared tool analytics funnel.
+  static const _toolName = 'Gratitude';
 
   final Uuid _uuid;
 
@@ -43,7 +51,10 @@ class GratitudeCubit extends Cubit<GratitudeState> {
 
     try {
       await GratitudeFirestoreService.saveEntry(entry);
-      AnalyticsService.capture(AnalyticsService.gratitudeCompleted);
+      AnalyticsService.capture(
+        AnalyticsService.toolSessionCompleted,
+        {'tool': _toolName},
+      );
       emit(state.copyWith(isSaving: false, saved: true));
       debugPrint('[GratitudeCubit] saved entry ${entry.id}');
       return true;

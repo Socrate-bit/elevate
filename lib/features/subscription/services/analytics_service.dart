@@ -72,7 +72,6 @@ class AnalyticsService {
   // Tools
   static const toolSessionStarted = 'tool_session_started'; // props: {tool}
   static const toolSessionCompleted = 'tool_session_completed'; // props: {tool}
-  static const gratitudeCompleted = 'gratitude_completed';
 
   // Chat
   static const chatConversationCreated = 'chat_conversation_created';
