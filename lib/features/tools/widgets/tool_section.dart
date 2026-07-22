@@ -46,7 +46,7 @@ class ToolSectionWidget extends StatelessWidget {
           itemCount: section.items.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
-            mainAxisExtent: 64.h,
+            childAspectRatio: 1,
             crossAxisSpacing: 10.w,
             mainAxisSpacing: 10.h,
           ),
