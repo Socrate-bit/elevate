@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'chat_form.dart';
+import 'chat_insight.dart';
 import 'chat_mission_suggestion.dart';
 import 'chat_mood_check_in.dart';
 import 'chat_routine_mutation.dart';
@@ -9,7 +10,8 @@ import 'chat_routine_mutation.dart';
 enum ChatRole { user, model }
 
 /// A single chat turn — either user text or a model reply (text, form,
-/// mission suggestion, mood check-in, or routine-mutation confirmation).
+/// mission suggestion, mood check-in, routine-mutation confirmation, or a
+/// distilled insight).
 class ChatMessage extends Equatable {
   final String id;
   final String conversationId;
@@ -19,6 +21,7 @@ class ChatMessage extends Equatable {
   final ChatMissionSuggestion? missionSuggestion;
   final ChatMoodCheckIn? moodCheckIn;
   final ChatRoutineMutation? routineMutation;
+  final ChatInsight? insight;
   final DateTime createdAt;
 
   const ChatMessage({
@@ -31,6 +34,7 @@ class ChatMessage extends Equatable {
     this.missionSuggestion,
     this.moodCheckIn,
     this.routineMutation,
+    this.insight,
   });
 
   ChatMessage copyWith({
@@ -42,6 +46,7 @@ class ChatMessage extends Equatable {
     ChatMissionSuggestion? missionSuggestion,
     ChatMoodCheckIn? moodCheckIn,
     ChatRoutineMutation? routineMutation,
+    ChatInsight? insight,
     DateTime? createdAt,
   }) => ChatMessage(
     id: id ?? this.id,
@@ -52,6 +57,7 @@ class ChatMessage extends Equatable {
     missionSuggestion: missionSuggestion ?? this.missionSuggestion,
     moodCheckIn: moodCheckIn ?? this.moodCheckIn,
     routineMutation: routineMutation ?? this.routineMutation,
+    insight: insight ?? this.insight,
     createdAt: createdAt ?? this.createdAt,
   );
 
@@ -62,6 +68,7 @@ class ChatMessage extends Equatable {
     'missionSuggestion': missionSuggestion?.toMap(),
     'moodCheckIn': moodCheckIn?.toMap(),
     'routineMutation': routineMutation?.toMap(),
+    'insight': insight?.toMap(),
     'createdAtMs': createdAt.millisecondsSinceEpoch,
   };
 
@@ -75,6 +82,7 @@ class ChatMessage extends Equatable {
     final missionMap = m['missionSuggestion'] as Map<String, dynamic>?;
     final moodMap = m['moodCheckIn'] as Map<String, dynamic>?;
     final routineMap = m['routineMutation'] as Map<String, dynamic>?;
+    final insightMap = m['insight'] as Map<String, dynamic>?;
     return ChatMessage(
       id: id,
       conversationId: conversationId,
@@ -88,6 +96,7 @@ class ChatMessage extends Equatable {
       routineMutation: routineMap == null
           ? null
           : ChatRoutineMutation.fromMap(routineMap),
+      insight: insightMap == null ? null : ChatInsight.fromMap(insightMap),
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         m['createdAtMs'] as int? ?? 0,
       ),
@@ -104,6 +113,7 @@ class ChatMessage extends Equatable {
     missionSuggestion,
     moodCheckIn,
     routineMutation,
+    insight,
     createdAt,
   ];
 }

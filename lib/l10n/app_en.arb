@@ -443,6 +443,15 @@
   "chatPageSuggestReflect": "Help me reflect",
   "chatPageComposerHint": "Your message",
 
+  "chatInsightsFormingTitle": "Your insights are forming",
+  "chatInsightsFormingBody": "Ash just needs a little more context from this conversation before it can reflect an insight back to you.",
+  "chatInsightsReadyTitle": "An insight is ready",
+  "chatInsightsReadyBody": "Ash has spotted something in this conversation worth reflecting back to you.",
+  "chatInsightsContinue": "Continue conversation",
+  "chatInsightsReveal": "Reveal insight",
+  "chatInsightCardLabel": "Insight",
+  "chatInsightCardCta": "Read insight",
+
   "journalTitle": "Journal",
   "journalMonthlyInsight": "Monthly Insight",
   "journalInputCues": "Input Cues"
