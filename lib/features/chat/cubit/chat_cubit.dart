@@ -61,6 +61,26 @@ class ChatCubit extends Cubit<ChatState> {
   StreamSubscription? _sub;
   bool _hasNewUserActivity = false;
 
+  /// The ring reaches "full" at this many user turns since the last insight —
+  /// the user may then tap to reveal one on demand.
+  static const _insightReadyThreshold = 5;
+
+  /// If the user never taps, an insight is generated automatically after this
+  /// many user turns since the last insight.
+  static const _insightAutoThreshold = 20;
+
+  /// Guards against overlapping insight generations.
+  bool _insightInFlight = false;
+
+  /// Fill of the insight ring in [0,1]; reaches 1 when a new insight is ready
+  /// to be revealed.
+  double get insightProgress =>
+      (state.userTurnsSinceLastInsight / _insightReadyThreshold).clamp(0.0, 1.0);
+
+  /// Whether the user may reveal an insight now (the ring is full).
+  bool get isInsightReady =>
+      state.userTurnsSinceLastInsight >= _insightReadyThreshold;
+
   void _subscribe() {
     _sub?.cancel();
     _sub = _repo
@@ -176,6 +196,59 @@ class ChatCubit extends Cubit<ChatState> {
       rethrow;
     } finally {
       emit(state.copyWith(isSending: false));
+    }
+    // After the reply lands, auto-generate an insight if the user has gone long
+    // enough without one. Best-effort — never blocks or disrupts the chat.
+    unawaited(_maybeAutoGenerateInsight());
+  }
+
+  /// Auto path: fire when the conversation has run long enough without an
+  /// insight and the user hasn't manually revealed one.
+  Future<void> _maybeAutoGenerateInsight() async {
+    if (_insightInFlight) return;
+    if (state.userTurnsSinceLastInsight < _insightAutoThreshold) return;
+    await _generateInsight();
+  }
+
+  /// Manual path: called from the "insights forming" sheet once the ring is
+  /// full. No-op until the ready threshold is reached.
+  Future<void> generateInsightNow() async {
+    if (_insightInFlight) return;
+    if (state.userTurnsSinceLastInsight < _insightReadyThreshold) return;
+    await _generateInsight();
+  }
+
+  /// Generates an insight from the conversation so far and, if one is produced,
+  /// saves it as an inline model message (which resets the progress ring).
+  Future<void> _generateInsight() async {
+    _insightInFlight = true;
+    emit(state.copyWith(isGeneratingInsight: true));
+    try {
+      final insight = await _gemini.generateInsight(
+        history: state.messages.toList(),
+      );
+      if (insight == null) {
+        debugPrint('[ChatCubit] insight generation returned nothing');
+        return;
+      }
+      final now = DateTime.now();
+      final msg = ChatMessage(
+        id: _uuid.v4(),
+        conversationId: state.conversationId,
+        role: ChatRole.model,
+        text: '',
+        insight: insight,
+        createdAt: now,
+      );
+      await _repo.saveMessage(msg);
+      await _repo.updateConversation(state.conversationId, lastMessageAt: now);
+      AnalyticsService.capture(AnalyticsService.chatInsightGenerated);
+      debugPrint('[ChatCubit] saved insight "${insight.title}"');
+    } catch (e) {
+      debugPrint('[ChatCubit] _generateInsight failed: $e');
+    } finally {
+      _insightInFlight = false;
+      emit(state.copyWith(isGeneratingInsight: false));
     }
   }
 

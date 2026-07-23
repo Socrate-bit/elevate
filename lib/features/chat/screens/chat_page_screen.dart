@@ -22,6 +22,7 @@ import '../widgets/chat_composer_bar.dart';
 import '../widgets/chat_message_list.dart';
 import '../widgets/chat_suggestions_card.dart';
 import '../widgets/chat_top_bar.dart';
+import '../widgets/insight_progress_button.dart';
 
 /// Illustrated "Forest Friend" chat page. Renders the cozy-room scene, header,
 /// and floating nav; the conversation itself is driven by the real [ChatCubit]
@@ -69,8 +70,8 @@ class ChatPage extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 6.h),
-                const ChatTopBar(),
-                SizedBox(height: 10.h),
+                // The header lives inside the conversation gate so the insight
+                // progress button can read the ChatCubit provided there.
                 const Expanded(child: _ChatConversationGate()),
               ],
             ),
@@ -226,28 +227,38 @@ class _ResolvingPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(100.r),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
-            padding: EdgeInsets.all(14.w),
-            decoration: BoxDecoration(
-              color: ChatPalette.glassPill,
+    // Keep the header visible (title only — no cubit yet for the insight button)
+    // so it doesn't flash in once the conversation resolves.
+    return Column(
+      children: [
+        const ChatTopBar(),
+        SizedBox(height: 10.h),
+        Expanded(
+          child: Center(
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(100.r),
-            ),
-            child: SizedBox(
-              width: 20.w,
-              height: 20.w,
-              child: const CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                child: Container(
+                  padding: EdgeInsets.all(14.w),
+                  decoration: BoxDecoration(
+                    color: ChatPalette.glassPill,
+                    borderRadius: BorderRadius.circular(100.r),
+                  ),
+                  child: SizedBox(
+                    width: 20.w,
+                    height: 20.w,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -279,6 +290,10 @@ class _ChatViewState extends State<_ChatView> {
     final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
+        // Header with the insight progress button (needs the ChatCubit provided
+        // by the enclosing gate, so it lives here rather than at page level).
+        ChatTopBar(trailing: const InsightProgressButton()),
+        SizedBox(height: 10.h),
         // Conversation fills the remaining space; auto-scrolls on new turns.
         Expanded(
           child: BlocConsumer<ChatCubit, ChatState>(

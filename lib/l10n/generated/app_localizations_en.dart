@@ -1149,6 +1149,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatPageComposerHint => 'Your message';
 
   @override
+  String get chatInsightsFormingTitle => 'Your insights are forming';
+
+  @override
+  String get chatInsightsFormingBody =>
+      'Ash just needs a little more context from this conversation before it can reflect an insight back to you.';
+
+  @override
+  String get chatInsightsReadyTitle => 'An insight is ready';
+
+  @override
+  String get chatInsightsReadyBody =>
+      'Ash has spotted something in this conversation worth reflecting back to you.';
+
+  @override
+  String get chatInsightsContinue => 'Continue conversation';
+
+  @override
+  String get chatInsightsReveal => 'Reveal insight';
+
+  @override
+  String get chatInsightCardLabel => 'Insight';
+
+  @override
+  String get chatInsightCardCta => 'Read insight';
+
+  @override
   String get journalTitle => 'Journal';
 
   @override

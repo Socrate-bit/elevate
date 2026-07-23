@@ -2228,6 +2228,54 @@ abstract class AppLocalizations {
   /// **'Your message'**
   String get chatPageComposerHint;
 
+  /// No description provided for @chatInsightsFormingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your insights are forming'**
+  String get chatInsightsFormingTitle;
+
+  /// No description provided for @chatInsightsFormingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ash just needs a little more context from this conversation before it can reflect an insight back to you.'**
+  String get chatInsightsFormingBody;
+
+  /// No description provided for @chatInsightsReadyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'An insight is ready'**
+  String get chatInsightsReadyTitle;
+
+  /// No description provided for @chatInsightsReadyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ash has spotted something in this conversation worth reflecting back to you.'**
+  String get chatInsightsReadyBody;
+
+  /// No description provided for @chatInsightsContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue conversation'**
+  String get chatInsightsContinue;
+
+  /// No description provided for @chatInsightsReveal.
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal insight'**
+  String get chatInsightsReveal;
+
+  /// No description provided for @chatInsightCardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Insight'**
+  String get chatInsightCardLabel;
+
+  /// No description provided for @chatInsightCardCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Read insight'**
+  String get chatInsightCardCta;
+
   /// No description provided for @journalTitle.
   ///
   /// In en, this message translates to:

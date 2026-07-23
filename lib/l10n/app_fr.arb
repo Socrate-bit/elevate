@@ -424,6 +424,15 @@
   "chatPageSuggestReflect": "M'aider à réfléchir",
   "chatPageComposerHint": "Votre message",
 
+  "chatInsightsFormingTitle": "Vos insights se dessinent",
+  "chatInsightsFormingBody": "Ash a besoin d'un peu plus de contexte dans cette conversation avant de pouvoir vous refléter un insight.",
+  "chatInsightsReadyTitle": "Un insight est prêt",
+  "chatInsightsReadyBody": "Ash a repéré dans cette conversation quelque chose qui mérite de vous être reflété.",
+  "chatInsightsContinue": "Continuer la conversation",
+  "chatInsightsReveal": "Révéler l'insight",
+  "chatInsightCardLabel": "Insight",
+  "chatInsightCardCta": "Lire l'insight",
+
   "journalTitle": "Journal",
   "journalMonthlyInsight": "Bilan du mois",
   "journalInputCues": "Pistes d'écriture"

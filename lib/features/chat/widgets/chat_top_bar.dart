@@ -4,25 +4,35 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 
-/// Chat header: just the companion name centered over the scene.
+/// Chat header: the companion name centered over the scene, with an optional
+/// [trailing] widget pinned to the right (e.g. the insight progress button).
 class ChatTopBar extends StatelessWidget {
-  const ChatTopBar({super.key});
+  final Widget? trailing;
+
+  const ChatTopBar({super.key, this.trailing});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Text(
-        '${l10n.chatPageCompanionName} 🌿',
-        maxLines: 1,
-        textAlign: TextAlign.center,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          color: ChatPalette.headerTitle,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w800,
-        ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Text(
+            '${l10n.chatPageCompanionName} 🌿',
+            maxLines: 1,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: ChatPalette.headerTitle,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          if (trailing != null)
+            Align(alignment: Alignment.centerRight, child: trailing),
+        ],
       ),
     );
   }

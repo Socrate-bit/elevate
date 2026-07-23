@@ -82,4 +82,7 @@ class AnalyticsService {
   static const chatFormAnswered = 'chat_form_answered';
   static const chatMissionAccepted = 'chat_mission_accepted';
   static const chatMissionDeclined = 'chat_mission_declined';
+  static const chatInsightGenerated = 'chat_insight_generated';
+  static const chatInsightOpened = 'chat_insight_opened';
+  static const chatInsightsFormingOpened = 'chat_insights_forming_opened';
 }

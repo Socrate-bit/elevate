@@ -4,6 +4,7 @@ import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/foundation.dart';
 
 import 'chat_form.dart';
+import 'chat_insight.dart';
 import 'chat_message.dart';
 import 'chat_mission_suggestion.dart';
 import 'chat_mood_check_in.dart';
@@ -99,6 +100,11 @@ abstract interface class GeminiClient {
     required Map<String, String> existingFacts,
     required List<String> existingEventTitles,
   });
+
+  /// Distills the conversation so far into a single useful insight (title, a key
+  /// citation from the chat, and a short paragraph). Returns null when there
+  /// isn't enough material to say something meaningful.
+  Future<ChatInsight?> generateInsight({required List<ChatMessage> history});
 }
 
 /// Firebase Gemini implementation with function tools:
@@ -254,6 +260,21 @@ Use plain prose replies for everything else.
       '`summary` is a 1–3 sentence neutral recap of what was discussed in this '
       'conversation.';
 
+  static const _insightSystemInstruction =
+      'You read a chat between a user and their supportive coach, and surface ONE '
+      'genuinely useful insight that reflects something back to the user — naming a '
+      'pattern, reframing a worry, or unlocking a next step they could not quite see '
+      'themselves. Speak warmly and directly to the user ("you"), like the coach. '
+      'Return JSON matching the schema:\n'
+      '- `title`: a short, punchy headline for the insight (a few words, no ending '
+      'punctuation).\n'
+      '- `quote`: one short verbatim sentence taken from the conversation that best '
+      'captures the heart of the insight — copy it exactly, do not paraphrase.\n'
+      '- `body`: 1–3 short paragraphs delivering the insight itself: specific to what '
+      'was said, encouraging, and non-generic.\n'
+      'If the conversation is too short or thin to say anything meaningful, return '
+      'empty strings for all three fields.';
+
   GenerativeModel _buildChatModel(String? memoryContext) {
     final instruction = (memoryContext == null || memoryContext.isEmpty)
         ? _systemInstruction
@@ -370,6 +391,30 @@ Use plain prose replies for everything else.
             ),
             'summary': Schema.string(
               description: '1–3 sentence neutral recap of what was discussed.',
+            ),
+          },
+        ),
+      ),
+    );
+  }
+
+  GenerativeModel _buildInsightModel() {
+    return FirebaseAI.googleAI().generativeModel(
+      model: _modelName,
+      systemInstruction: Content.system(_insightSystemInstruction),
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: Schema.object(
+          properties: {
+            'title': Schema.string(
+              description: 'Short headline for the insight. Empty if none.',
+            ),
+            'quote': Schema.string(
+              description:
+                  'One short verbatim sentence copied from the conversation.',
+            ),
+            'body': Schema.string(
+              description: '1–3 short paragraphs delivering the insight.',
             ),
           },
         ),
@@ -590,6 +635,46 @@ Use plain prose replies for everything else.
       newEvents: events,
       summary: summary,
     );
+  }
+
+  @override
+  Future<ChatInsight?> generateInsight({
+    required List<ChatMessage> history,
+  }) async {
+    try {
+      final transcript = _renderTranscript(history);
+      if (transcript.trim().isEmpty) return null;
+      final prompt =
+          'Conversation transcript:\n$transcript\n\n'
+          'Return JSON per the schema with one useful insight.';
+
+      final response = await _buildInsightModel()
+          .generateContent([Content.text(prompt)])
+          .timeout(const Duration(seconds: 45));
+      final text = response.text?.trim() ?? '';
+      if (text.isEmpty) return null;
+      return _parseInsight(text);
+    } catch (e, st) {
+      debugPrint('[GeminiService] generateInsight failed: $e\n$st');
+      return null;
+    }
+  }
+
+  static ChatInsight? _parseInsight(String jsonText) {
+    final dynamic decoded;
+    try {
+      decoded = jsonDecode(jsonText);
+    } catch (e) {
+      debugPrint('[GeminiService] generateInsight invalid JSON: $e');
+      return null;
+    }
+    if (decoded is! Map) return null;
+    final title = decoded['title']?.toString().trim() ?? '';
+    final quote = decoded['quote']?.toString().trim() ?? '';
+    final body = decoded['body']?.toString().trim() ?? '';
+    // The model returns empty fields when there isn't enough to say.
+    if (title.isEmpty || body.isEmpty) return null;
+    return ChatInsight(title: title, quote: quote, body: body);
   }
 
   static String _renderTranscript(List<ChatMessage> history) {

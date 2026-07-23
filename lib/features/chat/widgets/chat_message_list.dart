@@ -12,6 +12,7 @@ import '../../routines/cubit/routine_cubit.dart';
 import '../cubit/chat_cubit.dart';
 import '../services/chat_message.dart';
 import 'chat_form_card.dart';
+import 'chat_insight_card.dart';
 import 'chat_mission_card.dart';
 import 'chat_mood_check_in_card.dart';
 import 'chat_routine_card.dart';
@@ -177,6 +178,9 @@ class _MessageRow extends StatelessWidget {
           onStartNow: () => _startRoutineNow(context, mutation.routineId),
         ),
       );
+    }
+    if (isModel && m.insight != null) {
+      return _CardWrap(child: ChatInsightCard(insight: m.insight!));
     }
     return _TextBubble(message: m);
   }
