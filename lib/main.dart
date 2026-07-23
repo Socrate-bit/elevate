@@ -7,6 +7,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'app.dart';
 import 'config/app_config.dart';
 import 'firebase_options.dart';
+import 'shared/services/notification_service.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 final _navigatorKey = GlobalKey<NavigatorState>();
@@ -15,6 +16,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Sets up the timezone DB + local notifications plugin for reminders.
+  await NotificationService.init();
   // Pre-warms the liquid glass shaders used by the home GlassBottomBar.
   await LiquidGlassWidgets.initialize();
 

@@ -2069,13 +2069,13 @@ abstract class AppLocalizations {
   /// No description provided for @routineFormAlarmLabel.
   ///
   /// In en, this message translates to:
-  /// **'Ring an alarm'**
+  /// **'Reminder'**
   String get routineFormAlarmLabel;
 
   /// No description provided for @routineFormAlarmHint.
   ///
   /// In en, this message translates to:
-  /// **'Plays when the time arrives.'**
+  /// **'Get a notification when the time arrives.'**
   String get routineFormAlarmHint;
 
   /// No description provided for @routineFormDeleteTitle.
