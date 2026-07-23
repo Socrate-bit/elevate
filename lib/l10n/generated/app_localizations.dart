@@ -1712,6 +1712,24 @@ abstract class AppLocalizations {
   /// **'Couldn\'t load. Tap to retry.'**
   String get toolSessionLoadError;
 
+  /// No description provided for @reflectionContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get reflectionContinue;
+
+  /// No description provided for @reflectionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get reflectionDone;
+
+  /// No description provided for @reflectionSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Please try again.'**
+  String get reflectionSaveError;
+
   /// No description provided for @gratitudeStepPrompt.
   ///
   /// In en, this message translates to:
@@ -1754,23 +1772,89 @@ abstract class AppLocalizations {
   /// **'Hold gratitude for these moments — let it settle in.'**
   String get gratitudeAffirmBody;
 
-  /// No description provided for @gratitudeContinue.
+  /// No description provided for @selfLoveStepPrompt.
   ///
   /// In en, this message translates to:
-  /// **'Continue'**
-  String get gratitudeContinue;
+  /// **'What are 3 things you appreciate about yourself?'**
+  String get selfLoveStepPrompt;
 
-  /// No description provided for @gratitudeDone.
+  /// No description provided for @selfLoveHint.
   ///
   /// In en, this message translates to:
-  /// **'Done'**
-  String get gratitudeDone;
+  /// **'Big or small — a strength, an effort, a kindness.'**
+  String get selfLoveHint;
 
-  /// No description provided for @gratitudeSaveError.
+  /// No description provided for @selfLoveItemLabel.
   ///
   /// In en, this message translates to:
-  /// **'Couldn\'t save. Please try again.'**
-  String get gratitudeSaveError;
+  /// **'Quality {number}'**
+  String selfLoveItemLabel(int number);
+
+  /// No description provided for @selfLoveRememberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a moment'**
+  String get selfLoveRememberTitle;
+
+  /// No description provided for @selfLoveRememberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Read each one back to yourself, gently and without judgment.'**
+  String get selfLoveRememberBody;
+
+  /// No description provided for @selfLoveAffirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Be kind to yourself'**
+  String get selfLoveAffirmTitle;
+
+  /// No description provided for @selfLoveAffirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Let this kindness settle in — you deserve it.'**
+  String get selfLoveAffirmBody;
+
+  /// No description provided for @mindfulnessStepPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'What are 3 things you notice right now?'**
+  String get mindfulnessStepPrompt;
+
+  /// No description provided for @mindfulnessHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A sound, a sensation, something you can see.'**
+  String get mindfulnessHint;
+
+  /// No description provided for @mindfulnessItemLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensation {number}'**
+  String mindfulnessItemLabel(int number);
+
+  /// No description provided for @mindfulnessRememberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a moment'**
+  String get mindfulnessRememberTitle;
+
+  /// No description provided for @mindfulnessRememberBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to each one, and stay with it for a breath.'**
+  String get mindfulnessRememberBody;
+
+  /// No description provided for @mindfulnessAffirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Be present'**
+  String get mindfulnessAffirmTitle;
+
+  /// No description provided for @mindfulnessAffirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest here for a moment — there\'s nowhere else to be.'**
+  String get mindfulnessAffirmBody;
 
   /// No description provided for @moodPickerTitle.
   ///

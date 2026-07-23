@@ -321,6 +321,10 @@
   "toolSessionDone": "Done",
   "toolSessionLoadError": "Couldn't load. Tap to retry.",
 
+  "reflectionContinue": "Continue",
+  "reflectionDone": "Done",
+  "reflectionSaveError": "Couldn't save. Please try again.",
+
   "gratitudeStepPrompt": "What are 3 things this week that gave you joy?",
   "gratitudeHint": "It can be as simple as a good meal…",
   "gratitudeJoyLabel": "Joy {number}",
@@ -329,9 +333,24 @@
   "gratitudeRememberBody": "Remember each one, and relive the feeling it gave you.",
   "gratitudeAffirmTitle": "Be grateful",
   "gratitudeAffirmBody": "Hold gratitude for these moments — let it settle in.",
-  "gratitudeContinue": "Continue",
-  "gratitudeDone": "Done",
-  "gratitudeSaveError": "Couldn't save. Please try again.",
+
+  "selfLoveStepPrompt": "What are 3 things you appreciate about yourself?",
+  "selfLoveHint": "Big or small — a strength, an effort, a kindness.",
+  "selfLoveItemLabel": "Quality {number}",
+  "@selfLoveItemLabel": { "placeholders": { "number": { "type": "int" } } },
+  "selfLoveRememberTitle": "Take a moment",
+  "selfLoveRememberBody": "Read each one back to yourself, gently and without judgment.",
+  "selfLoveAffirmTitle": "Be kind to yourself",
+  "selfLoveAffirmBody": "Let this kindness settle in — you deserve it.",
+
+  "mindfulnessStepPrompt": "What are 3 things you notice right now?",
+  "mindfulnessHint": "A sound, a sensation, something you can see.",
+  "mindfulnessItemLabel": "Sensation {number}",
+  "@mindfulnessItemLabel": { "placeholders": { "number": { "type": "int" } } },
+  "mindfulnessRememberTitle": "Take a moment",
+  "mindfulnessRememberBody": "Return to each one, and stay with it for a breath.",
+  "mindfulnessAffirmTitle": "Be present",
+  "mindfulnessAffirmBody": "Rest here for a moment — there's nowhere else to be.",
 
   "moodPickerTitle": "How are you?",
   "moodPickerRad": "rad",

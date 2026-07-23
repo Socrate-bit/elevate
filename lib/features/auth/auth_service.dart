@@ -20,6 +20,8 @@ const kUserSubcollections = [
   'memory',
   'lifeEvents',
   'gratitude',
+  'selfLove',
+  'mindfulness',
 ];
 
 /// Thrown when [blockNewAccounts] is set and the OAuth credential

@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/utils/haptic_utils.dart';
 import '../../../shared/widgets/appy_nav_bar.dart';
 import '../models/tools_mock_data.dart';
 import '../widgets/tool_section.dart';
 import '../widgets/tools_top_bar.dart';
 
 /// Tools page — catalogue of wellness activities grouped into sections.
-/// Pure UI on mock data ([ToolsMockData]); hosted by the shared AppyShell, so
-/// the bottom nav is driven by the shell's [AppNavCubit].
+/// Pure UI on mock data ([ToolsMockData]).
 class ToolsPage extends StatelessWidget {
-  const ToolsPage({super.key});
+  /// When true, the page is shown as a standalone pushed route: the bottom nav
+  /// bar is hidden and a back button is overlaid to pop back (e.g. opened from
+  /// the chat top bar). Otherwise it's hosted by the shared AppyShell.
+  final bool fullScreen;
+
+  const ToolsPage({super.key, this.fullScreen = false});
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +30,16 @@ class ToolsPage extends StatelessWidget {
       // place while the content scrolls beneath it.
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        leading: fullScreen
+            ? IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: HomePalette.textDarkGreen,
+                  size: 20.sp,
+                ),
+                onPressed: withHaptic(() => Navigator.of(context).maybePop()),
+              )
+            : null,
         titleSpacing: 0,
         toolbarHeight: 52.h,
         elevation: 0,
@@ -50,14 +65,15 @@ class ToolsPage extends StatelessWidget {
                 SizedBox(height: topInset + 52.h + 111.h),
                 // Detached translucent panel, padded clear of the edges.
                 const _SectionsPanel(),
-                // Clear the floating bottom nav bar.
-                SizedBox(height: 90.h),
+                // Clear the floating bottom nav bar (or just the edge when
+                // shown as a standalone page without the nav bar).
+                SizedBox(height: fullScreen ? 24.h : 90.h),
               ],
             ),
           ),
         ],
       ),
-      bottomNavigationBar: const AppyNavBar(),
+      bottomNavigationBar: fullScreen ? null : const AppyNavBar(),
     );
   }
 }
