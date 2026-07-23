@@ -5,6 +5,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../features/chat/screens/chat_page_screen.dart';
+import '../../features/subscription/services/analytics_service.dart';
 import '../app_nav_cubit.dart';
 import '../theme/app_theme.dart';
 import '../utils/haptic_utils.dart';
@@ -18,9 +19,10 @@ class AppyNavBar extends StatelessWidget {
   /// Opens the chat as a standalone full-page route. ChatPage's cubits are all
   /// app-global (provided in app.dart), so no extra provider wiring is needed.
   void _openChat(BuildContext context) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const ChatPage(fullScreen: true)));
+    AnalyticsService.capture(AnalyticsService.chatOpened);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ChatPage(fullScreen: true)),
+    );
   }
 
   @override
@@ -45,11 +47,11 @@ class AppyNavBar extends StatelessWidget {
                       icon: const Icon(Icons.home_rounded),
                     ),
                     GlassBottomBarTab(
-                      thickness: 0.5,
                       label: l10n.navQuest,
                       icon: const Icon(Icons.flag_rounded),
                     ),
                     GlassBottomBarTab(
+                      thickness: 1,
                       label: l10n.navJournal,
                       icon: const Icon(Icons.menu_book_rounded),
                     ),
@@ -107,7 +109,7 @@ class _ChatCircleButton extends StatelessWidget {
         width: 80.w,
         height: 80.h,
         decoration: BoxDecoration(
-          color: HomePalette.navInactive,
+          color: HomePalette.checkGreen,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
