@@ -20,9 +20,9 @@ class AppyNavBar extends StatelessWidget {
   /// app-global (provided in app.dart), so no extra provider wiring is needed.
   void _openChat(BuildContext context) {
     AnalyticsService.capture(AnalyticsService.chatOpened);
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ChatPage(fullScreen: true)),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const ChatPage(fullScreen: true)));
   }
 
   @override
@@ -47,11 +47,11 @@ class AppyNavBar extends StatelessWidget {
                       icon: const Icon(Icons.home_rounded),
                     ),
                     GlassBottomBarTab(
+                      thickness: 1,
                       label: l10n.navQuest,
                       icon: const Icon(Icons.flag_rounded),
                     ),
                     GlassBottomBarTab(
-                      thickness: 1,
                       label: l10n.navJournal,
                       icon: const Icon(Icons.menu_book_rounded),
                     ),
@@ -109,11 +109,11 @@ class _ChatCircleButton extends StatelessWidget {
         width: 80.w,
         height: 80.h,
         decoration: BoxDecoration(
-          color: HomePalette.checkGreen,
+          color: HomePalette.navInactive,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: HomePalette.checkGreen.withValues(alpha: 0.25),
+              color: HomePalette.navInactive.withValues(alpha: 0.25),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
