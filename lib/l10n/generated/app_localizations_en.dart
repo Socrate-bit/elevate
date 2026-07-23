@@ -1062,10 +1062,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get routineFormClear => 'Clear';
 
   @override
-  String get routineFormAlarmLabel => 'Ring an alarm';
+  String get routineFormAlarmLabel => 'Reminder';
 
   @override
-  String get routineFormAlarmHint => 'Plays when the time arrives.';
+  String get routineFormAlarmHint =>
+      'Get a notification when the time arrives.';
 
   @override
   String get routineFormDeleteTitle => 'Delete routine?';

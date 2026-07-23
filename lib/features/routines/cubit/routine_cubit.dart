@@ -4,16 +4,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../shared/services/notification_service.dart';
 import '../../activity/services/activity_service.dart';
-// import '../../alarms/services/alarm_channel.dart';
 import '../models/routine.dart';
 import '../services/routine_firestore_service.dart';
 import 'routine_state.dart';
 
 /// Owns the user's routines (actions + habits). CRUD against Firestore +
-/// optional native alarm scheduling. Native alarm calls are currently
-/// commented out to match the noop'd `AlarmChannel`; the `nativeAlarmId`
-/// schema is still persisted so re-enabling later is a one-line change.
+/// optional local reminder notifications (see [NotificationService]). When a
+/// routine opts into a reminder, `nativeAlarmId` stores a marker so the
+/// scheduled/cleared state survives reloads.
 class RoutineCubit extends Cubit<RoutineState> {
   RoutineCubit({Uuid? uuid})
       : _uuid = uuid ?? const Uuid(),
@@ -134,55 +134,19 @@ class RoutineCubit extends Cubit<RoutineState> {
     }
   }
 
-  /// Schedules a native cascade for [r] when [hasAlarm] + a time are present.
-  /// The actual `AlarmChannel.*` calls are commented out (matching the noop'd
-  /// channel); when re-enabled they return the native id we persist.
+  /// Schedules a local reminder notification for [r] when [hasAlarm] + a time
+  /// are present. Requests OS notification permission on first enable. Returns
+  /// a marker persisted in `nativeAlarmId` to record that a reminder is set.
   Future<String?> _scheduleNativeIfNeeded(Routine r) async {
-    if (!r.hasAlarm) return null;
-    if (r.scheduledMinute == null) return null;
+    if (!r.hasAlarm || r.scheduledMinute == null) return null;
 
-    if (r.type == RoutineType.action) {
-      if (r.scheduledDate == null) return null;
-      // final hour = r.scheduledMinute! ~/ 60;
-      // final minute = r.scheduledMinute! % 60;
-      // final at = DateTime(
-      //   r.scheduledDate!.year,
-      //   r.scheduledDate!.month,
-      //   r.scheduledDate!.day,
-      //   hour,
-      //   minute,
-      // );
-      // return AlarmChannel.scheduleOneShot(
-      //   timestampMs: at.millisecondsSinceEpoch,
-      //   title: r.name.isEmpty ? 'Routine' : r.name,
-      //   sfSymbol: 'alarm',
-      //   secondaryLabel: r.name,
-      // );
-      return null;
-    }
-
-    if (!r.scheduledDays.any((d) => d)) return null;
-    // final hour = r.scheduledMinute! ~/ 60;
-    // final minute = r.scheduledMinute! % 60;
-    // return AlarmChannel.scheduleRepeating(
-    //   weekdayMask: AlarmChannel.toWeekdayMask(r.scheduledDays),
-    //   hour: hour,
-    //   minute: minute,
-    //   title: r.name.isEmpty ? 'Routine' : r.name,
-    //   sfSymbol: 'alarm',
-    //   secondaryLabel: r.name,
-    // );
-    return null;
+    await NotificationService.requestPermission();
+    await NotificationService.scheduleForRoutine(r);
+    return 'scheduled';
   }
 
   Future<void> _cancelNativeIfNeeded(Routine r) async {
-    if (r.nativeAlarmId == null) return;
-    // try {
-    //   await AlarmChannel.cancel(r.nativeAlarmId!);
-    //   await AlarmChannel.cleanupConfig(r.nativeAlarmId!);
-    // } catch (e) {
-    //   debugPrint('[RoutineCubit] cancelNative failed: $e');
-    // }
+    await NotificationService.cancelForRoutine(r);
   }
 
   @override

@@ -1074,10 +1074,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get routineFormClear => 'Effacer';
 
   @override
-  String get routineFormAlarmLabel => 'Sonner une alarme';
+  String get routineFormAlarmLabel => 'Rappel';
 
   @override
-  String get routineFormAlarmHint => 'Joue à l\'heure prévue.';
+  String get routineFormAlarmHint =>
+      'Recevez une notification à l\'heure prévue.';
 
   @override
   String get routineFormDeleteTitle => 'Supprimer ?';
