@@ -67,7 +67,7 @@ class ChatComposerBar extends StatelessWidget {
                             decoration: InputDecoration(
                               isDense: true,
                               contentPadding: EdgeInsets.symmetric(
-                                vertical: 14.h,
+                                vertical: 18.h,
                               ),
                               border: InputBorder.none,
                               hintText: hint,

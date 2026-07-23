@@ -356,10 +356,10 @@ class _CheckButton extends StatelessWidget {
         height: 40.w,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: done ? HomePalette.teal : HomePalette.checkButtonBg,
-          borderRadius: BorderRadius.circular(12.r),
+          color: done ? const Color.fromARGB(255, 14, 165, 19) : HomePalette.checkButtonBg,
+          borderRadius: BorderRadius.circular(90.r),
           border: Border.all(
-            color: done ? HomePalette.teal : HomePalette.checkButtonBorder,
+            color: done ? const Color.fromARGB(255, 14, 165, 19) : HomePalette.checkButtonBorder,
             width: 1,
           ),
         ),
@@ -369,7 +369,7 @@ class _CheckButton extends StatelessWidget {
               : (hasObjectCheck
                     ? Icons.camera_alt_rounded
                     : Icons.check_rounded),
-          size: 22.sp,
+          size: 28.sp,
           color: done ? Colors.white : HomePalette.checkButtonBorder,
         ),
       ),

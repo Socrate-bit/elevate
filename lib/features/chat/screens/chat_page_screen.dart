@@ -325,10 +325,10 @@ class _ChatViewState extends State<_ChatView> {
         // bar when closed (padding grows smoothly to 96 as the keyboard retracts).
         Padding(
           padding: EdgeInsets.fromLTRB(
-            12.w,
-            0,
-            12.w,
-            (96.h - MediaQuery.viewInsetsOf(context).bottom).clamp(8.h, 96.h),
+            24.w,
+            24,
+            24.w,
+            (24.h - MediaQuery.viewInsetsOf(context).bottom).clamp(8.h, 96.h),
           ),
           child: BlocBuilder<ChatCubit, ChatState>(
             buildWhen: (a, b) => a.isListening != b.isListening,
