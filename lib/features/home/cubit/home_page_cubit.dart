@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../activity/models/activity.dart';
 import '../../activity/services/activity_service.dart';
-import '../../milestones/services/streak_service.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../../routines/cubit/routine_state.dart';
 import '../../routines/models/routine.dart';
@@ -23,7 +22,6 @@ class HomePageCubit extends Cubit<HomePageState> {
   final RoutineCubit _routineCubit;
   StreamSubscription<List<Activity>>? _activitiesSub;
   StreamSubscription<RoutineState>? _routinesSub;
-  StreamSubscription<StreakProfile>? _profileSub;
 
   List<Activity> _activities = [];
   List<Routine> _routines = [];
@@ -45,12 +43,6 @@ class HomePageCubit extends Cubit<HomePageState> {
       _routines = rs.routines;
       _routinesReady = !rs.isLoading;
       _recompute();
-    });
-
-    // Real-time streak count from the user's profile.
-    _profileSub = StreakService.watchProfile().listen((profile) {
-      if (isClosed) return;
-      emit(state.copyWith(currentStreak: profile.currentStreak));
     });
 
     _recompute();
@@ -91,7 +83,6 @@ class HomePageCubit extends Cubit<HomePageState> {
   Future<void> close() {
     _activitiesSub?.cancel();
     _routinesSub?.cancel();
-    _profileSub?.cancel();
     return super.close();
   }
 }

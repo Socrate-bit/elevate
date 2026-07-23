@@ -5,8 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
-import '../cubit/home_page_cubit.dart';
-import '../cubit/home_page_state.dart';
+import '../cubit/heart_cubit.dart';
+import '../cubit/heart_state.dart';
 import '../models/home_mock_data.dart';
 
 /// Teal quest banner with lightning icon, title and progress pill. The shop and
@@ -97,14 +97,15 @@ class _PerchIcon extends StatelessWidget {
 }
 
 /// Streak sign perched on the banner: the flame asset with the live streak
-/// count. Reads the count from [HomePageCubit], kept reactive to profile updates.
+/// count. Reads the count from [HeartCubit], kept reactive to activity updates
+/// and heart-driven streak breaks.
 class _StreakSign extends StatelessWidget {
   const _StreakSign();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomePageCubit, HomePageState>(
-      buildWhen: (a, b) => a.currentStreak != b.currentStreak,
+    return BlocBuilder<HeartCubit, HeartState>(
+      buildWhen: (a, b) => a.streak != b.streak,
       builder: (context, state) {
         return Row(
           mainAxisSize: MainAxisSize.min,
@@ -116,7 +117,7 @@ class _StreakSign extends StatelessWidget {
             ),
             SizedBox(width: 4.w),
             Text(
-              '${state.currentStreak}',
+              '${state.streak}',
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w800,

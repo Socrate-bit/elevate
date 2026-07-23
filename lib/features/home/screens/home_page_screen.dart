@@ -5,8 +5,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/appy_nav_bar.dart';
 import '../../routines/cubit/routine_cubit.dart';
+import '../cubit/heart_cubit.dart';
+import '../cubit/heart_state.dart';
 import '../cubit/home_page_cubit.dart';
 import '../cubit/home_page_state.dart';
+import '../services/heart_service.dart';
 import '../widgets/home_top_bar.dart';
 import '../widgets/quest_banner.dart';
 import '../widgets/todays_plan_card.dart';
@@ -96,13 +99,17 @@ class _HomeViewState extends State<_HomeView> {
                       SizedBox(height: 18.w + 18.h),
                       // Pet sits in the flow: it can never overlap the content
                       // below. Both dimensions are fixed (the gif is square) so
-                      // the first-frame paws measurement is already final.
-                      Image.asset(
-                        'assets/home/pet_rest_animation.gif',
-                        key: _petKey,
-                        width: w * _petWidthFactor,
-                        height: w * _petWidthFactor,
-                        gaplessPlayback: true,
+                      // the first-frame paws measurement is already final. The
+                      // mood animation follows the pet's remaining hearts.
+                      BlocBuilder<HeartCubit, HeartState>(
+                        buildWhen: (a, b) => a.hearts != b.hearts,
+                        builder: (context, state) => Image.asset(
+                          HeartService.petAssetForHearts(state.hearts),
+                          key: _petKey,
+                          width: w * _petWidthFactor,
+                          height: w * _petWidthFactor,
+                          gaplessPlayback: true,
+                        ),
                       ),
                       SizedBox(height: 10.h),
                     ],
