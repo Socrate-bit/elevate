@@ -876,6 +876,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec du chargement. Touchez pour réessayer.';
 
   @override
+  String get reflectionContinue => 'Continuer';
+
+  @override
+  String get reflectionDone => 'Terminé';
+
+  @override
+  String get reflectionSaveError => 'Échec de l\'enregistrement. Réessaie.';
+
+  @override
   String get gratitudeStepPrompt =>
       'Quelles sont 3 choses qui t\'ont apporté de la joie cette semaine ?';
 
@@ -902,13 +911,58 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ressens de la gratitude pour ces moments — laisse-la s\'installer.';
 
   @override
-  String get gratitudeContinue => 'Continuer';
+  String get selfLoveStepPrompt =>
+      'Quelles sont 3 choses que tu apprécies chez toi ?';
 
   @override
-  String get gratitudeDone => 'Terminé';
+  String get selfLoveHint =>
+      'Grande ou petite — une force, un effort, une gentillesse.';
 
   @override
-  String get gratitudeSaveError => 'Échec de l\'enregistrement. Réessaie.';
+  String selfLoveItemLabel(int number) {
+    return 'Qualité $number';
+  }
+
+  @override
+  String get selfLoveRememberTitle => 'Prends un instant';
+
+  @override
+  String get selfLoveRememberBody =>
+      'Relis chacune pour toi-même, avec douceur et sans jugement.';
+
+  @override
+  String get selfLoveAffirmTitle => 'Sois bienveillant envers toi';
+
+  @override
+  String get selfLoveAffirmBody =>
+      'Laisse cette bienveillance s\'installer — tu le mérites.';
+
+  @override
+  String get mindfulnessStepPrompt =>
+      'Quelles sont 3 choses que tu remarques maintenant ?';
+
+  @override
+  String get mindfulnessHint =>
+      'Un son, une sensation, quelque chose que tu vois.';
+
+  @override
+  String mindfulnessItemLabel(int number) {
+    return 'Sensation $number';
+  }
+
+  @override
+  String get mindfulnessRememberTitle => 'Prends un instant';
+
+  @override
+  String get mindfulnessRememberBody =>
+      'Reviens à chacune, et reste avec elle le temps d\'une respiration.';
+
+  @override
+  String get mindfulnessAffirmTitle => 'Sois présent';
+
+  @override
+  String get mindfulnessAffirmBody =>
+      'Repose-toi ici un instant — il n\'y a nulle part où aller.';
 
   @override
   String get moodPickerTitle => 'Comment vas-tu ?';

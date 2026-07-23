@@ -70,6 +70,7 @@ class AnalyticsService {
   static const moodRecorded = 'mood_recorded'; // props: {mood, source}
 
   // Tools
+  static const toolsOpened = 'tools_opened';
   static const toolSessionStarted = 'tool_session_started'; // props: {tool}
   static const toolSessionCompleted = 'tool_session_completed'; // props: {tool}
 

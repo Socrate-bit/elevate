@@ -321,6 +321,10 @@
   "toolSessionDone": "Terminé",
   "toolSessionLoadError": "Échec du chargement. Touchez pour réessayer.",
 
+  "reflectionContinue": "Continuer",
+  "reflectionDone": "Terminé",
+  "reflectionSaveError": "Échec de l'enregistrement. Réessaie.",
+
   "gratitudeStepPrompt": "Quelles sont 3 choses qui t'ont apporté de la joie cette semaine ?",
   "gratitudeHint": "Ça peut être aussi simple qu'un bon repas…",
   "gratitudeJoyLabel": "Joie {number}",
@@ -329,9 +333,24 @@
   "gratitudeRememberBody": "Souviens-toi de chacune, et revis le sentiment qu'elle t'a procuré.",
   "gratitudeAffirmTitle": "Sois reconnaissant",
   "gratitudeAffirmBody": "Ressens de la gratitude pour ces moments — laisse-la s'installer.",
-  "gratitudeContinue": "Continuer",
-  "gratitudeDone": "Terminé",
-  "gratitudeSaveError": "Échec de l'enregistrement. Réessaie.",
+
+  "selfLoveStepPrompt": "Quelles sont 3 choses que tu apprécies chez toi ?",
+  "selfLoveHint": "Grande ou petite — une force, un effort, une gentillesse.",
+  "selfLoveItemLabel": "Qualité {number}",
+  "@selfLoveItemLabel": { "placeholders": { "number": { "type": "int" } } },
+  "selfLoveRememberTitle": "Prends un instant",
+  "selfLoveRememberBody": "Relis chacune pour toi-même, avec douceur et sans jugement.",
+  "selfLoveAffirmTitle": "Sois bienveillant envers toi",
+  "selfLoveAffirmBody": "Laisse cette bienveillance s'installer — tu le mérites.",
+
+  "mindfulnessStepPrompt": "Quelles sont 3 choses que tu remarques maintenant ?",
+  "mindfulnessHint": "Un son, une sensation, quelque chose que tu vois.",
+  "mindfulnessItemLabel": "Sensation {number}",
+  "@mindfulnessItemLabel": { "placeholders": { "number": { "type": "int" } } },
+  "mindfulnessRememberTitle": "Prends un instant",
+  "mindfulnessRememberBody": "Reviens à chacune, et reste avec elle le temps d'une respiration.",
+  "mindfulnessAffirmTitle": "Sois présent",
+  "mindfulnessAffirmBody": "Repose-toi ici un instant — il n'y a nulle part où aller.",
 
   "moodPickerTitle": "Comment vas-tu ?",
   "moodPickerRad": "génial",

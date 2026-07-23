@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
 
+import 'reflection_spec.dart';
+
 /// What a tool card opens when tapped.
-enum ToolAction { none, breathing, video, gratitude }
+enum ToolAction { none, breathing, video, reflection }
 
 /// A single tool/activity card.
 class ToolItem extends Equatable {
@@ -15,16 +17,22 @@ class ToolItem extends Equatable {
   /// Remote video URL — required when [action] is [ToolAction.video].
   final String? videoUrl;
 
+  /// Reflection mission to run — required when [action] is
+  /// [ToolAction.reflection].
+  final ReflectionSpec? reflectionSpec;
+
   const ToolItem({
     required this.iconAsset,
     required this.title,
     required this.subtitle,
     this.action = ToolAction.none,
     this.videoUrl,
+    this.reflectionSpec,
   });
 
   @override
-  List<Object?> get props => [iconAsset, title, subtitle, action, videoUrl];
+  List<Object?> get props =>
+      [iconAsset, title, subtitle, action, videoUrl, reflectionSpec];
 }
 
 /// A titled group of tool cards (e.g. Wellness).
@@ -103,7 +111,22 @@ class ToolsMockData {
           iconAsset: 'assets/activities/gratefulness_icon.png',
           title: 'Gratitude',
           subtitle: 'Notice the good',
-          action: ToolAction.gratitude,
+          action: ToolAction.reflection,
+          reflectionSpec: ReflectionSpec.gratitude,
+        ),
+        ToolItem(
+          iconAsset: 'assets/activities/emotionalsupport_icon.png',
+          title: 'Self-love',
+          subtitle: 'Be kind to yourself',
+          action: ToolAction.reflection,
+          reflectionSpec: ReflectionSpec.selfLove,
+        ),
+        ToolItem(
+          iconAsset: 'assets/activities/mindfulness_icon.png',
+          title: 'Mindfulness',
+          subtitle: 'Come back to now',
+          action: ToolAction.reflection,
+          reflectionSpec: ReflectionSpec.mindfulness,
         ),
         ToolItem(
           iconAsset: 'assets/activities/walking_icon.png',

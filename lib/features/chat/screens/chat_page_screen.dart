@@ -12,6 +12,8 @@ import '../../../shared/widgets/appy_nav_bar.dart';
 import '../../memory/cubit/memory_cubit.dart';
 import '../../mood/cubit/mood_cubit.dart';
 import '../../routines/cubit/routine_cubit.dart';
+import '../../subscription/services/analytics_service.dart';
+import '../../tools/screens/tools_page_screen.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_list_cubit.dart';
 import '../cubit/chat_list_state.dart';
@@ -97,9 +99,35 @@ class ChatPage extends StatelessWidget {
                 ),
               ),
             ),
+          // Shortcut to the wellness tools, overlaid top-right.
+          SafeArea(
+            bottom: false,
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: EdgeInsets.only(right: 4.w, top: 4.h),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.spa_rounded,
+                    color: ChatPalette.headerTitle,
+                    size: 22.sp,
+                  ),
+                  onPressed: withHaptic(() => _openTools(context)),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: fullScreen ? null : const AppyNavBar(),
+    );
+  }
+
+  /// Opens the wellness tools catalogue as a standalone full-page route.
+  void _openTools(BuildContext context) {
+    AnalyticsService.capture(AnalyticsService.toolsOpened);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ToolsPage(fullScreen: true)),
     );
   }
 }

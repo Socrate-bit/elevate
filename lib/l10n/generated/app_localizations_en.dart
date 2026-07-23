@@ -869,6 +869,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toolSessionLoadError => 'Couldn\'t load. Tap to retry.';
 
   @override
+  String get reflectionContinue => 'Continue';
+
+  @override
+  String get reflectionDone => 'Done';
+
+  @override
+  String get reflectionSaveError => 'Couldn\'t save. Please try again.';
+
+  @override
   String get gratitudeStepPrompt =>
       'What are 3 things this week that gave you joy?';
 
@@ -895,13 +904,56 @@ class AppLocalizationsEn extends AppLocalizations {
       'Hold gratitude for these moments — let it settle in.';
 
   @override
-  String get gratitudeContinue => 'Continue';
+  String get selfLoveStepPrompt =>
+      'What are 3 things you appreciate about yourself?';
 
   @override
-  String get gratitudeDone => 'Done';
+  String get selfLoveHint =>
+      'Big or small — a strength, an effort, a kindness.';
 
   @override
-  String get gratitudeSaveError => 'Couldn\'t save. Please try again.';
+  String selfLoveItemLabel(int number) {
+    return 'Quality $number';
+  }
+
+  @override
+  String get selfLoveRememberTitle => 'Take a moment';
+
+  @override
+  String get selfLoveRememberBody =>
+      'Read each one back to yourself, gently and without judgment.';
+
+  @override
+  String get selfLoveAffirmTitle => 'Be kind to yourself';
+
+  @override
+  String get selfLoveAffirmBody =>
+      'Let this kindness settle in — you deserve it.';
+
+  @override
+  String get mindfulnessStepPrompt => 'What are 3 things you notice right now?';
+
+  @override
+  String get mindfulnessHint => 'A sound, a sensation, something you can see.';
+
+  @override
+  String mindfulnessItemLabel(int number) {
+    return 'Sensation $number';
+  }
+
+  @override
+  String get mindfulnessRememberTitle => 'Take a moment';
+
+  @override
+  String get mindfulnessRememberBody =>
+      'Return to each one, and stay with it for a breath.';
+
+  @override
+  String get mindfulnessAffirmTitle => 'Be present';
+
+  @override
+  String get mindfulnessAffirmBody =>
+      'Rest here for a moment — there\'s nowhere else to be.';
 
   @override
   String get moodPickerTitle => 'How are you?';

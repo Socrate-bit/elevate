@@ -5,9 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../missions/screens/breathing_mission_screen.dart';
-import '../cubit/gratitude_cubit.dart';
+import '../cubit/reflection_cubit.dart';
 import '../models/tools_mock_data.dart';
-import '../screens/gratitude_tool_session_screen.dart';
+import '../screens/reflection_tool_session_screen.dart';
 import '../screens/video_tool_session_screen.dart';
 
 /// A single square tool/activity card: asset icon on top, title + subtitle
@@ -31,11 +31,11 @@ class ToolCard extends StatelessWidget {
             videoUrl: item.videoUrl!,
           ),
         ));
-      case ToolAction.gratitude:
+      case ToolAction.reflection:
         Navigator.of(context).push(MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => GratitudeCubit(),
-            child: const GratitudeToolSessionScreen(),
+            create: (_) => ReflectionCubit(item.reflectionSpec!),
+            child: const ReflectionToolSessionScreen(),
           ),
         ));
       case ToolAction.none:
