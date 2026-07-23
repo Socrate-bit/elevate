@@ -55,6 +55,7 @@ class AnalyticsService {
 
   // Achievements
   static const badgeEarned = 'badge_earned';
+  static const streakBroken = 'streak_broken'; // props: {streak}
 
   // Onboarding
   static const onboardingStep = 'onboarding_step';

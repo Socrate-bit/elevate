@@ -11,6 +11,7 @@ import 'features/alarms/cubit/alarm_cubit.dart';
 import 'features/mood/cubit/mood_cubit.dart';
 import 'features/alarms/screens/alarm_stop_screen.dart';
 import 'features/chat/cubit/chat_list_cubit.dart';
+import 'features/home/cubit/heart_cubit.dart';
 import 'features/memory/cubit/memory_cubit.dart';
 import 'features/onboarding/cubit/onboarding_cubit.dart';
 import 'features/routines/cubit/routine_cubit.dart';
@@ -32,6 +33,10 @@ class SkeletonApp extends StatelessWidget {
         BlocProvider(create: (_) => SettingsCubit()),
         BlocProvider(create: (_) => AlarmCubit()),
         BlocProvider(create: (_) => RoutineCubit()),
+        BlocProvider(
+          create: (context) =>
+              HeartCubit(routineCubit: context.read<RoutineCubit>()),
+        ),
         BlocProvider(create: (_) => SubscriptionCubit()),
         BlocProvider(create: (_) => OnboardingCubit()),
         BlocProvider(create: (_) => ChatListCubit()),
