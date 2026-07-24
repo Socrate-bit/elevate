@@ -15,6 +15,7 @@ import 'features/onboarding/cubit/onboarding_cubit.dart';
 import 'features/routines/cubit/routine_cubit.dart';
 import 'features/settings/cubit/settings_cubit.dart';
 import 'features/settings/cubit/settings_state.dart';
+import 'features/shop/cubit/shop_cubit.dart';
 import 'features/subscription/cubit/subscription_cubit.dart';
 import '../features/adventure/cubit/adventure_cubit.dart';
 import 'features/navigation/app_nav_cubit.dart';
@@ -39,6 +40,7 @@ class AppyApp extends StatelessWidget {
         BlocProvider(create: (_) => MemoryCubit()),
         BlocProvider(create: (_) => AppNavCubit()),
         BlocProvider(create: (_) => AdventureCubit()),
+        BlocProvider(create: (_) => ShopCubit()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) => ScreenUtilInit(

@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
+import '../../adventure/cubit/adventure_cubit.dart';
+import '../../adventure/cubit/adventure_state.dart';
+import '../../shop/cubit/shop_cubit.dart';
+import '../../shop/cubit/shop_state.dart';
 import '../cubit/streak_cubit.dart';
 import '../cubit/streak_state.dart';
 import '../services/heart_service.dart';
@@ -62,11 +67,17 @@ class HomeTopBar extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          // Right: settings.
-          _IconButton(
-            asset: 'assets/home/setting.png',
-            size: 40,
-            onTap: () {},
+          // Right: settings — swapped for the live coin balance while the
+          // shop modal is open.
+          BlocBuilder<ShopCubit, ShopState>(
+            buildWhen: (a, b) => a.isOpen != b.isOpen,
+            builder: (context, shop) => shop.isOpen
+                ? const _CoinBalance()
+                : _IconButton(
+                    asset: 'assets/home/setting.png',
+                    size: 40,
+                    onTap: () {},
+                  ),
           ),
         ],
       ),
@@ -91,6 +102,53 @@ class _IconButton extends StatelessWidget {
     return GestureDetector(
       onTap: withHaptic(onTap),
       child: Image.asset(asset, width: size.w, height: size.w),
+    );
+  }
+}
+
+/// Live coin balance pill shown in place of the settings icon while the shop
+/// modal is open.
+class _CoinBalance extends StatelessWidget {
+  const _CoinBalance();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AdventureCubit, AdventureState>(
+      buildWhen: (a, b) => a.profile.coins != b.profile.coins,
+      builder: (context, adv) => Container(
+        height: 40.w,
+        padding: EdgeInsets.symmetric(horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.monetization_on_rounded,
+              size: 24.w,
+              color: HomePalette.progressYellow,
+            ),
+            SizedBox(width: 6.w),
+            Text(
+              '${adv.profile.coins}',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w800,
+                color: HomePalette.progressBrown,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

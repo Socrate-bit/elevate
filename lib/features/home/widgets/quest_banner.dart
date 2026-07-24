@@ -9,6 +9,7 @@ import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../adventure/models/game_profile.dart';
 import '../../adventure/screens/adventure_success_screen.dart';
+import '../../shop/widgets/shop_sheet.dart';
 import '../cubit/streak_cubit.dart';
 import '../cubit/streak_state.dart';
 
@@ -33,7 +34,10 @@ class QuestBanner extends StatelessWidget {
               const Spacer(),
               const _StreakCounter(),
               SizedBox(width: 24.w),
-              _PerchIcon(asset: 'assets/home_page/shop_icon.png', onTap: () {}),
+              _PerchIcon(
+                asset: 'assets/home_page/shop_icon.png',
+                onTap: () => showShopSheet(context),
+              ),
             ],
           ),
         ),

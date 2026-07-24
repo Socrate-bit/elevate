@@ -77,6 +77,9 @@ class AnalyticsService {
 
   // Tools
   static const toolsOpened = 'tools_opened';
+
+  // Shop
+  static const shopOpened = 'shop_opened';
   static const toolSessionStarted = 'tool_session_started'; // props: {tool}
   static const toolSessionCompleted = 'tool_session_completed'; // props: {tool}
 
