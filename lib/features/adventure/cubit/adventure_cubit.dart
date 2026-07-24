@@ -33,12 +33,12 @@ class AdventureCubit extends Cubit<AdventureState> {
     });
   }
 
-  /// Runs a ~30s clock only while walking (and not yet arrived) so the bar
-  /// advances; stops it otherwise to save cycles.
+  /// Runs a 1s clock only while walking (and not yet arrived) so the bar and
+  /// the seconds countdown advance; stops it otherwise to save cycles.
   void _syncTicker() {
     final shouldTick = state.isWalking && !state.isArrived;
     if (shouldTick && _ticker == null) {
-      _ticker = Timer.periodic(const Duration(seconds: 30), (_) {
+      _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
         if (isClosed) return;
         emit(state.copyWith(nowMs: DateTime.now().millisecondsSinceEpoch));
         if (state.isArrived) _syncTicker();

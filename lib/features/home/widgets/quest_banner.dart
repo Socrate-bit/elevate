@@ -57,80 +57,71 @@ class QuestBanner extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 18.w),
           child: Container(
-            padding: EdgeInsets.fromLTRB(14.w, 10.h, 14.w, 12.h),
+            padding: EdgeInsets.fromLTRB(14.w, 12.h, 14.w, 12.h),
             decoration: BoxDecoration(
-              // Just opacity — a translucent overlay over the green background.
+              // Just opacity — a translucent overlay over the green bg.
               color: Colors.black.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16.r),
             ),
-            child: Row(
-              children: [
-                Image.asset('assets/home/light.png', width: 38.w),
-                SizedBox(width: 10.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.adventureTitle,
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
+            child: BlocBuilder<AdventureCubit, AdventureState>(
+              builder: (context, adv) {
+                // Action phases: a big white button inside the banner replaces
+                // the "aventure en forêt" title + the strike/progress pill.
+                if (adv.isArrived) {
+                  return _BigActionButton(
+                    label: l10n.adventureDiscoverButton,
+                    onTap: () => _discover(context),
+                  );
+                }
+                if (adv.isReady) {
+                  return _BigActionButton(
+                    label: l10n.adventureStartButton,
+                    onTap: () =>
+                        context.read<AdventureCubit>().startAdventure(),
+                  );
+                }
+                // Charging / walking: lightning + title + progress pill.
+                return Row(
+                  children: [
+                    Image.asset('assets/home/light.png', width: 38.w),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.adventureTitle,
+                            style: TextStyle(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 6.h),
+                          _ProgressPill(
+                            progress: adv.isWalking
+                                ? adv.walkProgress
+                                : adv.chargeProgress,
+                            label: adv.isWalking
+                                ? _remainingLabel(l10n, adv.remaining)
+                                : l10n.adventureStrikeProgress(
+                                    adv.profile.strikes, kStrikeGoal),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 6.h),
-                      const _AdventureSlot(),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
       ],
     );
   }
-}
-
-/// The pill / button below the adventure title. Swaps by adventure phase:
-/// charging bar → Start button → loading bar → Discover button.
-class _AdventureSlot extends StatelessWidget {
-  const _AdventureSlot();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return BlocBuilder<AdventureCubit, AdventureState>(
-      builder: (context, adv) {
-        if (adv.isArrived) {
-          return _ActionButton(
-            label: l10n.adventureDiscoverButton,
-            onTap: () => _discover(context),
-          );
-        }
-        if (adv.isWalking) {
-          return _ProgressPill(
-            progress: adv.walkProgress,
-            label: _remainingLabel(l10n, adv.remaining),
-          );
-        }
-        if (adv.isReady) {
-          return _ActionButton(
-            label: l10n.adventureStartButton,
-            onTap: () => context.read<AdventureCubit>().startAdventure(),
-          );
-        }
-        return _ProgressPill(
-          progress: adv.chargeProgress,
-          label: l10n.adventureStrikeProgress(adv.profile.strikes, kStrikeGoal),
-        );
-      },
-    );
-  }
 
   String _remainingLabel(AppLocalizations l10n, Duration d) =>
-      l10n.adventureRemaining(d.inHours, d.inMinutes % 60);
+      l10n.adventureRemaining(d.inHours, d.inMinutes % 60, d.inSeconds % 60);
 
   /// Claims the reward, then shows the full-screen success celebration.
   Future<void> _discover(BuildContext context) async {
@@ -145,28 +136,29 @@ class _AdventureSlot extends StatelessWidget {
   }
 }
 
-/// White CTA button used for "Start Adventure" / "Discover the surprise".
-class _ActionButton extends StatelessWidget {
+/// Big white CTA that fills the banner for "Start Adventure" / "Discover".
+class _BigActionButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ActionButton({required this.label, required this.onTap});
+  const _BigActionButton({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: withMediumHaptic(onTap),
       child: Container(
-        height: 30.h,
+        width: double.infinity,
+        height: 44.h,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: HomePalette.progressYellow,
-          borderRadius: BorderRadius.circular(21.r),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 12.sp,
+            fontSize: 16.sp,
             fontWeight: FontWeight.w800,
             color: HomePalette.progressBrown,
           ),

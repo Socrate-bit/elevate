@@ -54,7 +54,7 @@ class _ShopSheet extends StatelessWidget {
 
     // Half the screen height so the streak and shop icons above stay visible.
     return SizedBox(
-      height: MediaQuery.sizeOf(context).height * 0.5,
+      height: MediaQuery.sizeOf(context).height * 0.55,
       child: DefaultTabController(
         length: tabs.length,
         child: Container(
@@ -68,7 +68,7 @@ class _ShopSheet extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(top: 12.h, bottom: 4.h),
                 child: Container(
-                  width: 40.w,
+                  width: 100.w,
                   height: 4.h,
                   decoration: BoxDecoration(
                     color: HomePalette.subtitleGrey.withValues(alpha: 0.4),
@@ -167,6 +167,7 @@ class _ComingSoon extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 64.h),
           ],
         ),
       ),

@@ -169,25 +169,26 @@ class TodaysPlanCard extends StatelessWidget {
   }
 }
 
-/// Empty-state card shown when nothing is planned for today.
+/// Empty-state shown when nothing is planned for today — plain white writing
+/// over the green background (no card).
 class _EmptyPlan extends StatelessWidget {
   final String text;
   const _EmptyPlan({required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 16.w),
-      decoration: BoxDecoration(
-        color: HomePalette.cardWhite,
-        borderRadius: BorderRadius.circular(18.r),
-      ),
-      child: Center(
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.h),
+      child: SizedBox(
+        width: double.infinity,
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 13.sp, color: HomePalette.subtitleGrey),
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
         ),
       ),
     );
