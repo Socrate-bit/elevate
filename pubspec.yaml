@@ -95,6 +95,7 @@ flutter:
     - assets/chat/
     - assets/journal/
     - assets/mood tracking/
+    - assets/shop/shop_tab/
   uses-material-design: true
   fonts:
     - family: Nunito

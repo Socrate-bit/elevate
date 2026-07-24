@@ -2426,53 +2426,11 @@ abstract class AppLocalizations {
   /// **'Input Cues'**
   String get journalInputCues;
 
-  /// No description provided for @shopTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Shop'**
-  String get shopTitle;
-
   /// No description provided for @shopComingSoon.
   ///
   /// In en, this message translates to:
   /// **'Coming soon'**
   String get shopComingSoon;
-
-  /// No description provided for @shopTabBackground.
-  ///
-  /// In en, this message translates to:
-  /// **'Background'**
-  String get shopTabBackground;
-
-  /// No description provided for @shopTabHat.
-  ///
-  /// In en, this message translates to:
-  /// **'Hat'**
-  String get shopTabHat;
-
-  /// No description provided for @shopTabGlass.
-  ///
-  /// In en, this message translates to:
-  /// **'Glasses'**
-  String get shopTabGlass;
-
-  /// No description provided for @shopTabScarf.
-  ///
-  /// In en, this message translates to:
-  /// **'Scarf'**
-  String get shopTabScarf;
-
-  /// No description provided for @shopTabColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Color'**
-  String get shopTabColor;
-
-  /// No description provided for @shopTabFurniture.
-  ///
-  /// In en, this message translates to:
-  /// **'Furniture'**
-  String get shopTabFurniture;
 
   /// No description provided for @shopCtaBackground.
   ///
@@ -2503,12 +2461,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change color'**
   String get shopCtaColor;
-
-  /// No description provided for @shopCtaFurniture.
-  ///
-  /// In en, this message translates to:
-  /// **'Buy new furniture'**
-  String get shopCtaFurniture;
 }
 
 class _AppLocalizationsDelegate
