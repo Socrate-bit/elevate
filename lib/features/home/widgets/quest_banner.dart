@@ -206,6 +206,7 @@ class _StreakCounter extends StatelessWidget {
         return GestureDetector(
           onTap: withHaptic(() => Navigator.of(context).push(
                 MaterialPageRoute(
+                  fullscreenDialog: true,
                   builder: (_) => const StreakDetailScreen(),
                 ),
               )),
