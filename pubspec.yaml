@@ -96,6 +96,7 @@ flutter:
     - assets/journal/
     - assets/mood tracking/
     - assets/shop/shop_tab/
+    - assets/streak_badges/
   uses-material-design: true
   fonts:
     - family: Nunito
