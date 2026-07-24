@@ -4,7 +4,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
-import '../../features/routines/models/routine.dart';
+import '../routines/models/routine.dart';
 
 /// Local (banner) notification reminders for routines.
 ///

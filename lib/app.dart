@@ -16,12 +16,14 @@ import 'features/routines/cubit/routine_cubit.dart';
 import 'features/settings/cubit/settings_cubit.dart';
 import 'features/settings/cubit/settings_state.dart';
 import 'features/subscription/cubit/subscription_cubit.dart';
+import '../features/adventure/cubit/adventure_cubit.dart';
+import 'features/navigation/app_nav_cubit.dart';
 import 'shared/theme/app_theme.dart';
 
-class SkeletonApp extends StatelessWidget {
+class AppyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
 
-  const SkeletonApp({super.key, required this.navigatorKey});
+  const AppyApp({super.key, required this.navigatorKey});
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,8 @@ class SkeletonApp extends StatelessWidget {
         BlocProvider(create: (_) => OnboardingCubit()),
         BlocProvider(create: (_) => ChatListCubit()),
         BlocProvider(create: (_) => MemoryCubit()),
+        BlocProvider(create: (_) => AppNavCubit()),
+        BlocProvider(create: (_) => AdventureCubit()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settings) => ScreenUtilInit(

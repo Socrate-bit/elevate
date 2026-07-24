@@ -8,7 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
-import '../../../shared/widgets/appy_nav_bar.dart';
+import '../../navigation/appy_nav_bar.dart';
 import '../../memory/cubit/memory_cubit.dart';
 import '../../mood/cubit/mood_cubit.dart';
 import '../../routines/cubit/routine_cubit.dart';

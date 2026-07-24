@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/widgets/appy_nav_bar.dart';
+import '../../navigation/appy_nav_bar.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../routines/cubit/routine_cubit.dart';

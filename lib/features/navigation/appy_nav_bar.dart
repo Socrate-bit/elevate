@@ -4,11 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
-import '../../features/chat/screens/chat_page_screen.dart';
-import '../../features/subscription/services/analytics_service.dart';
-import '../app_nav_cubit.dart';
-import '../theme/app_theme.dart';
-import '../utils/haptic_utils.dart';
+import '../chat/screens/chat_page_screen.dart';
+import '../subscription/services/analytics_service.dart';
+import 'app_nav_cubit.dart';
+import '../../shared/theme/app_theme.dart';
+import '../../shared/utils/haptic_utils.dart';
 
 /// Liquid-glass bottom navigation bar (2 tabs: Home, Journal) driven by
 /// [AppNavCubit], with a circular chat button perched to its right that opens

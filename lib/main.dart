@@ -7,7 +7,7 @@ import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'app.dart';
 import 'config/app_config.dart';
 import 'firebase_options.dart';
-import 'shared/services/notification_service.dart';
+import 'features/notifications/notification_service.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 final _navigatorKey = GlobalKey<NavigatorState>();
@@ -21,23 +21,14 @@ void main() async {
   // Pre-warms the liquid glass shaders used by the home GlassBottomBar.
   await LiquidGlassWidgets.initialize();
 
-  // FirebaseFunctions.instance.useFunctionsEmulator('192.168.1.69', 5001);
-
   // Match paywall locale to the device locale (e.g. "en_US", "fr_FR").
   final options = SuperwallOptions()..localeIdentifier = Platform.localeName;
   Superwall.configure(AppConfig.superwallPublicKey, options: options);
+
   runApp(
     LiquidGlassWidgets.wrap(
       adaptiveQuality: true,
-      // DevicePreview(
-      //   enabled: !kReleaseMode,
-      //   data: DevicePreviewData(
-      //     deviceIdentifier: Devices.ios.iPhoneSE.identifier.toString(),
-      //     isFrameVisible: true,
-      //   ),
-      //   builder: (context) =>
-      child: SkeletonApp(navigatorKey: _navigatorKey),
-      // ),
+      child: AppyApp(navigatorKey: _navigatorKey),
     ),
   );
 }

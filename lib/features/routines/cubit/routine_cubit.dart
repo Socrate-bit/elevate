@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../shared/services/notification_service.dart';
+import '../../notifications/notification_service.dart';
 import '../../activity/services/activity_service.dart';
 import '../models/routine.dart';
 import '../services/routine_firestore_service.dart';

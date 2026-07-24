@@ -5,7 +5,7 @@ import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 import '../cubit/subscription_cubit.dart';
 import '../cubit/subscription_state.dart';
-import '../../../shared/appy_shell.dart';
+import '../../navigation/appy_shell.dart';
 
 /// Subscription gate. Renders [AppyShell] once the user has access — wrapped in
 /// a tap-catching paywall overlay when access is missing.
