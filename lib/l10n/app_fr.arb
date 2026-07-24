@@ -464,5 +464,20 @@
 
   "journalTitle": "Journal",
   "journalMonthlyInsight": "Bilan du mois",
-  "journalInputCues": "Pistes d'écriture"
+  "journalInputCues": "Pistes d'écriture",
+
+  "shopTitle": "Boutique",
+  "shopComingSoon": "Bientôt disponible",
+  "shopTabBackground": "Décor",
+  "shopTabHat": "Chapeau",
+  "shopTabGlass": "Lunettes",
+  "shopTabScarf": "Écharpe",
+  "shopTabColor": "Couleur",
+  "shopTabFurniture": "Mobilier",
+  "shopCtaBackground": "Changer le décor",
+  "shopCtaHat": "Acheter un chapeau",
+  "shopCtaGlass": "Acheter des lunettes",
+  "shopCtaScarf": "Acheter une écharpe",
+  "shopCtaColor": "Changer la couleur",
+  "shopCtaFurniture": "Acheter du mobilier"
 }

@@ -1263,4 +1263,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get journalInputCues => 'Input Cues';
+
+  @override
+  String get shopTitle => 'Shop';
+
+  @override
+  String get shopComingSoon => 'Coming soon';
+
+  @override
+  String get shopTabBackground => 'Background';
+
+  @override
+  String get shopTabHat => 'Hat';
+
+  @override
+  String get shopTabGlass => 'Glasses';
+
+  @override
+  String get shopTabScarf => 'Scarf';
+
+  @override
+  String get shopTabColor => 'Color';
+
+  @override
+  String get shopTabFurniture => 'Furniture';
+
+  @override
+  String get shopCtaBackground => 'Change background';
+
+  @override
+  String get shopCtaHat => 'Buy new hat';
+
+  @override
+  String get shopCtaGlass => 'Buy new glasses';
+
+  @override
+  String get shopCtaScarf => 'Buy new scarf';
+
+  @override
+  String get shopCtaColor => 'Change color';
+
+  @override
+  String get shopCtaFurniture => 'Buy new furniture';
 }
