@@ -204,6 +204,32 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  /// Hidden instruction behind the "Ask me an insightful question" starter:
+  /// Appy replies with one warm opening question, without a visible user turn.
+  static const _openingQuestionPrompt =
+      'Ask me one warm, open-ended, insightful question to help me start '
+      'opening up. Reply with just the question.';
+
+  /// Asks Appy for an insightful opening question without persisting a user
+  /// message. No [_hasNewUserActivity] flip — there is no user content to
+  /// extract if the user leaves right after tapping the starter.
+  Future<void> promptOpeningQuestion() async {
+    if (state.isSending) return;
+    emit(state.copyWith(isSending: true));
+    try {
+      final reply = await _gemini.send(
+        history: state.messages.toList(),
+        userText: _openingQuestionPrompt,
+        memoryContext: _buildContext(),
+      );
+      await _commitModelReply(reply);
+    } catch (e) {
+      debugPrint('[ChatCubit] promptOpeningQuestion failed: $e');
+    } finally {
+      emit(state.copyWith(isSending: false));
+    }
+  }
+
   Future<void> _generateModelReply() async {
     try {
       final reply = await _gemini.send(

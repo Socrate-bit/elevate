@@ -106,10 +106,10 @@ class ChatPage extends StatelessWidget {
   }
 }
 
-/// Resolves the single conversation for the tab (resume the most recent, or
-/// create one if none exists) and provides a [ChatCubit] for it. Lives inside
-/// the always-alive shell `IndexedStack`, so the cubit is created once and its
-/// state survives tab switches.
+/// Resolves the single conversation for the chat (resume the most recent, or
+/// create one if none exists) and provides a [ChatCubit] for it. Chat is a
+/// full-page pushed route, so this gate is created on open and disposed on
+/// close — which is what drives the on-enter / on-leave memory extraction.
 class _ChatConversationGate extends StatefulWidget {
   const _ChatConversationGate();
 
@@ -117,8 +117,7 @@ class _ChatConversationGate extends StatefulWidget {
   State<_ChatConversationGate> createState() => _ChatConversationGateState();
 }
 
-class _ChatConversationGateState extends State<_ChatConversationGate>
-    with WidgetsBindingObserver {
+class _ChatConversationGateState extends State<_ChatConversationGate> {
   String? _resolvedId;
   bool _autoStart = false;
   Timer? _fallbackTimer;
@@ -132,7 +131,6 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     // Attempt resolution against whatever the conversations stream already has.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -150,22 +148,7 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
   @override
   void dispose() {
     _fallbackTimer?.cancel();
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // The page is never disposed inside the IndexedStack, so ChatCubit.close()
-    // (which triggers memory extraction) won't fire. Extract on background as a
-    // best-effort stand-in; MemoryCubit also runs a catch-up on next launch.
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached) {
-      final id = _resolvedId;
-      if (id != null && mounted) {
-        context.read<MemoryCubit>().extractNow(id);
-      }
-    }
   }
 
   /// Picks the most-recent conversation, or creates one if the user has none.
@@ -176,12 +159,19 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
 
     // Prefer an existing conversation (resume where the user left off).
     if (s.conversations.isNotEmpty) {
-      debugPrint('[ChatPage] resuming conversation ${s.conversations.first.id}');
+      final conv = s.conversations.first;
+      debugPrint('[ChatPage] resuming conversation ${conv.id}');
       _fallbackTimer?.cancel();
       setState(() {
-        _resolvedId = s.conversations.first.id;
+        _resolvedId = conv.id;
         _autoStart = false; // resume — no fresh greeting
       });
+      // On enter: if the previous session's messages were never scanned for
+      // memory (e.g. app-killed before leave-extraction ran), scan them now.
+      if (!conv.memoryExtracted) {
+        debugPrint('[ChatPage] resumed unscanned conversation → extracting');
+        context.read<MemoryCubit>().extractNow(conv.id);
+      }
       return;
     }
 
@@ -277,14 +267,33 @@ class _ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<_ChatView> {
   final _composer = TextEditingController();
+  final _composerFocus = FocusNode();
   final _scrollController = ScrollController();
   bool _suggestionsDismissed = false;
 
   @override
   void dispose() {
     _composer.dispose();
+    _composerFocus.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Handles a tapped starter chip — each intent behaves differently.
+  void _onStarterPick(BuildContext context, ChatSuggestion suggestion) {
+    switch (suggestion.action) {
+      case ChatStarterAction.askQuestion:
+        // Appy asks an opening question; hide the card while it replies.
+        setState(() => _suggestionsDismissed = true);
+        context.read<ChatCubit>().promptOpeningQuestion();
+      case ChatStarterAction.letMeType:
+        // Nothing sent — just dismiss and open the keyboard on the composer.
+        setState(() => _suggestionsDismissed = true);
+        _composerFocus.requestFocus();
+      case ChatStarterAction.sendAsMessage:
+        // Send the label as the opening user message (card auto-hides then).
+        _send(context, suggestion.label);
+    }
   }
 
   @override
@@ -332,7 +341,7 @@ class _ChatViewState extends State<_ChatView> {
             return Padding(
               padding: EdgeInsets.only(bottom: 10.h),
               child: ChatSuggestionsCard(
-                onPick: (label) => _send(context, label),
+                onPick: (suggestion) => _onStarterPick(context, suggestion),
                 onDismiss: () => setState(() => _suggestionsDismissed = true),
               ),
             );
@@ -351,6 +360,7 @@ class _ChatViewState extends State<_ChatView> {
             buildWhen: (a, b) => a.isListening != b.isListening,
             builder: (context, state) => ChatComposerBar(
               controller: _composer,
+              focusNode: _composerFocus,
               hint: state.isListening
                   ? l10n.chatVoiceListening
                   : l10n.chatPageComposerHint,

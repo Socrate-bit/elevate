@@ -486,9 +486,9 @@
   "chatPageToday": "Today",
   "chatPageYesterday": "Yesterday",
   "chatPageStartConversation": "Start a conversation",
-  "chatPageSuggestTalkDay": "Talk about my day",
-  "chatPageSuggestComfort": "I need comfort",
-  "chatPageSuggestReflect": "Help me reflect",
+  "chatStarterAsk": "Ask me an insightful question",
+  "chatStarterKnow": "I know already what I wanna talk about",
+  "chatStarterOff": "I just feel not right",
   "chatPageComposerHint": "Your message",
 
   "chatInsightsFormingTitle": "Your insights are forming",

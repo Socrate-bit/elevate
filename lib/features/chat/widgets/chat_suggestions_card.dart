@@ -7,18 +7,35 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
+/// What tapping a starter chip does — the three intents behave differently.
+enum ChatStarterAction {
+  /// Appy asks the user an insightful opening question (hidden prompt).
+  askQuestion,
+
+  /// Just close the card and focus the composer — the user will type.
+  letMeType,
+
+  /// Send the chip's label as the user's opening message.
+  sendAsMessage,
+}
+
 /// A starter suggestion chip in the "Start a conversation" card.
 class ChatSuggestion {
   final String emoji;
   final String label;
+  final ChatStarterAction action;
 
-  const ChatSuggestion({required this.emoji, required this.label});
+  const ChatSuggestion({
+    required this.emoji,
+    required this.label,
+    required this.action,
+  });
 }
 
 /// Frosted "Start a conversation" card with a close button and three
 /// emoji starter suggestions.
 class ChatSuggestionsCard extends StatelessWidget {
-  final ValueChanged<String> onPick;
+  final ValueChanged<ChatSuggestion> onPick;
   final VoidCallback onDismiss;
 
   const ChatSuggestionsCard({
@@ -31,9 +48,21 @@ class ChatSuggestionsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final suggestions = [
-      ChatSuggestion(emoji: '☀️', label: l10n.chatPageSuggestTalkDay),
-      ChatSuggestion(emoji: '❤️', label: l10n.chatPageSuggestComfort),
-      ChatSuggestion(emoji: '🌿', label: l10n.chatPageSuggestReflect),
+      ChatSuggestion(
+        emoji: '💭',
+        label: l10n.chatStarterAsk,
+        action: ChatStarterAction.askQuestion,
+      ),
+      ChatSuggestion(
+        emoji: '💬',
+        label: l10n.chatStarterKnow,
+        action: ChatStarterAction.letMeType,
+      ),
+      ChatSuggestion(
+        emoji: '🌧️',
+        label: l10n.chatStarterOff,
+        action: ChatStarterAction.sendAsMessage,
+      ),
     ];
 
     return Padding(
@@ -92,7 +121,7 @@ class ChatSuggestionsCard extends StatelessWidget {
                         Expanded(
                           child: _SuggestionButton(
                             suggestion: suggestions[i],
-                            onTap: () => onPick(suggestions[i].label),
+                            onTap: () => onPick(suggestions[i]),
                           ),
                         ),
                       ],
