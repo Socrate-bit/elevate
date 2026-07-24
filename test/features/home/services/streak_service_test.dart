@@ -73,6 +73,45 @@ void main() {
     });
   });
 
+  group('StreakService.computeBestStreak', () {
+    test('no activities → 0', () {
+      expect(StreakService.computeBestStreak([]), 0);
+    });
+
+    test('only incomplete activities → 0', () {
+      expect(
+        StreakService.computeBestStreak([at(DateTime(2026, 7, 24, 9), completed: false)]),
+        0,
+      );
+    });
+
+    test('returns the longest past run even after the current one broke', () {
+      // A 3-day run in June (long since broken) beats a 1-day run in July.
+      final acts = [
+        at(DateTime(2026, 7, 24, 9)), // current run: 1 day
+        at(DateTime(2026, 6, 3, 9)),
+        at(DateTime(2026, 6, 2, 9)),
+        at(DateTime(2026, 6, 1, 9)), // June run: 3 days
+      ];
+      expect(StreakService.computeBestStreak(acts), 3);
+    });
+
+    test('frozen (missed) days within a run are not counted', () {
+      // Two days 35h apart form one 2-day run (the gap day is frozen).
+      final acts = [at(DateTime(2026, 7, 24, 9)), at(DateTime(2026, 7, 22, 22))];
+      expect(StreakService.computeBestStreak(acts), 2);
+    });
+
+    test('multiple activities on the same day count once', () {
+      final acts = [
+        at(DateTime(2026, 7, 24, 8)),
+        at(DateTime(2026, 7, 24, 18)),
+        at(DateTime(2026, 7, 23, 12)),
+      ];
+      expect(StreakService.computeBestStreak(acts), 2);
+    });
+  });
+
   group('Heart ↔ streak alignment', () {
     test('hearts decay one per 12h from the last activity', () {
       expect(HeartService.computeHearts(null, now: now), kHeartMax);

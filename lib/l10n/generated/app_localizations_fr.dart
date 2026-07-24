@@ -277,6 +277,79 @@ class AppLocalizationsFr extends AppLocalizations {
       'Enregistrez une activité chaque jour pour conserver votre série. Jusqu\'à 2 jours manqués par semaine comptent comme des congélations et ne brisent pas la série.';
 
   @override
+  String get streakTitle => 'Série';
+
+  @override
+  String get streakCurrentLabel => 'Série actuelle';
+
+  @override
+  String get streakBestLabel => 'Meilleure série';
+
+  @override
+  String get streakNextBadge => 'Prochain objectif';
+
+  @override
+  String streakDaysToGo(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'plus que $days jours',
+      one: 'plus qu\'un jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get streakAllMilestonesReached => 'Tous les objectifs atteints !';
+
+  @override
+  String get streakBadge1Name => 'Éveil';
+
+  @override
+  String get streakBadge1Quote =>
+      'Le voyage de mille matins commence par une seule alarme.';
+
+  @override
+  String get streakBadge3Name => 'Étincelle';
+
+  @override
+  String get streakBadge3Quote => 'Trois jours. La flamme grandit.';
+
+  @override
+  String get streakBadge7Name => 'Horizon';
+
+  @override
+  String get streakBadge7Quote =>
+      'Une semaine de matins — tu réécris ton histoire.';
+
+  @override
+  String get streakBadge14Name => 'Aurore';
+
+  @override
+  String get streakBadge14Quote =>
+      'Deux semaines de levers. Continue de chercher la lumière.';
+
+  @override
+  String get streakBadge30Name => 'Céleste';
+
+  @override
+  String get streakBadge30Quote =>
+      'Un mois entier à te lever. Tu es inarrêtable.';
+
+  @override
+  String get streakBadge100Name => 'Nébuleuse';
+
+  @override
+  String get streakBadge100Quote => 'Cent matins. Un nouveau toi est né.';
+
+  @override
+  String get streakBadge365Name => 'Éternel';
+
+  @override
+  String get streakBadge365Quote =>
+      'Une année entière de matins. Tu es légendaire.';
+
+  @override
   String get settingsTitle => 'Réglages';
 
   @override

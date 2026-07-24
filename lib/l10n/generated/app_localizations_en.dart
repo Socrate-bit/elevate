@@ -277,6 +277,80 @@ class AppLocalizationsEn extends AppLocalizations {
       'Log an activity each day to keep your streak alive. Up to 2 missed days per week count as freezes and don\'t break the streak.';
 
   @override
+  String get streakTitle => 'Streak';
+
+  @override
+  String get streakCurrentLabel => 'Current streak';
+
+  @override
+  String get streakBestLabel => 'Best streak';
+
+  @override
+  String get streakNextBadge => 'Next milestone';
+
+  @override
+  String streakDaysToGo(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days to go',
+      one: '1 day to go',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get streakAllMilestonesReached => 'All milestones reached!';
+
+  @override
+  String get streakBadge1Name => 'Risen';
+
+  @override
+  String get streakBadge1Quote =>
+      'The journey of a thousand mornings begins with one alarm.';
+
+  @override
+  String get streakBadge3Name => 'Ignite';
+
+  @override
+  String get streakBadge3Quote => 'Three days in. The flame is growing.';
+
+  @override
+  String get streakBadge7Name => 'Horizon';
+
+  @override
+  String get streakBadge7Quote =>
+      'A week of mornings — you\'re rewriting your story.';
+
+  @override
+  String get streakBadge14Name => 'Aurora';
+
+  @override
+  String get streakBadge14Quote =>
+      'Two weeks of sunrise. Keep chasing the light.';
+
+  @override
+  String get streakBadge30Name => 'Celestial';
+
+  @override
+  String get streakBadge30Quote =>
+      'A full month of rising. You are unstoppable.';
+
+  @override
+  String get streakBadge100Name => 'Nebula';
+
+  @override
+  String get streakBadge100Quote =>
+      'One hundred mornings. A new you has been born.';
+
+  @override
+  String get streakBadge365Name => 'Eternal';
+
+  @override
+  String get streakBadge365Quote =>
+      'A full year of mornings. You are legendary.';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override

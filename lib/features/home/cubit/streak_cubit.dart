@@ -38,6 +38,7 @@ class StreakCubit extends Cubit<StreakState> {
   void _recompute() {
     if (isClosed) return;
     final streak = StreakService.computeStreak(_activities);
+    final bestStreak = StreakService.computeBestStreak(_activities);
 
     // Hearts decay from the last completed activity (stream is newest-first).
     DateTime? lastActivityAt;
@@ -52,6 +53,7 @@ class StreakCubit extends Cubit<StreakState> {
     emit(
       state.copyWith(
         streak: streak,
+        bestStreak: bestStreak,
         hearts: hearts,
         loading: !_activitiesReady,
       ),

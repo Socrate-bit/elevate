@@ -49,5 +49,36 @@ class StreakService {
     return days.length;
   }
 
+  /// Longest historical streak, in distinct active days.
+  ///
+  /// Walks every completed activity, splitting the timeline into runs wherever
+  /// two consecutive activities are `_breakAfter` or more apart (the same
+  /// break rule as [computeStreak]), and returns the largest distinct-day count
+  /// across all runs. Unlike [computeStreak] there is no "now" cutoff — a past
+  /// run counts even if the current streak has since broken.
+  static int computeBestStreak(List<Activity> activities) {
+    // Completed-activity timestamps, newest first.
+    final times = <DateTime>[
+      for (final a in activities)
+        if (a.completed) a.timestamp,
+    ]..sort((a, b) => b.compareTo(a));
+    if (times.isEmpty) return 0;
+
+    var best = 0;
+    var days = <DateTime>{};
+    DateTime? prev;
+    for (final t in times) {
+      // A gap at or beyond the window closes the current run.
+      if (prev != null && prev.difference(t) >= _breakAfter) {
+        if (days.length > best) best = days.length;
+        days = <DateTime>{};
+      }
+      days.add(_dateOnly(t));
+      prev = t;
+    }
+    if (days.length > best) best = days.length;
+    return best;
+  }
+
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 }

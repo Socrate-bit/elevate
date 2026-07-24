@@ -620,6 +620,126 @@ abstract class AppLocalizations {
   /// **'Log an activity each day to keep your streak alive. Up to 2 missed days per week count as freezes and don\'t break the streak.'**
   String get milestonesStreakExplanation;
 
+  /// No description provided for @streakTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak'**
+  String get streakTitle;
+
+  /// No description provided for @streakCurrentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current streak'**
+  String get streakCurrentLabel;
+
+  /// No description provided for @streakBestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Best streak'**
+  String get streakBestLabel;
+
+  /// No description provided for @streakNextBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Next milestone'**
+  String get streakNextBadge;
+
+  /// No description provided for @streakDaysToGo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day to go} other{{days} days to go}}'**
+  String streakDaysToGo(int days);
+
+  /// No description provided for @streakAllMilestonesReached.
+  ///
+  /// In en, this message translates to:
+  /// **'All milestones reached!'**
+  String get streakAllMilestonesReached;
+
+  /// No description provided for @streakBadge1Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Risen'**
+  String get streakBadge1Name;
+
+  /// No description provided for @streakBadge1Quote.
+  ///
+  /// In en, this message translates to:
+  /// **'The journey of a thousand mornings begins with one alarm.'**
+  String get streakBadge1Quote;
+
+  /// No description provided for @streakBadge3Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Ignite'**
+  String get streakBadge3Name;
+
+  /// No description provided for @streakBadge3Quote.
+  ///
+  /// In en, this message translates to:
+  /// **'Three days in. The flame is growing.'**
+  String get streakBadge3Quote;
+
+  /// No description provided for @streakBadge7Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Horizon'**
+  String get streakBadge7Name;
+
+  /// No description provided for @streakBadge7Quote.
+  ///
+  /// In en, this message translates to:
+  /// **'A week of mornings — you\'re rewriting your story.'**
+  String get streakBadge7Quote;
+
+  /// No description provided for @streakBadge14Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Aurora'**
+  String get streakBadge14Name;
+
+  /// No description provided for @streakBadge14Quote.
+  ///
+  /// In en, this message translates to:
+  /// **'Two weeks of sunrise. Keep chasing the light.'**
+  String get streakBadge14Quote;
+
+  /// No description provided for @streakBadge30Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Celestial'**
+  String get streakBadge30Name;
+
+  /// No description provided for @streakBadge30Quote.
+  ///
+  /// In en, this message translates to:
+  /// **'A full month of rising. You are unstoppable.'**
+  String get streakBadge30Quote;
+
+  /// No description provided for @streakBadge100Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Nebula'**
+  String get streakBadge100Name;
+
+  /// No description provided for @streakBadge100Quote.
+  ///
+  /// In en, this message translates to:
+  /// **'One hundred mornings. A new you has been born.'**
+  String get streakBadge100Quote;
+
+  /// No description provided for @streakBadge365Name.
+  ///
+  /// In en, this message translates to:
+  /// **'Eternal'**
+  String get streakBadge365Name;
+
+  /// No description provided for @streakBadge365Quote.
+  ///
+  /// In en, this message translates to:
+  /// **'A full year of mornings. You are legendary.'**
+  String get streakBadge365Quote;
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:

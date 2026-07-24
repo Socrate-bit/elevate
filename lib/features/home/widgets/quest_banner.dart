@@ -14,6 +14,7 @@ import '../../shop/cubit/shop_state.dart';
 import '../../shop/widgets/shop_sheet.dart';
 import '../cubit/streak_cubit.dart';
 import '../cubit/streak_state.dart';
+import '../screens/streak_detail_screen.dart';
 
 /// Teal quest banner with lightning icon, adventure title and a progress
 /// pill / action button reflecting the live adventure state. The coin balance
@@ -200,20 +201,28 @@ class _StreakCounter extends StatelessWidget {
     return BlocBuilder<StreakCubit, StreakState>(
       buildWhen: (a, b) => a.streak != b.streak,
       builder: (context, state) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/home_page/streak_icon.png', width: 34.w),
-            SizedBox(width: 4.w),
-            Text(
-              '${state.streak}',
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
+        return GestureDetector(
+          onTap: withHaptic(() => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const StreakDetailScreen(),
+                ),
+              )),
+          behavior: HitTestBehavior.opaque,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset('assets/home_page/streak_icon.png', width: 34.w),
+              SizedBox(width: 4.w),
+              Text(
+                '${state.streak}',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
