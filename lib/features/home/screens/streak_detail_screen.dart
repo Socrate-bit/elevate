@@ -70,7 +70,7 @@ class StreakDetailScreen extends StatelessWidget {
                           Expanded(
                             child: _StreakStatCard(
                               icon: Image.asset(
-                                'assets/home_page/streak_icon.png',
+                                'assets/home_page/streak.png',
                                 width: 56.w,
                                 height: 56.w,
                               ),
@@ -339,7 +339,7 @@ class _BadgeGrid extends StatelessWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _BadgeThumb(asset: m.asset, earned: earned, size: 72.w),
+            _BadgeThumb(asset: m.asset, earned: earned, size: 100.w),
             SizedBox(height: 8.h),
             Text(
               localizedStreakBadgeName(l10n, m.days),
