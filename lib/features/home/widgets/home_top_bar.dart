@@ -6,6 +6,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
+import '../../settings/screens/settings_screen.dart';
 import '../../shop/cubit/shop_cubit.dart';
 import '../../shop/cubit/shop_state.dart';
 import '../cubit/streak_cubit.dart';
@@ -76,7 +77,11 @@ class HomeTopBar extends StatelessWidget {
                 : _IconButton(
                     asset: 'assets/home/setting.png',
                     size: 40,
-                    onTap: () {},
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const SettingsScreen(),
+                      ),
+                    ),
                   ),
           ),
         ],

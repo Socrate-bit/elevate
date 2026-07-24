@@ -62,7 +62,7 @@ class _HomeViewState extends State<_HomeView> {
   void _flashCoins() {
     setState(() => _showCoins = true);
     _coinTimer?.cancel();
-    _coinTimer = Timer(const Duration(seconds: 3), () {
+    _coinTimer = Timer(const Duration(seconds: 5), () {
       if (mounted) setState(() => _showCoins = false);
     });
   }

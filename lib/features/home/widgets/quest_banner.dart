@@ -103,7 +103,8 @@ class QuestBanner extends StatelessWidget {
                                 ? adv.walkProgress
                                 : adv.chargeProgress,
                             label: adv.isWalking
-                                ? _remainingLabel(l10n, adv.remaining)
+                                ? l10n.adventureRemaining(
+                                    _clock(adv.remaining))
                                 : l10n.adventureStrikeProgress(
                                     adv.profile.strikes, kStrikeGoal),
                           ),
@@ -120,8 +121,13 @@ class QuestBanner extends StatelessWidget {
     );
   }
 
-  String _remainingLabel(AppLocalizations l10n, Duration d) =>
-      l10n.adventureRemaining(d.inHours, d.inMinutes % 60, d.inSeconds % 60);
+  /// Remaining walk time as a plain HH:MM:SS clock (e.g. "16:15:23").
+  String _clock(Duration d) {
+    final h = d.inHours.toString().padLeft(2, '0');
+    final m = (d.inMinutes % 60).toString().padLeft(2, '0');
+    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return '$h:$m:$s';
+  }
 
   /// Claims the reward, then shows the full-screen success celebration.
   Future<void> _discover(BuildContext context) async {
@@ -224,7 +230,7 @@ class _ProgressPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 21.h,
+      height: 28.h,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(21.r),
@@ -247,7 +253,7 @@ class _ProgressPill extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 11.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w800,
                 color: HomePalette.progressBrown,
               ),

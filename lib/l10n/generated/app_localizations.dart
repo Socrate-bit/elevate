@@ -2297,8 +2297,8 @@ abstract class AppLocalizations {
   /// No description provided for @adventureRemaining.
   ///
   /// In en, this message translates to:
-  /// **'Come back in {h}h {m}m {s}s'**
-  String adventureRemaining(int h, int m, int s);
+  /// **'Come back in {time}'**
+  String adventureRemaining(String time);
 
   /// No description provided for @adventureSuccessLabel.
   ///

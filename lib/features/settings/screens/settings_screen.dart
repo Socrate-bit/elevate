@@ -10,8 +10,6 @@ import '../../auth/auth_service.dart';
 import '../../subscription/services/analytics_service.dart';
 import '../../subscription/cubit/subscription_cubit.dart';
 import '../../subscription/cubit/subscription_state.dart';
-import '../cubit/settings_cubit.dart';
-import '../cubit/settings_state.dart';
 import '../widgets/referral_code_dialog.dart';
 import 'privacy_policy_screen.dart';
 import 'terms_conditions_screen.dart';
@@ -111,6 +109,18 @@ class _SettingsScreenState extends State<SettingsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Back to the home page (this screen is pushed as a route).
+              GestureDetector(
+                onTap: withHaptic(() => Navigator.of(context).maybePop()),
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 8.h),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: c.textPrimary,
+                    size: 22.sp,
+                  ),
+                ),
+              ),
               Text(
                 l10n.settingsTitle,
                 style: TextStyle(
@@ -157,37 +167,20 @@ class _SettingsScreenState extends State<SettingsScreen>
               ),
               SizedBox(height: 16.h),
               _SectionTitle(title: l10n.settingsApp),
-              BlocBuilder<SettingsCubit, SettingsState>(
-                builder: (context, settings) => _SettingsCard(children: [
-                  _ToggleRow(
-                    icon: Icons.notifications_outlined,
-                    label: l10n.settingsNotifications,
-                    value: _notifications,
-                    onChanged: (v) {
-                      setState(() => _notifications = v);
-                      AnalyticsService.capture(
-                        AnalyticsService.settingsNotificationsToggled,
-                        {'enabled': v},
-                      );
-                    },
-                  ),
-                  const _Divider(),
-                  _ToggleRow(
-                    icon: Icons.dark_mode_outlined,
-                    label: l10n.settingsDarkMode,
-                    value: settings.themeMode == ThemeMode.dark,
-                    onChanged: (v) {
-                      context
-                          .read<SettingsCubit>()
-                          .setThemeMode(v ? ThemeMode.dark : ThemeMode.light);
-                      AnalyticsService.capture(
-                        AnalyticsService.settingsDarkModeToggled,
-                        {'enabled': v},
-                      );
-                    },
-                  ),
-                ]),
-              ),
+              _SettingsCard(children: [
+                _ToggleRow(
+                  icon: Icons.notifications_outlined,
+                  label: l10n.settingsNotifications,
+                  value: _notifications,
+                  onChanged: (v) {
+                    setState(() => _notifications = v);
+                    AnalyticsService.capture(
+                      AnalyticsService.settingsNotificationsToggled,
+                      {'enabled': v},
+                    );
+                  },
+                ),
+              ]),
               SizedBox(height: 16.h),
               _SectionTitle(title: l10n.settingsAbout),
               _SettingsCard(children: [
@@ -227,6 +220,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                   onTap: () => _confirmDeleteAccount(context),
                 ),
               ]),
+              // Dev tools hidden for now — uncomment to restore.
+              /*
               SizedBox(height: 16.h),
               // Empty Dev tools placeholder — drop project-specific debug
               // actions in here (e.g. Firestore dumps, feature-flag toggles).
@@ -245,6 +240,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                 ),
                 // TODO: add per-project dev tools here.
               ]),
+              */
               SizedBox(height: 16.h),
               Center(
                 child: Text(

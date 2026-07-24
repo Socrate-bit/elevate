@@ -1206,8 +1206,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get adventureDiscoverButton => 'Découvrir la surprise';
 
   @override
-  String adventureRemaining(int h, int m, int s) {
-    return 'Reviens dans ${h}h ${m}min ${s}s';
+  String adventureRemaining(String time) {
+    return 'Reviens dans $time';
   }
 
   @override
