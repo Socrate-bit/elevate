@@ -8,7 +8,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../chat/screens/chat_page_screen.dart';
-import '../../missions/screens/breathing_mission_screen.dart';
+import '../../missions/screens/breathing_intro_screen.dart';
 import '../../missions/widgets/mission_complete_screen.dart';
 import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../routines/cubit/routine_cubit.dart';
@@ -142,7 +142,7 @@ class TodaysPlanCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (bc) => BreathingMissionScreen(
+            builder: (bc) => BreathingIntroScreen(
               onComplete: () async {
                 await DefaultTaskCompletion.complete(
                   task: task,

@@ -919,13 +919,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get missionComplete => 'Mission accomplie !';
 
   @override
-  String get missionCompleteMessage => 'Excellent travail ! Continuez.';
+  String get missionCompleteMessage => 'Vous sentez-vous plus calme ?';
 
   @override
   String get missionPickerTitle => 'Missions';
 
   @override
   String get missionPickerSubtitle => 'Choisissez une mission et commencez';
+
+  @override
+  String get breathingIntroTitle => 'Respiration';
+
+  @override
+  String get breathingIntroDescription =>
+      'La respiration profonde est l\'un des moyens les plus efficaces pour réguler votre système nerveux.';
+
+  @override
+  String get breathingIntroStart => 'Commencer';
 
   @override
   String get breathingPhaseInhale => 'Inspirez';

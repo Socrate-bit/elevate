@@ -1775,13 +1775,13 @@ abstract class AppLocalizations {
   /// No description provided for @missionComplete.
   ///
   /// In en, this message translates to:
-  /// **'Mission Complete!'**
+  /// **'Mission accomplished!'**
   String get missionComplete;
 
   /// No description provided for @missionCompleteMessage.
   ///
   /// In en, this message translates to:
-  /// **'Great job! Keep it up.'**
+  /// **'Do you feel calmer?'**
   String get missionCompleteMessage;
 
   /// No description provided for @missionPickerTitle.
@@ -1795,6 +1795,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick a mission and start now'**
   String get missionPickerSubtitle;
+
+  /// No description provided for @breathingIntroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Breathing'**
+  String get breathingIntroTitle;
+
+  /// No description provided for @breathingIntroDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep breathing is one of the most effective ways to regulate your nervous system.'**
+  String get breathingIntroDescription;
+
+  /// No description provided for @breathingIntroStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get breathingIntroStart;
 
   /// No description provided for @breathingPhaseInhale.
   ///
