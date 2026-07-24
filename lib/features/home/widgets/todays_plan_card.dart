@@ -4,13 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import 'package:elevate/l10n/l10n_helpers.dart';
-import '../../../shared/app_nav_cubit.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
-import '../../missions/models/mission.dart';
-import '../../missions/screens/mission_picker_screen.dart';
-import '../../missions/screens/photo_mission_screen.dart';
+import '../../chat/screens/chat_page_screen.dart';
+import '../../missions/screens/breathing_mission_screen.dart';
 import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../../routines/models/routine.dart';
@@ -93,8 +91,7 @@ class TodaysPlanCard extends StatelessWidget {
     );
   }
 
-  /// Validates (or, with an object check, opens the photo mission first) or
-  /// un-validates the routine for today.
+  /// Validates or un-validates the routine for today.
   Future<void> _toggle(BuildContext context, Routine r, bool done) async {
     final cubit = context.read<RoutineCubit>();
     final adventure = context.read<AdventureCubit>();
@@ -104,27 +101,9 @@ class TodaysPlanCard extends StatelessWidget {
       await adventure.removeForCompletion(r.xp);
       return;
     }
-    final objectCheck = r.objectCheck;
-    if (objectCheck == null || objectCheck.isEmpty) {
-      await cubit.validate(r.id);
-      // Award coins (== the task's XP) + a strike; fires confetti on home.
-      await adventure.awardForCompletion(r.xp);
-      return;
-    }
-    final nav = Navigator.of(context);
-    await nav.push(
-      MaterialPageRoute(
-        builder: (_) => PhotoMissionScreen(
-          missionType: MissionType.objectHunt,
-          selectedItems: [objectCheck],
-          onComplete: () async {
-            nav.pop();
-            await cubit.validate(r.id);
-            await adventure.awardForCompletion(r.xp);
-          },
-        ),
-      ),
-    );
+    await cubit.validate(r.id);
+    // Award coins (== the task's XP) + a strike; fires confetti on home.
+    await adventure.awardForCompletion(r.xp);
   }
 
   void _edit(BuildContext context, Routine r) {
@@ -139,25 +118,29 @@ class TodaysPlanCard extends StatelessWidget {
     );
   }
 
-  /// Opens the shared "add" sheet (Chat / Action / Habit / Mood / Mission).
+  /// Opens the shared "add" sheet (Chat / Action / Habit / Mood / Breathing).
   Future<void> _openAddSheet(BuildContext context) async {
     final routineCubit = context.read<RoutineCubit>();
-    final navCubit = context.read<AppNavCubit>();
     final action = await showHomeActionSheet(context);
     if (action == null || !context.mounted) return;
     switch (action) {
       case HomeAction.startChat:
-        navCubit.selectTab(1); // Chat tab
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ChatPage(fullScreen: true)),
+        );
       case HomeAction.action:
         _pushForm(context, routineCubit, RoutineType.action);
       case HomeAction.habit:
         _pushForm(context, routineCubit, RoutineType.habit);
       case HomeAction.mood:
         showMoodPickerSheet(context);
-      case HomeAction.mission:
+      case HomeAction.breathing:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const MissionPickerScreen()),
+          MaterialPageRoute(
+            builder: (_) => const BreathingMissionScreen(isPreview: true),
+          ),
         );
     }
   }

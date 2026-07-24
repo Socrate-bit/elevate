@@ -7,9 +7,9 @@ import '../features/subscription/services/analytics_service.dart';
 class AppNavCubit extends Cubit<int> {
   AppNavCubit() : super(0);
 
-  static const _tabNames = ['home', 'quest', 'journal'];
+  static const _tabNames = ['home', 'journal'];
 
-  /// Selects a bottom-nav tab (Home 0, Quest 1, Journal 2).
+  /// Selects a bottom-nav tab (Home 0, Journal 1).
   void selectTab(int index) {
     if (index == state) return;
     emit(index);

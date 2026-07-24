@@ -367,6 +367,8 @@
   "homeAddTitle": "Et maintenant ?",
   "homeAddMoodDesc": "Notez votre humeur",
   "homeAddMissionDesc": "Démarrer une mission",
+  "homeAddBreathingTitle": "Respiration",
+  "homeAddBreathingDesc": "Exercice de respiration",
 
   "routinePickerTitle": "Que voulez-vous ajouter ?",
   "routinePickerSubtitle": "Les actions sont uniques. Les habitudes se répètent.",

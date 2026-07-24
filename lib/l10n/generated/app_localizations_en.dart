@@ -998,6 +998,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeAddMissionDesc => 'Start a quick mission';
 
   @override
+  String get homeAddBreathingTitle => 'Breathing';
+
+  @override
+  String get homeAddBreathingDesc => 'Box breathing exercise';
+
+  @override
   String get routinePickerTitle => 'What do you want to add?';
 
   @override

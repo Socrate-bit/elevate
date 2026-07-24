@@ -292,7 +292,6 @@ class ChatCubit extends Cubit<ChatState> {
       role: ChatRole.model,
       text: replyText,
       form: reply.form,
-      missionSuggestion: reply.missionSuggestion,
       moodCheckIn: reply.moodCheckIn,
       routineMutation: mutation,
       createdAt: DateTime.now(),
@@ -305,8 +304,8 @@ class ChatCubit extends Cubit<ChatState> {
     );
     debugPrint(
       '[ChatCubit] saved model reply '
-      '(form=${reply.isForm}, mission=${reply.isMissionSuggestion}, '
-      'mood=${reply.isMoodCheckIn}, routine=${mutation != null})',
+      '(form=${reply.isForm}, mood=${reply.isMoodCheckIn}, '
+      'routine=${mutation != null})',
     );
   }
 
@@ -482,62 +481,6 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     await sendText(form.options[optionIndex]);
-  }
-
-  Future<void> acceptMissionSuggestion(String messageId) async {
-    final idx = state.messages.indexWhere((m) => m.id == messageId);
-    if (idx == -1) return;
-    final msg = state.messages[idx];
-    final suggestion = msg.missionSuggestion;
-    if (suggestion == null || suggestion.accepted != null) return;
-
-    final updatedMessages = List<ChatMessage>.from(state.messages)
-      ..[idx] = msg.copyWith(
-        missionSuggestion: suggestion.copyWith(accepted: true),
-      );
-    emit(state.copyWith(messages: updatedMessages));
-
-    try {
-      await _repo.updateMessageMissionSuggestion(
-        state.conversationId,
-        messageId,
-        true,
-      );
-      AnalyticsService.capture(AnalyticsService.chatMissionAccepted, {
-        'mission_type': suggestion.missionType,
-      });
-    } catch (e) {
-      debugPrint('[ChatCubit] acceptMissionSuggestion failed: $e');
-    }
-  }
-
-  Future<void> declineMissionSuggestion(String messageId) async {
-    final idx = state.messages.indexWhere((m) => m.id == messageId);
-    if (idx == -1) return;
-    final msg = state.messages[idx];
-    final suggestion = msg.missionSuggestion;
-    if (suggestion == null || suggestion.accepted != null) return;
-
-    final updatedMessages = List<ChatMessage>.from(state.messages)
-      ..[idx] = msg.copyWith(
-        missionSuggestion: suggestion.copyWith(accepted: false),
-      );
-    emit(state.copyWith(messages: updatedMessages));
-
-    try {
-      await _repo.updateMessageMissionSuggestion(
-        state.conversationId,
-        messageId,
-        false,
-      );
-      AnalyticsService.capture(AnalyticsService.chatMissionDeclined, {
-        'mission_type': suggestion.missionType,
-      });
-    } catch (e) {
-      debugPrint('[ChatCubit] declineMissionSuggestion failed: $e');
-    }
-
-    await sendText('No thanks, not now.');
   }
 
   /// Records the user's mood selection from an inline check-in card.

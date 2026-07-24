@@ -1009,6 +1009,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeAddMissionDesc => 'Démarrer une mission';
 
   @override
+  String get homeAddBreathingTitle => 'Respiration';
+
+  @override
+  String get homeAddBreathingDesc => 'Exercice de respiration';
+
+  @override
   String get routinePickerTitle => 'Que voulez-vous ajouter ?';
 
   @override
