@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/utils/haptic_utils.dart';
+import '../cubit/heart_cubit.dart';
+import '../cubit/heart_state.dart';
+import '../services/heart_service.dart';
 
 /// Top bar over the scene: "Appy" name with a row of hearts on the left, and
 /// the settings icon aligned to the right.
 class HomeTopBar extends StatelessWidget {
   const HomeTopBar({super.key});
-
-  // Number of hearts shown under the name.
-  static const _heartCount = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -39,19 +40,24 @@ class HomeTopBar extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 4.h),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (var i = 0; i < _heartCount; i++)
-                    Padding(
-                      padding: EdgeInsets.only(right: 4.w),
-                      child: Image.asset(
-                        'assets/home_page/heart_icon.png',
-                        width: 32.w,
-                        height: 32.w,
+              BlocBuilder<HeartCubit, HeartState>(
+                buildWhen: (a, b) => a.hearts != b.hearts,
+                builder: (context, state) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (var i = 0; i < kHeartMax; i++)
+                      Padding(
+                        padding: EdgeInsets.only(right: 4.w),
+                        child: Image.asset(
+                          i < state.hearts
+                              ? 'assets/home_page/heart_icon.png'
+                              : 'assets/home_page/heartempty_icon.png',
+                          width: 32.w,
+                          height: 32.w,
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

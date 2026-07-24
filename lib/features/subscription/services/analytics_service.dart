@@ -55,6 +55,7 @@ class AnalyticsService {
 
   // Achievements
   static const badgeEarned = 'badge_earned';
+  static const streakBroken = 'streak_broken'; // props: {streak}
 
   // Adventure / gamification
   static const coinEarned = 'coin_earned'; // props: {coins}

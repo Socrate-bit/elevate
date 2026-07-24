@@ -9,8 +9,8 @@ import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../adventure/models/game_profile.dart';
 import '../../adventure/screens/adventure_success_screen.dart';
-import '../cubit/home_page_cubit.dart';
-import '../cubit/home_page_state.dart';
+import '../cubit/heart_cubit.dart';
+import '../cubit/heart_state.dart';
 
 /// Teal quest banner with lightning icon, adventure title and a progress
 /// pill / action button reflecting the live adventure state. The coin balance,
@@ -212,14 +212,15 @@ class _CoinCounter extends StatelessWidget {
 }
 
 /// Streak sign perched on the banner: the flame asset with the live streak
-/// count. Reads the count from [HomePageCubit], kept reactive to profile updates.
+/// count. Reads the count from [HeartCubit], kept reactive to activity updates
+/// and heart-driven streak breaks.
 class _StreakSign extends StatelessWidget {
   const _StreakSign();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HomePageCubit, HomePageState>(
-      buildWhen: (a, b) => a.currentStreak != b.currentStreak,
+    return BlocBuilder<HeartCubit, HeartState>(
+      buildWhen: (a, b) => a.streak != b.streak,
       builder: (context, state) {
         return Row(
           mainAxisSize: MainAxisSize.min,
@@ -231,7 +232,7 @@ class _StreakSign extends StatelessWidget {
             ),
             SizedBox(width: 4.w),
             Text(
-              '${state.currentStreak}',
+              '${state.streak}',
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w800,

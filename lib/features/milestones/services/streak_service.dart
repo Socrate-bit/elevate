@@ -34,12 +34,17 @@ class StreakProfile {
   final int totalActivities;
   final List<String> earnedBadgeIds;
 
+  /// When the streak was last broken by heart depletion. Days on/before this
+  /// are excluded from the streak walk, so the streak restarts afterwards.
+  final DateTime? streakBrokenAt;
+
   const StreakProfile({
     this.currentStreak = 0,
     this.longestStreak = 0,
     this.lastActivityDate,
     this.totalActivities = 0,
     this.earnedBadgeIds = const [],
+    this.streakBrokenAt,
   });
 
   factory StreakProfile.fromMap(Map<String, dynamic> data) => StreakProfile(
@@ -54,6 +59,9 @@ class StreakProfile {
             0,
         earnedBadgeIds:
             List<String>.from(data['earnedBadgeIds'] as List? ?? []),
+        streakBrokenAt: data['streakBrokenAt'] != null
+            ? DateTime.fromMillisecondsSinceEpoch(data['streakBrokenAt'] as int)
+            : null,
       );
 
   Map<String, dynamic> toMap() => {
@@ -62,6 +70,7 @@ class StreakProfile {
         'lastActivityDate': lastActivityDate?.millisecondsSinceEpoch,
         'totalActivities': totalActivities,
         'earnedBadgeIds': earnedBadgeIds,
+        'streakBrokenAt': streakBrokenAt?.millisecondsSinceEpoch,
       };
 }
 

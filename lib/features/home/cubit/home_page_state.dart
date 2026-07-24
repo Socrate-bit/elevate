@@ -11,27 +11,21 @@ class HomePageState extends Equatable {
   /// Ids of routines completed today (matched against `Routine.id`).
   final Set<String> completedTodayIds;
 
-  /// Current daily streak, from the user's streak profile.
-  final int currentStreak;
-
   final bool loading;
 
   const HomePageState({
     this.todayRoutines = const [],
     this.completedTodayIds = const {},
-    this.currentStreak = 0,
     this.loading = true,
   });
 
   HomePageState copyWith({
     List<Routine>? todayRoutines,
     Set<String>? completedTodayIds,
-    int? currentStreak,
     bool? loading,
   }) => HomePageState(
     todayRoutines: todayRoutines ?? this.todayRoutines,
     completedTodayIds: completedTodayIds ?? this.completedTodayIds,
-    currentStreak: currentStreak ?? this.currentStreak,
     loading: loading ?? this.loading,
   );
 
@@ -39,7 +33,6 @@ class HomePageState extends Equatable {
   List<Object?> get props => [
     todayRoutines,
     completedTodayIds,
-    currentStreak,
     loading,
   ];
 }

@@ -9,8 +9,11 @@ import '../../../shared/widgets/appy_nav_bar.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../routines/cubit/routine_cubit.dart';
+import '../cubit/heart_cubit.dart';
+import '../cubit/heart_state.dart';
 import '../cubit/home_page_cubit.dart';
 import '../cubit/home_page_state.dart';
+import '../services/heart_service.dart';
 import '../widgets/home_top_bar.dart';
 import '../widgets/quest_banner.dart';
 import '../widgets/todays_plan_card.dart';
@@ -119,21 +122,32 @@ class _HomeViewState extends State<_HomeView> {
                       // Pet sits in the flow: it can never overlap the content
                       // below. Both dimensions are fixed (the gif is square) so
                       // the first-frame paws measurement is already final. The
-                      // walking gif plays while the pet is away on an adventure.
+                      // The walking gif plays while the pet is away on an
+                      // adventure; otherwise its mood animation follows the
+                      // pet's remaining hearts.
                       BlocBuilder<AdventureCubit, AdventureState>(
                         buildWhen: (a, b) =>
                             (a.isWalking && !a.isArrived) !=
                             (b.isWalking && !b.isArrived),
                         builder: (context, adv) {
-                          final away = adv.isWalking && !adv.isArrived;
-                          return Image.asset(
-                            away
-                                ? 'assets/home/walking_pet.gif'
-                                : 'assets/home/pet_rest_animation.gif',
-                            key: _petKey,
-                            width: w * _petWidthFactor,
-                            height: w * _petWidthFactor,
-                            gaplessPlayback: true,
+                          if (adv.isWalking && !adv.isArrived) {
+                            return Image.asset(
+                              'assets/home/walking_pet.gif',
+                              key: _petKey,
+                              width: w * _petWidthFactor,
+                              height: w * _petWidthFactor,
+                              gaplessPlayback: true,
+                            );
+                          }
+                          return BlocBuilder<HeartCubit, HeartState>(
+                            buildWhen: (a, b) => a.hearts != b.hearts,
+                            builder: (context, state) => Image.asset(
+                              HeartService.petAssetForHearts(state.hearts),
+                              key: _petKey,
+                              width: w * _petWidthFactor,
+                              height: w * _petWidthFactor,
+                              gaplessPlayback: true,
+                            ),
                           );
                         },
                       ),
