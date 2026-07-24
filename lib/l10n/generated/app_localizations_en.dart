@@ -1088,6 +1088,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeAddBreathingDesc => 'Box breathing exercise';
 
   @override
+  String get homeAddActivitiesTitle => 'Activities';
+
+  @override
   String get routinePickerTitle => 'What do you want to add?';
 
   @override

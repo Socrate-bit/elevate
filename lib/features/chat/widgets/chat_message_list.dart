@@ -7,10 +7,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../routines/cubit/routine_cubit.dart';
+import '../../tools/models/tools_mock_data.dart';
+import '../../tools/tools_launcher.dart';
 import '../cubit/chat_cubit.dart';
 import '../services/chat_message.dart';
 import 'chat_form_card.dart';
 import 'chat_insight_card.dart';
+import 'chat_mission_card.dart';
 import 'chat_mood_check_in_card.dart';
 import 'chat_routine_card.dart';
 
@@ -143,12 +146,22 @@ class _MessageRow extends StatelessWidget {
     final isModel = m.role == ChatRole.model;
 
     // Interactive cards are always model turns. Dispatch order:
-    // form → mood → routine → insight → text.
+    // form → mission → mood → routine → insight → text.
     if (isModel && m.form != null) {
       return _CardWrap(
         child: ChatFormCard(
           form: m.form!,
           onAnswer: (idx) => context.read<ChatCubit>().answerForm(m.id, idx),
+        ),
+      );
+    }
+    if (isModel && m.missionSuggestion != null) {
+      return _CardWrap(
+        child: ChatMissionCard(
+          suggestion: m.missionSuggestion!,
+          onAccept: () => _acceptMission(context, m),
+          onDecline: () =>
+              context.read<ChatCubit>().declineMissionSuggestion(m.id),
         ),
       );
     }
@@ -170,6 +183,15 @@ class _MessageRow extends StatelessWidget {
       return _CardWrap(child: ChatInsightCard(insight: m.insight!));
     }
     return _TextBubble(message: m);
+  }
+
+  /// Accept an activity suggestion, then open its guided session.
+  Future<void> _acceptMission(BuildContext context, ChatMessage m) async {
+    final cubit = context.read<ChatCubit>();
+    await cubit.acceptMissionSuggestion(m.id);
+    if (!context.mounted) return;
+    final tool = ToolsMockData.byKey(m.missionSuggestion!.toolKey);
+    if (tool != null) openToolSession(context, tool);
   }
 
   Future<void> _startRoutineNow(BuildContext context, String routineId) async {

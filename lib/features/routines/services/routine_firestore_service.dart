@@ -26,6 +26,7 @@ class RoutineFirestoreService {
         'scheduledMinute': r.scheduledMinute,
         'hasAlarm': r.hasAlarm,
         'nativeAlarmId': r.nativeAlarmId,
+        'toolKey': r.toolKey,
         'createdAtMs': r.createdAt.millisecondsSinceEpoch,
       });
 
@@ -65,6 +66,7 @@ class RoutineFirestoreService {
       scheduledMinute: d['scheduledMinute'] as int?,
       hasAlarm: d['hasAlarm'] as bool? ?? false,
       nativeAlarmId: d['nativeAlarmId'] as String?,
+      toolKey: d['toolKey'] as String?,
       createdAt: d['createdAtMs'] != null
           ? DateTime.fromMillisecondsSinceEpoch(d['createdAtMs'] as int)
           : null,
