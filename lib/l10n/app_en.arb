@@ -466,18 +466,10 @@
   "journalMonthlyInsight": "Monthly Insight",
   "journalInputCues": "Input Cues",
 
-  "shopTitle": "Shop",
   "shopComingSoon": "Coming soon",
-  "shopTabBackground": "Background",
-  "shopTabHat": "Hat",
-  "shopTabGlass": "Glasses",
-  "shopTabScarf": "Scarf",
-  "shopTabColor": "Color",
-  "shopTabFurniture": "Furniture",
   "shopCtaBackground": "Change background",
   "shopCtaHat": "Buy new hat",
   "shopCtaGlass": "Buy new glasses",
   "shopCtaScarf": "Buy new scarf",
-  "shopCtaColor": "Change color",
-  "shopCtaFurniture": "Buy new furniture"
+  "shopCtaColor": "Change color"
 }

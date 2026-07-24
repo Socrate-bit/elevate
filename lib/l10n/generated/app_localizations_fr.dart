@@ -1276,28 +1276,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get journalInputCues => 'Pistes d\'écriture';
 
   @override
-  String get shopTitle => 'Boutique';
-
-  @override
   String get shopComingSoon => 'Bientôt disponible';
-
-  @override
-  String get shopTabBackground => 'Décor';
-
-  @override
-  String get shopTabHat => 'Chapeau';
-
-  @override
-  String get shopTabGlass => 'Lunettes';
-
-  @override
-  String get shopTabScarf => 'Écharpe';
-
-  @override
-  String get shopTabColor => 'Couleur';
-
-  @override
-  String get shopTabFurniture => 'Mobilier';
 
   @override
   String get shopCtaBackground => 'Changer le décor';
@@ -1313,7 +1292,4 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get shopCtaColor => 'Changer la couleur';
-
-  @override
-  String get shopCtaFurniture => 'Acheter du mobilier';
 }

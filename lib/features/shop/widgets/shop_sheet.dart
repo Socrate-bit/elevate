@@ -19,21 +19,21 @@ Future<void> showShopSheet(BuildContext context) async {
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    // Light scrim so the streak/coins above the sheet stay readable.
-    barrierColor: Colors.black.withValues(alpha: 0.2),
+    // No scrim — the rest of the screen stays fully visible while shopping.
+    barrierColor: Colors.transparent,
     builder: (_) => const _ShopSheet(),
   );
   shop.dismiss();
 }
 
-/// A shop tab: its label plus the coming-soon call-to-action and emoji shown
-/// in its body.
+/// A shop tab: its icon asset plus the coming-soon call-to-action and emoji
+/// shown in its body.
 class _ShopTab {
-  final String label;
+  final String icon;
   final String cta;
   final String emoji;
 
-  const _ShopTab({required this.label, required this.cta, required this.emoji});
+  const _ShopTab({required this.icon, required this.cta, required this.emoji});
 }
 
 /// Half-height shop modal with a tab per customization category. Each tab is a
@@ -44,20 +44,28 @@ class _ShopSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    const iconBase = 'assets/shop/shop_tab';
     final tabs = <_ShopTab>[
       _ShopTab(
-        label: l10n.shopTabBackground,
+        icon: '$iconBase/image.png',
         cta: l10n.shopCtaBackground,
         emoji: '🌄',
       ),
-      _ShopTab(label: l10n.shopTabHat, cta: l10n.shopCtaHat, emoji: '🎩'),
-      _ShopTab(label: l10n.shopTabGlass, cta: l10n.shopCtaGlass, emoji: '🕶️'),
-      _ShopTab(label: l10n.shopTabScarf, cta: l10n.shopCtaScarf, emoji: '🧣'),
-      _ShopTab(label: l10n.shopTabColor, cta: l10n.shopCtaColor, emoji: '🎨'),
+      _ShopTab(icon: '$iconBase/cap.png', cta: l10n.shopCtaHat, emoji: '🎩'),
       _ShopTab(
-        label: l10n.shopTabFurniture,
-        cta: l10n.shopCtaFurniture,
-        emoji: '🛋️',
+        icon: '$iconBase/safety-glasses.png',
+        cta: l10n.shopCtaGlass,
+        emoji: '🕶️',
+      ),
+      _ShopTab(
+        icon: '$iconBase/scarf.png',
+        cta: l10n.shopCtaScarf,
+        emoji: '🧣',
+      ),
+      _ShopTab(
+        icon: '$iconBase/palette.png',
+        cta: l10n.shopCtaColor,
+        emoji: '🎨',
       ),
     ];
 
@@ -85,35 +93,17 @@ class _ShopSheet extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.h),
-                child: Text(
-                  l10n.shopTitle,
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.w800,
-                    color: HomePalette.titleDark,
-                  ),
-                ),
-              ),
-              // Category tabs.
+              SizedBox(height: 8.h),
+              // Category tabs — icon only, black when selected, grey otherwise.
               TabBar(
                 isScrollable: true,
-                tabAlignment: TabAlignment.start,
-                indicatorColor: HomePalette.teal,
+                tabAlignment: TabAlignment.center,
+                indicatorColor: Colors.black,
                 indicatorWeight: 3,
-                labelColor: HomePalette.teal,
-                unselectedLabelColor: HomePalette.subtitleGrey,
-                labelStyle: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w800,
-                ),
-                unselectedLabelStyle: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w700,
-                ),
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.grey,
                 onTap: (_) => HapticFeedback.selectionClick(),
-                tabs: [for (final t in tabs) Tab(text: t.label)],
+                tabs: [for (final t in tabs) Tab(icon: _TabIcon(t.icon))],
               ),
               Expanded(
                 child: TabBarView(
@@ -124,6 +114,24 @@ class _ShopSheet extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Tab bar icon that tints itself with the current [IconTheme] colour, which
+/// TabBar animates between grey (unselected) and black (selected).
+class _TabIcon extends StatelessWidget {
+  final String asset;
+
+  const _TabIcon(this.asset);
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      asset,
+      width: 26.w,
+      height: 26.w,
+      color: IconTheme.of(context).color,
     );
   }
 }
