@@ -9,7 +9,6 @@ import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../chat/screens/chat_page_screen.dart';
 import '../../missions/screens/breathing_intro_screen.dart';
-import '../../missions/widgets/mission_complete_screen.dart';
 import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../../routines/models/routine.dart';
@@ -147,20 +146,11 @@ class TodaysPlanCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (bc) => BreathingIntroScreen(
-              onComplete: () async {
-                await DefaultTaskCompletion.complete(
-                  task: task,
-                  adventure: adventure,
-                );
-                if (bc.mounted) {
-                  Navigator.of(bc).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (_) => const MissionCompleteScreen(),
-                    ),
-                  );
-                }
-              },
+            builder: (_) => BreathingIntroScreen(
+              // Mark the task complete; the breathing screen itself navigates
+              // to the completion screen once the animation finishes.
+              onComplete: () =>
+                  DefaultTaskCompletion.complete(task: task, adventure: adventure),
             ),
           ),
         );
