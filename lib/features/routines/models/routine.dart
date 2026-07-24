@@ -40,6 +40,11 @@ class Routine extends Equatable {
   /// Native alarm id returned by `AlarmChannel.schedule*`. Null = none scheduled.
   final String? nativeAlarmId;
 
+  /// Stable [ToolItem.key] when this routine is an activity/tool task. Non-null
+  /// means tapping the card opens that tool's guided session (meditation,
+  /// stretching, breathing…) instead of the edit form.
+  final String? toolKey;
+
   final DateTime createdAt;
 
   Routine({
@@ -56,6 +61,7 @@ class Routine extends Equatable {
     this.scheduledMinute,
     this.hasAlarm = false,
     this.nativeAlarmId,
+    this.toolKey,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -100,6 +106,8 @@ class Routine extends Equatable {
     bool? hasAlarm,
     String? nativeAlarmId,
     bool clearNativeAlarmId = false,
+    String? toolKey,
+    bool clearToolKey = false,
     DateTime? createdAt,
   }) =>
       Routine(
@@ -122,6 +130,7 @@ class Routine extends Equatable {
         hasAlarm: hasAlarm ?? this.hasAlarm,
         nativeAlarmId:
             clearNativeAlarmId ? null : (nativeAlarmId ?? this.nativeAlarmId),
+        toolKey: clearToolKey ? null : (toolKey ?? this.toolKey),
         createdAt: createdAt ?? this.createdAt,
       );
 
@@ -140,6 +149,7 @@ class Routine extends Equatable {
         scheduledMinute,
         hasAlarm,
         nativeAlarmId,
+        toolKey,
         createdAt,
       ];
 }

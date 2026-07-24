@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'chat_form.dart';
 import 'chat_insight.dart';
 import 'chat_message.dart';
+import 'chat_mission_suggestion.dart';
 import 'chat_mood_check_in.dart';
 
 /// Tool call returned by Gemini that mutates the user's routines. The chat
@@ -16,29 +17,34 @@ class RoutineToolCall {
   const RoutineToolCall({required this.tool, required this.args});
 }
 
-/// Either a text reply, a structured multiple-choice form, a mood check-in, or
-/// a routine tool call from the model.
+/// Either a text reply, a structured multiple-choice form, an activity
+/// suggestion, a mood check-in, or a routine tool call from the model.
 class GeminiReply {
   final String? text;
   final ChatForm? form;
+  final ChatMissionSuggestion? missionSuggestion;
   final ChatMoodCheckIn? moodCheckIn;
   final RoutineToolCall? routineToolCall;
 
   const GeminiReply._({
     this.text,
     this.form,
+    this.missionSuggestion,
     this.moodCheckIn,
     this.routineToolCall,
   });
 
   factory GeminiReply.text(String text) => GeminiReply._(text: text);
   factory GeminiReply.form(ChatForm form) => GeminiReply._(form: form);
+  factory GeminiReply.missionSuggestion(ChatMissionSuggestion s) =>
+      GeminiReply._(missionSuggestion: s);
   factory GeminiReply.moodCheckIn(ChatMoodCheckIn c) =>
       GeminiReply._(moodCheckIn: c);
   factory GeminiReply.routineToolCall(RoutineToolCall t) =>
       GeminiReply._(routineToolCall: t);
 
   bool get isForm => form != null;
+  bool get isMissionSuggestion => missionSuggestion != null;
   bool get isMoodCheckIn => moodCheckIn != null;
   bool get isRoutineToolCall => routineToolCall != null;
 }
@@ -135,6 +141,7 @@ abstract interface class GeminiClient {
 
 /// Firebase Gemini implementation with function tools:
 /// - `present_choices`: renders interactive multiple-choice cards inline in chat
+/// - `suggest_mission`: proposes a guided-activity card when context calls for it
 /// - `create_routine` / `update_routine` / `delete_routine`: mutate the user's
 ///   action/habit tracker
 class GeminiService implements GeminiClient {
@@ -145,6 +152,7 @@ class GeminiService implements GeminiClient {
 
   static const _modelName = 'gemini-2.5-flash';
   static const _toolChoices = 'present_choices';
+  static const _toolMission = 'suggest_mission';
   static const _toolMood = 'ask_mood';
   static const _toolCreateRoutine = 'create_routine';
   static const _toolUpdateRoutine = 'update_routine';
@@ -253,6 +261,11 @@ When you need the user to choose between a small finite set of options
 (typically 2 to 6), call the `present_choices` tool with a short question
 and clear option labels — do not list options as plain text.
 
+When the user's message clearly indicates they want to calm down, relax, refocus,
+move their body, or be more mindful, call the `suggest_mission` tool with the most
+relevant activity and a one-sentence reason. Only suggest reactively — when the
+user's intent is explicit. Never suggest speculatively.
+
 When the user's emotional state, stress level, energy, or wellbeing seems relevant
 to the conversation, call the `ask_mood` tool to check in — reactively only, never speculatively.
 
@@ -336,6 +349,22 @@ Use plain prose replies for everything else.
               'options': Schema.array(
                 items: Schema.string(),
                 description: 'Two to six concise answer labels.',
+              ),
+            },
+          ),
+          FunctionDeclaration(
+            _toolMission,
+            'Propose a guided activity to the user when context suggests they '
+            'want to calm down, relax, refocus, move, or be mindful.',
+            parameters: {
+              'tool_key': Schema.string(
+                description:
+                    'One of: breathing, wimHof, meditation, stretching, sport, '
+                    'gratitude, selfLove, mindfulness.',
+              ),
+              'reason': Schema.string(
+                description:
+                    'One short sentence explaining why this activity fits right now.',
               ),
             },
           ),
@@ -552,6 +581,16 @@ Use plain prose replies for everything else.
           if (options.isNotEmpty) {
             return GeminiReply.form(
               ChatForm(question: question, options: options),
+            );
+          }
+        }
+        if (call.name == _toolMission) {
+          final args = call.args;
+          final toolKey = args['tool_key']?.toString() ?? '';
+          final reason = args['reason']?.toString() ?? '';
+          if (toolKey.isNotEmpty) {
+            return GeminiReply.missionSuggestion(
+              ChatMissionSuggestion(toolKey: toolKey, reason: reason),
             );
           }
         }
@@ -794,11 +833,16 @@ Use plain prose replies for everything else.
         continue;
       }
       final form = m.form;
+      final mission = m.missionSuggestion;
       final mood = m.moodCheckIn;
       final mutation = m.routineMutation;
       if (form != null) {
         lines.add(
           'Assistant: [asked "${form.question}", options: ${form.options.join(", ")}]',
+        );
+      } else if (mission != null) {
+        lines.add(
+          'Assistant: [suggested activity ${mission.toolKey}: ${mission.reason}]',
         );
       } else if (mood != null) {
         final chosen = mood.selectedMood?.name;

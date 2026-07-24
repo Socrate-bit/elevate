@@ -1098,6 +1098,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeAddBreathingDesc => 'Exercice de respiration';
 
   @override
+  String get homeAddActivitiesTitle => 'Activités';
+
+  @override
   String get routinePickerTitle => 'Que voulez-vous ajouter ?';
 
   @override

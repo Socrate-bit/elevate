@@ -15,7 +15,10 @@ import '../../routines/cubit/routine_cubit.dart';
 import '../../routines/models/routine.dart';
 import '../../routines/models/routine_palette.dart';
 import '../../routines/screens/routine_form_screen.dart';
+import '../../tools/models/tools_mock_data.dart';
+import '../../tools/tools_launcher.dart';
 import '../models/default_task.dart';
+import 'home_action_sheet.dart';
 
 /// "Today's Plan" section (Finch-style): a header on the green background, then
 /// each routine relevant today in its own white card. Backed by real routines.
@@ -67,6 +70,8 @@ class TodaysPlanCard extends StatelessWidget {
                   ],
                 ),
               ),
+              // Add a task / activity to today's plan.
+              _AddButton(onTap: () => showHomeAddSheet(context)),
             ],
           ),
           SizedBox(height: 14.h),
@@ -171,6 +176,29 @@ class TodaysPlanCard extends StatelessWidget {
           ),
         );
     }
+  }
+}
+
+/// Round white "+" button in the plan header — opens the add-task sheet.
+class _AddButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: withHaptic(onTap),
+      child: Container(
+        width: 34.w,
+        height: 34.w,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.28),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(Icons.add_rounded, color: Colors.white, size: 24.sp),
+      ),
+    );
   }
 }
 
@@ -318,8 +346,17 @@ class _TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final tile = routineColor(routine.colorKey);
+    // Activity/tool task: resolve its tool so we can show its asset icon and
+    // open its guided session on tap (falling back to edit when there's none).
+    final tool =
+        routine.toolKey == null ? null : ToolsMockData.byKey(routine.toolKey!);
+    final opensSession = tool != null && tool.hasSession;
     return GestureDetector(
-      onTap: withHaptic(onEdit),
+      onTap: withHaptic(
+        opensSession ? () => openToolSession(context, tool) : onEdit,
+      ),
+      // Keep tool tasks manageable (edit/delete) via long-press.
+      onLongPress: opensSession ? withHaptic(onEdit) : null,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
         decoration: BoxDecoration(
@@ -335,7 +372,7 @@ class _TaskCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Circular emoji tile, tinted by the routine's color.
+            // Circular tile: the tool's asset icon, or the routine's emoji.
             Container(
               width: 44.w,
               height: 44.w,
@@ -344,7 +381,9 @@ class _TaskCard extends StatelessWidget {
                 color: tile.withAlpha(40),
                 shape: BoxShape.circle,
               ),
-              child: Text(routine.emoji, style: TextStyle(fontSize: 22.sp)),
+              child: tool != null
+                  ? Image.asset(tool.iconAsset, width: 26.w, height: 26.w)
+                  : Text(routine.emoji, style: TextStyle(fontSize: 22.sp)),
             ),
             SizedBox(width: 12.w),
             // Title + subtitle.
@@ -364,7 +403,7 @@ class _TaskCard extends StatelessWidget {
                   ),
                   SizedBox(height: 1.h),
                   Text(
-                    _subtitle(l10n),
+                    tool?.subtitle ?? _subtitle(l10n),
                     style: TextStyle(
                       fontSize: 11.sp,
                       color: HomePalette.subtitleGrey,

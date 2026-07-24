@@ -2090,6 +2090,12 @@ abstract class AppLocalizations {
   /// **'Box breathing exercise'**
   String get homeAddBreathingDesc;
 
+  /// No description provided for @homeAddActivitiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Activities'**
+  String get homeAddActivitiesTitle;
+
   /// No description provided for @routinePickerTitle.
   ///
   /// In en, this message translates to:
