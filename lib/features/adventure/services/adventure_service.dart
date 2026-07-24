@@ -141,9 +141,9 @@ class AdventureService {
     }
   }
 
-  /// Claims the reward: records the earned trophy [wisdomId] and resets to a
+  /// Claims the reward: records the earned trophy [trophyId] and resets to a
   /// fresh charging bar.
-  static Future<void> discover(String wisdomId) async {
+  static Future<void> completeAdventure(String trophyId) async {
     try {
       await _db.runTransaction((tx) async {
         final snap = await tx.get(_gameDoc);
@@ -157,18 +157,18 @@ class AdventureService {
               .copyWith(
                 phase: AdventurePhase.charging,
                 strikes: 0,
-                trophies: [...profile.trophies, wisdomId],
+                trophies: [...profile.trophies, trophyId],
                 clearWindow: true,
               )
               .toMap(),
         );
       });
-      debugPrint('[AdventureService] adventure discovered: $wisdomId');
+      debugPrint('[AdventureService] adventure completed: $trophyId');
       AnalyticsService.capture(AnalyticsService.adventureCompleted, {
-        'wisdom_id': wisdomId,
+        'trophy_id': trophyId,
       });
     } catch (e) {
-      debugPrint('[AdventureService] discover failed: $e');
+      debugPrint('[AdventureService] completeAdventure failed: $e');
       rethrow;
     }
   }

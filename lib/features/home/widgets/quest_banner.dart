@@ -8,7 +8,8 @@ import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../adventure/models/game_profile.dart';
-import '../../adventure/screens/adventure_success_screen.dart';
+import '../../trophy/cubit/trophy_reveal_cubit.dart';
+import '../../trophy/screens/trophy_reveal_screen.dart';
 import '../../shop/cubit/shop_cubit.dart';
 import '../../shop/cubit/shop_state.dart';
 import '../../shop/widgets/shop_sheet.dart';
@@ -130,14 +131,15 @@ class QuestBanner extends StatelessWidget {
     return '$h:$m:$s';
   }
 
-  /// Claims the reward, then shows the full-screen success celebration.
-  Future<void> _discover(BuildContext context) async {
-    final nav = Navigator.of(context);
-    final trophy = await context.read<AdventureCubit>().discover();
-    if (trophy == null) return;
-    await nav.push(
+  /// Opens the reward reveal, which generates the citation, saves the trophy,
+  /// and resets the adventure.
+  void _discover(BuildContext context) {
+    Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => AdventureSuccessScreen(trophy: trophy),
+        builder: (_) => BlocProvider(
+          create: (_) => TrophyRevealCubit()..reveal(),
+          child: const TrophyRevealScreen(),
+        ),
       ),
     );
   }

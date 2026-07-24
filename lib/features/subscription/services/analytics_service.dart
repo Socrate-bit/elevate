@@ -60,7 +60,10 @@ class AnalyticsService {
   // Adventure / gamification
   static const coinEarned = 'coin_earned'; // props: {coins}
   static const adventureStarted = 'adventure_started';
-  static const adventureCompleted = 'adventure_completed'; // props: {wisdom_id}
+  static const adventureCompleted = 'adventure_completed'; // props: {trophy_id}
+  static const trophyEarned =
+      'trophy_earned'; // props: {trophy_id, author, generated}
+  static const trophiesOpened = 'trophies_opened';
 
   // Onboarding
   static const onboardingStep = 'onboarding_step';

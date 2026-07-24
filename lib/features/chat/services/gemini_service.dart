@@ -76,6 +76,25 @@ class MemoryExtraction {
   );
 }
 
+/// Plain DTO produced by [GeminiClient.generateCitation]: a real citation from
+/// a figure or book plus a badge [iconKey]/[colorKey] the model picked to match
+/// its mood. The trophy layer maps this into a persisted trophy.
+class GeneratedCitation {
+  final String quote;
+  final String author;
+  final String source;
+  final String iconKey;
+  final String colorKey;
+
+  const GeneratedCitation({
+    required this.quote,
+    required this.author,
+    required this.source,
+    required this.iconKey,
+    required this.colorKey,
+  });
+}
+
 /// LLM surface the chat depends on. Implementations: [GeminiService] for
 /// production (Firebase + Gemini), or a fake for tests.
 abstract interface class GeminiClient {
@@ -99,6 +118,17 @@ abstract interface class GeminiClient {
   /// citation from the chat, and a short paragraph). Returns null when there
   /// isn't enough material to say something meaningful.
   Future<ChatInsight?> generateInsight({required List<ChatMessage> history});
+
+  /// Produces a real, verbatim citation from a well-known figure or book,
+  /// thematically tied to [context] (a general one if it's empty), that is not
+  /// already in [avoid]. Also picks an [iconKey]/[colorKey] from the allowed
+  /// sets. Returns null on failure so callers can fall back.
+  Future<GeneratedCitation?> generateCitation({
+    String? context,
+    required List<String> avoid,
+    required List<String> allowedIcons,
+    required List<String> allowedColors,
+  });
 }
 
 /// Firebase Gemini implementation with function tools:
@@ -262,6 +292,25 @@ Use plain prose replies for everything else.
       'If the conversation is too short or thin to say anything meaningful, return '
       'empty strings for all three fields.';
 
+  static const _citationSystemInstruction =
+      'You award a "wisdom trophy": ONE real, verbatim quotation from a well-known '
+      'real figure (philosopher, writer, scientist, leader) or a real book. '
+      'The quote must be genuine and correctly attributed — never invent a quote '
+      'or misattribute one; if unsure of exact wording, choose a different quote '
+      'you are certain about. '
+      'Pick a citation that resonates with the themes in the provided context '
+      '(the user\'s recent reflections). If the context is empty, pick a general '
+      'uplifting or wise citation about growth, resilience, or self-compassion. '
+      'Do NOT return any citation listed as already earned. '
+      'Return JSON matching the schema:\n'
+      '- `quote`: the citation, verbatim, no surrounding quotation marks.\n'
+      '- `author`: the person the quote is attributed to (or the book\'s author).\n'
+      '- `source`: the book/work title if it comes from one, else an empty string.\n'
+      '- `icon_key`: exactly one key from the allowed icon list that best fits the '
+      'citation\'s mood.\n'
+      '- `color_key`: exactly one key from the allowed color list that best fits '
+      'the citation\'s mood.';
+
   GenerativeModel _buildChatModel(String? memoryContext) {
     final instruction = (memoryContext == null || memoryContext.isEmpty)
         ? _systemInstruction
@@ -385,6 +434,35 @@ Use plain prose replies for everything else.
             ),
             'body': Schema.string(
               description: '1–3 short paragraphs delivering the insight.',
+            ),
+          },
+        ),
+      ),
+    );
+  }
+
+  GenerativeModel _buildCitationModel() {
+    return FirebaseAI.googleAI().generativeModel(
+      model: _modelName,
+      systemInstruction: Content.system(_citationSystemInstruction),
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: Schema.object(
+          properties: {
+            'quote': Schema.string(
+              description: 'Verbatim citation, no surrounding quotation marks.',
+            ),
+            'author': Schema.string(
+              description: 'Figure or book author the quote is attributed to.',
+            ),
+            'source': Schema.string(
+              description: 'Book/work title, or empty string.',
+            ),
+            'icon_key': Schema.string(
+              description: 'One key from the allowed icon list.',
+            ),
+            'color_key': Schema.string(
+              description: 'One key from the allowed color list.',
             ),
           },
         ),
@@ -637,6 +715,60 @@ Use plain prose replies for everything else.
     // The model returns empty fields when there isn't enough to say.
     if (title.isEmpty || body.isEmpty) return null;
     return ChatInsight(title: title, quote: quote, body: body);
+  }
+
+  @override
+  Future<GeneratedCitation?> generateCitation({
+    String? context,
+    required List<String> avoid,
+    required List<String> allowedIcons,
+    required List<String> allowedColors,
+  }) async {
+    try {
+      final themes = (context == null || context.trim().isEmpty)
+          ? '(no recent reflections — pick a general wise citation)'
+          : context.trim();
+      final earned = avoid.isEmpty
+          ? '(none yet)'
+          : avoid.map((e) => '- $e').join('\n');
+      final prompt =
+          "The user's recent reflections:\n$themes\n\n"
+          'Already earned (do not repeat any of these):\n$earned\n\n'
+          'Allowed icon keys: ${allowedIcons.join(", ")}\n'
+          'Allowed color keys: ${allowedColors.join(", ")}\n\n'
+          'Return JSON per the schema with one fitting citation.';
+
+      final response = await _buildCitationModel()
+          .generateContent([Content.text(prompt)])
+          .timeout(const Duration(seconds: 45));
+      final text = response.text?.trim() ?? '';
+      if (text.isEmpty) return null;
+      return _parseCitation(text);
+    } catch (e, st) {
+      debugPrint('[GeminiService] generateCitation failed: $e\n$st');
+      return null;
+    }
+  }
+
+  static GeneratedCitation? _parseCitation(String jsonText) {
+    final dynamic decoded;
+    try {
+      decoded = jsonDecode(jsonText);
+    } catch (e) {
+      debugPrint('[GeminiService] generateCitation invalid JSON: $e');
+      return null;
+    }
+    if (decoded is! Map) return null;
+    final quote = decoded['quote']?.toString().trim() ?? '';
+    final author = decoded['author']?.toString().trim() ?? '';
+    if (quote.isEmpty || author.isEmpty) return null;
+    return GeneratedCitation(
+      quote: quote,
+      author: author,
+      source: decoded['source']?.toString().trim() ?? '',
+      iconKey: decoded['icon_key']?.toString().trim() ?? '',
+      colorKey: decoded['color_key']?.toString().trim() ?? '',
+    );
   }
 
   static String _renderTranscript(List<ChatMessage> history) {
