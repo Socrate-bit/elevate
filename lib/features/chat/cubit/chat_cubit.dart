@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../adventure/cubit/adventure_cubit.dart';
+import '../../home/models/default_task.dart';
 import '../../memory/cubit/memory_cubit.dart';
 import '../../mood/cubit/mood_cubit.dart';
 import '../../mood/models/mood_entry.dart';
@@ -27,6 +29,7 @@ class ChatCubit extends Cubit<ChatState> {
     RoutineCubit? routineCubit,
     MemoryCubit? memoryCubit,
     MoodCubit? moodCubit,
+    AdventureCubit? adventureCubit,
     bool autoStart = false,
     ChatRepository? repository,
     GeminiClient? gemini,
@@ -38,6 +41,7 @@ class ChatCubit extends Cubit<ChatState> {
        _routineCubit = routineCubit,
        _memoryCubit = memoryCubit,
        _moodCubit = moodCubit,
+       _adventureCubit = adventureCubit,
        _uuid = uuid ?? const Uuid(),
        super(
          ChatState(
@@ -57,9 +61,14 @@ class ChatCubit extends Cubit<ChatState> {
   final RoutineCubit? _routineCubit;
   final MemoryCubit? _memoryCubit;
   final MoodCubit? _moodCubit;
+  final AdventureCubit? _adventureCubit;
   final Uuid _uuid;
   StreamSubscription? _sub;
   bool _hasNewUserActivity = false;
+
+  /// Guards the "quick introspection" default task so it's marked done at most
+  /// once per chat session (the completion itself is also idempotent per day).
+  bool _introspectionMarked = false;
 
   /// The ring reaches "full" at this many user turns since the last insight —
   /// the user may then tap to reveal one on demand.
@@ -145,6 +154,18 @@ class ChatCubit extends Cubit<ChatState> {
     );
 
     AnalyticsService.capture(AnalyticsService.chatMessageSent);
+
+    // Sending a message completes the "quick introspection" default task.
+    final adventure = _adventureCubit;
+    if (!_introspectionMarked && adventure != null) {
+      _introspectionMarked = true;
+      unawaited(
+        DefaultTaskCompletion.complete(
+          task: kIntrospectionTask,
+          adventure: adventure,
+        ),
+      );
+    }
 
     await _generateModelReply();
   }

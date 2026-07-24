@@ -1151,8 +1151,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homePageTodaysPlanSubtitle => 'Small steps, big changes.';
 
   @override
-  String get homePagePlanEmpty =>
-      'Nothing planned for today. Tap + to add a task.';
+  String get homePagePlanEmpty => 'You\'re all set for today. Nice work!';
+
+  @override
+  String get defaultTaskMoodName => 'Mood check-in';
+
+  @override
+  String get defaultTaskMoodSubtitle => 'How are you feeling right now?';
+
+  @override
+  String get defaultTaskBreathingName => 'Breathing';
+
+  @override
+  String get defaultTaskBreathingSubtitle => 'Take a mindful moment';
+
+  @override
+  String get defaultTaskIntrospectionName => 'Quick introspection';
+
+  @override
+  String get defaultTaskIntrospectionSubtitle => 'Open up with Appy';
 
   @override
   String get homePageEdit => 'Edit';

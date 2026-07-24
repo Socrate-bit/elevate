@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
+import '../../adventure/cubit/adventure_cubit.dart';
 import '../../navigation/appy_nav_bar.dart';
 import '../../memory/cubit/memory_cubit.dart';
 import '../../mood/cubit/mood_cubit.dart';
@@ -212,6 +213,7 @@ class _ChatConversationGateState extends State<_ChatConversationGate>
                 routineCubit: context.read<RoutineCubit>(),
                 memoryCubit: context.read<MemoryCubit>(),
                 moodCubit: context.read<MoodCubit>(),
+                adventureCubit: context.read<AdventureCubit>(),
                 autoStart: _autoStart,
               ),
               child: const _ChatView(),
