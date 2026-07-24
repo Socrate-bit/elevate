@@ -1,37 +1,52 @@
 // Daily-streak tuning + pure helpers.
 //
-// The streak counts consecutive days on which the user completed at least one
-// activity. It is derived from the activity timestamps (no separate persistence)
-// and stays "alive" as long as there was activity today or yesterday.
+// The streak rewards regular activity but tolerates the occasional missed day.
+// It runs on a rolling window tied to the heart mechanic: the pet loses one
+// heart every `kHeartDecayInterval` and the streak breaks once the last heart
+// is gone (`kHeartMax * kHeartDecayInterval` = 48h of inactivity). A single
+// missed day "freezes" the streak — the number holds (that day isn't counted)
+// but the run doesn't break. It is derived from activity timestamps only (no
+// separate persistence).
 
 import '../../activity/models/activity.dart';
+import 'heart_service.dart';
 
 class StreakService {
-  /// Consecutive-day streak ending today (or yesterday, so it doesn't break
-  /// until a full day is missed). Days with no completed activity break it.
+  /// The streak breaks once this much time passes with no completed activity.
+  /// Tied to hearts: it ends exactly when the pet loses its last heart.
+  static final Duration _breakAfter = kHeartDecayInterval * kHeartMax;
+
+  /// Rolling-window streak, in distinct active days.
+  ///
+  /// Counts the distinct calendar days with a completed activity in the current
+  /// run, walking back while consecutive activity is never `_breakAfter` apart.
+  /// A single missed day leaves a gap below the window, so it's silently frozen
+  /// (not counted, doesn't break); two silent days exceed the window and break
+  /// the run. The streak is `0` once nothing has been completed within the
+  /// window.
   static int computeStreak(List<Activity> activities, {DateTime? now}) {
-    final today = _dateOnly(now ?? DateTime.now());
+    final current = now ?? DateTime.now();
 
-    // Set of distinct days that have at least one completed activity.
-    final days = <DateTime>{
+    // Completed-activity timestamps, newest first.
+    final times = <DateTime>[
       for (final a in activities)
-        if (a.completed) _dateOnly(a.timestamp),
-    };
-    if (days.isEmpty) return 0;
+        if (a.completed) a.timestamp,
+    ]..sort((a, b) => b.compareTo(a));
+    if (times.isEmpty) return 0;
 
-    // The streak is alive from today, or from yesterday if nothing done today.
-    var cursor = today;
-    if (!days.contains(cursor)) {
-      cursor = today.subtract(const Duration(days: 1));
-      if (!days.contains(cursor)) return 0;
-    }
+    // Broken: no completed activity within the rolling window.
+    if (current.difference(times.first) >= _breakAfter) return 0;
 
-    var streak = 0;
-    while (days.contains(cursor)) {
-      streak++;
-      cursor = cursor.subtract(const Duration(days: 1));
+    // Walk the run newest→oldest, collecting distinct calendar days. Missed
+    // days simply don't appear (freeze); a gap >= window ends the run.
+    final days = <DateTime>{_dateOnly(times.first)};
+    var prev = times.first;
+    for (final t in times.skip(1)) {
+      if (prev.difference(t) >= _breakAfter) break;
+      days.add(_dateOnly(t));
+      prev = t;
     }
-    return streak;
+    return days.length;
   }
 
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);

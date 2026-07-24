@@ -8,8 +8,8 @@ import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../shop/cubit/shop_cubit.dart';
 import '../../shop/cubit/shop_state.dart';
-import '../cubit/heart_cubit.dart';
-import '../cubit/heart_state.dart';
+import '../cubit/streak_cubit.dart';
+import '../cubit/streak_state.dart';
 import '../services/heart_service.dart';
 
 /// Top bar over the scene: "Appy" name with a row of hearts on the left, and
@@ -45,7 +45,7 @@ class HomeTopBar extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 4.h),
-              BlocBuilder<HeartCubit, HeartState>(
+              BlocBuilder<StreakCubit, StreakState>(
                 buildWhen: (a, b) => a.hearts != b.hearts,
                 builder: (context, state) => Row(
                   mainAxisSize: MainAxisSize.min,
