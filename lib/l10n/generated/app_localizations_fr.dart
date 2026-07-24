@@ -919,13 +919,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get missionComplete => 'Mission accomplie !';
 
   @override
-  String get missionCompleteMessage => 'Excellent travail ! Continuez.';
+  String get missionCompleteMessage => 'Vous sentez-vous plus calme ?';
 
   @override
   String get missionPickerTitle => 'Missions';
 
   @override
   String get missionPickerSubtitle => 'Choisissez une mission et commencez';
+
+  @override
+  String get breathingIntroTitle => 'Respiration';
+
+  @override
+  String get breathingIntroDescription =>
+      'La respiration profonde est l\'un des moyens les plus efficaces pour réguler votre système nerveux.';
+
+  @override
+  String get breathingIntroStart => 'Commencer';
 
   @override
   String get breathingPhaseInhale => 'Inspirez';
@@ -1341,13 +1351,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chatPageStartConversation => 'Démarrer une conversation';
 
   @override
-  String get chatPageSuggestTalkDay => 'Parler de ma journée';
+  String get chatStarterAsk => 'Pose-moi une question inspirante';
 
   @override
-  String get chatPageSuggestComfort => 'J\'ai besoin de réconfort';
+  String get chatStarterKnow => 'Je sais déjà de quoi je veux parler';
 
   @override
-  String get chatPageSuggestReflect => 'M\'aider à réfléchir';
+  String get chatStarterOff => 'Je ne me sens pas bien';
 
   @override
   String get chatPageComposerHint => 'Votre message';
