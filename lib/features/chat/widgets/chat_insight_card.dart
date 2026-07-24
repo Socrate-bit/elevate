@@ -37,14 +37,23 @@ class ChatInsightCard extends StatelessWidget {
           margin: EdgeInsets.symmetric(vertical: 4.h),
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           decoration: BoxDecoration(
-            color: ChatPalette.appyBubble,
+            // Filled primary green so the insight stands out from the plain
+            // chat bubbles; white content keeps it legible over the green.
+            color: ChatPalette.accent,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(18.r),
               topRight: Radius.circular(18.r),
               bottomLeft: Radius.circular(4.r),
               bottomRight: Radius.circular(18.r),
             ),
-            border: Border.all(color: ChatPalette.cardBorder),
+            boxShadow: [
+              BoxShadow(
+                color: ChatPalette.accent.withValues(alpha: 0.4),
+                blurRadius: 14,
+                spreadRadius: 1,
+                offset: Offset(0, 4.h),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +61,7 @@ class ChatInsightCard extends StatelessWidget {
               // "Insight" eyebrow with the glyph.
               Row(
                 children: [
-                  Icon(kInsightIcon, size: 16.sp, color: ChatPalette.accent),
+                  Icon(kInsightIcon, size: 16.sp, color: Colors.white),
                   SizedBox(width: 6.w),
                   Text(
                     l10n.chatInsightCardLabel.toUpperCase(),
@@ -60,7 +69,7 @@ class ChatInsightCard extends StatelessWidget {
                       fontSize: 11.sp,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.6,
-                      color: ChatPalette.accent,
+                      color: Colors.white.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -73,7 +82,7 @@ class ChatInsightCard extends StatelessWidget {
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w700,
                   height: 1.3,
-                  color: ChatPalette.appyText,
+                  color: Colors.white,
                 ),
               ),
               SizedBox(height: 10.h),
@@ -84,14 +93,14 @@ class ChatInsightCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,
-                      color: ChatPalette.accent,
+                      color: Colors.white,
                     ),
                   ),
                   SizedBox(width: 2.w),
                   Icon(
                     Icons.arrow_forward_ios_rounded,
                     size: 11.sp,
-                    color: ChatPalette.accent,
+                    color: Colors.white,
                   ),
                 ],
               ),

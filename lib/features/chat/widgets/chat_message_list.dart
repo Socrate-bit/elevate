@@ -215,7 +215,7 @@ class _TextBubble extends StatelessWidget {
         : _AppyBubble(text: message.text, maxWidth: maxWidth);
 
     return Padding(
-      padding: EdgeInsets.only(left: 94.w, top: 3.h, bottom: 3.h),
+      padding: EdgeInsets.only(left: 6.w, top: 3.h, bottom: 3.h, right: 6.w),
       child: Align(
         alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
         child: bubble,
@@ -256,7 +256,7 @@ class _UserBubble extends StatelessWidget {
                 message.text,
                 style: TextStyle(
                   color: ChatPalette.userText,
-                  fontSize: 14.sp,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w600,
                   height: 1.25,
                 ),
@@ -305,7 +305,7 @@ class _AppyBubble extends StatelessWidget {
           text,
           style: TextStyle(
             color: ChatPalette.appyText,
-            fontSize: 14.sp,
+            fontSize: 16.sp,
             fontWeight: FontWeight.w600,
             height: 1.25,
           ),

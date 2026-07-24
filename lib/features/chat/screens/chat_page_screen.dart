@@ -43,29 +43,6 @@ class ChatPage extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // Full-bleed cozy-room scene.
-          Positioned.fill(
-            child: Image.asset(
-              'assets/chat/chat_background.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-          // Soft top fade so the status bar and header stay legible.
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 160.h,
-            child: const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0x40FFFFFF), Color(0x00FFFFFF)],
-                ),
-              ),
-            ),
-          ),
           SafeArea(
             bottom: false,
             child: Column(
@@ -296,6 +273,8 @@ class _ChatViewState extends State<_ChatView> {
         // by the enclosing gate, so it lives here rather than at page level).
         ChatTopBar(trailing: const InsightProgressButton()),
         SizedBox(height: 10.h),
+        // Hairline separating the header from the conversation.
+        Divider(height: 1, thickness: 1, color: ChatPalette.cardBorder),
         // Conversation fills the remaining space; auto-scrolls on new turns.
         Expanded(
           child: BlocConsumer<ChatCubit, ChatState>(
@@ -338,12 +317,14 @@ class _ChatViewState extends State<_ChatView> {
             );
           },
         ),
+        // Hairline separating the conversation from the composer.
+        Divider(height: 1, thickness: 1, color: ChatPalette.cardBorder),
         // Composer: snug above the keyboard when open, clear of the floating nav
         // bar when closed (padding grows smoothly to 96 as the keyboard retracts).
         Padding(
           padding: EdgeInsets.fromLTRB(
             24.w,
-            24,
+            6,
             24.w,
             (24.h - MediaQuery.viewInsetsOf(context).bottom).clamp(8.h, 96.h),
           ),

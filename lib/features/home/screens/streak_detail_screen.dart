@@ -5,52 +5,60 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import 'package:elevate/l10n/l10n_helpers.dart';
 import '../../../shared/theme/app_theme.dart';
-import '../../../shared/utils/haptic_utils.dart';
 import '../cubit/streak_cubit.dart';
 import '../cubit/streak_state.dart';
 import '../models/streak_milestone.dart';
 
-/// Full-page modal for the daily streak, opened by tapping the streak counter on
-/// the home page. Mirrors the milestones design: the current/best streak record
-/// cards, a current → next badge card with progress, and the full badge grid.
-class StreakDetailScreen extends StatelessWidget {
-  const StreakDetailScreen({super.key});
+/// Opens the daily-streak detail as a cream bottom-sheet modal — same shell as
+/// the shop sheet (rounded top corners, grab handle). Provides the existing
+/// [StreakCubit] to the sheet so it stays reactive to streak changes.
+Future<void> showStreakDetailSheet(BuildContext context) {
+  final streak = context.read<StreakCubit>();
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    // No scrim — the rest of the screen stays fully visible, matching the shop.
+    barrierColor: Colors.transparent,
+    builder: (_) =>
+        BlocProvider.value(value: streak, child: const _StreakSheet()),
+  );
+}
+
+/// Bottom-sheet body for the daily streak, mirroring the milestones design: the
+/// current/best streak record cards, a current → next badge card with progress,
+/// and the full badge grid.
+class _StreakSheet extends StatelessWidget {
+  const _StreakSheet();
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: c.background,
-      body: SafeArea(
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.55,
+      child: Container(
+        decoration: BoxDecoration(
+          color: HomePalette.cream,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header — close button.
+            // Grab handle.
             Padding(
-              padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: withHaptic(() => Navigator.pop(context)),
-                    child: Container(
-                      width: 36.w,
-                      height: 36.w,
-                      decoration: BoxDecoration(
-                        color: c.card,
-                        shape: BoxShape.circle,
-                      ),
-                      child:
-                          Icon(Icons.close, size: 18.sp, color: c.textPrimary),
-                    ),
-                  ),
-                ],
+              padding: EdgeInsets.only(top: 12.h, bottom: 4.h),
+              child: Container(
+                width: 100.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: HomePalette.subtitleGrey.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
               ),
             ),
             Expanded(
               child: BlocBuilder<StreakCubit, StreakState>(
                 builder: (context, state) => SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
+                  padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 32.h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -59,7 +67,7 @@ class StreakDetailScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 28.sp,
                           fontWeight: FontWeight.bold,
-                          color: c.textPrimary,
+                          color: HomePalette.titleDark,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -70,7 +78,7 @@ class StreakDetailScreen extends StatelessWidget {
                           Expanded(
                             child: _StreakStatCard(
                               icon: Image.asset(
-                                'assets/home_page/streak.png',
+                                'assets/home_page/streaks.png',
                                 width: 56.w,
                                 height: 56.w,
                               ),
@@ -105,7 +113,7 @@ class StreakDetailScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
-                          color: c.textPrimary,
+                          color: HomePalette.titleDark,
                         ),
                       ),
                       SizedBox(height: 12.h),
@@ -137,26 +145,28 @@ class _StreakStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
     return AspectRatio(
       aspectRatio: 1,
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: c.card,
+          color: HomePalette.cardWhite,
           borderRadius: BorderRadius.circular(16.r),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 56.w, child: Center(child: icon)),
+            SizedBox(
+              height: 56.w,
+              child: Center(child: icon),
+            ),
             SizedBox(height: 4.h),
             Text(
               value,
               style: TextStyle(
                 fontSize: 32.sp,
                 fontWeight: FontWeight.bold,
-                color: c.textPrimary,
+                color: HomePalette.titleDark,
               ),
             ),
             Text(
@@ -164,7 +174,7 @@ class _StreakStatCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
-                color: c.textSecondary,
+                color: HomePalette.subtitleGrey,
               ),
             ),
           ],
@@ -186,7 +196,6 @@ class _NextBadgeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     // Highest badge already earned (by best streak), and the next to earn.
@@ -202,7 +211,7 @@ class _NextBadgeCard extends StatelessWidget {
       return Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: c.card,
+          color: HomePalette.cardWhite,
           borderRadius: BorderRadius.circular(16.r),
         ),
         child: Column(
@@ -223,7 +232,7 @@ class _NextBadgeCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
-                          color: c.textPrimary,
+                          color: HomePalette.titleDark,
                         ),
                       ),
                     ],
@@ -244,13 +253,14 @@ class _NextBadgeCard extends StatelessWidget {
         .where((d) => d <= streak)
         .fold<int>(0, (a, b) => b > a ? b : a);
     final span = next.days - prevDays;
-    final progress =
-        span <= 0 ? 0.0 : ((streak - prevDays) / span).clamp(0.0, 1.0);
+    final progress = span <= 0
+        ? 0.0
+        : ((streak - prevDays) / span).clamp(0.0, 1.0);
 
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: c.card,
+        color: HomePalette.cardWhite,
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
@@ -276,13 +286,16 @@ class _NextBadgeCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
-                        color: c.textPrimary,
+                        color: HomePalette.titleDark,
                       ),
                     ),
                     SizedBox(height: 2.h),
                     Text(
                       l10n.streakDaysToGo(next.days - streak),
-                      style: TextStyle(fontSize: 13.sp, color: c.textSecondary),
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: HomePalette.subtitleGrey,
+                      ),
                     ),
                   ],
                 ),
@@ -298,7 +311,7 @@ class _NextBadgeCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 8.h,
-              backgroundColor: c.background,
+              backgroundColor: HomePalette.checkButtonBg,
               valueColor: const AlwaysStoppedAnimation<Color>(
                 HomePalette.progressYellow,
               ),
@@ -321,7 +334,6 @@ class _BadgeGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return GridView.builder(
       shrinkWrap: true,
@@ -348,13 +360,18 @@ class _BadgeGrid extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w600,
-                color: earned ? c.textPrimary : c.textSecondary,
+                color: earned
+                    ? HomePalette.titleDark
+                    : HomePalette.subtitleGrey,
               ),
             ),
             SizedBox(height: 2.h),
             Text(
               '${m.days}',
-              style: TextStyle(fontSize: 10.sp, color: c.textSecondary),
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: HomePalette.subtitleGrey,
+              ),
             ),
           ],
         );
@@ -413,13 +430,12 @@ class _Quote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.of(context);
     return Text(
       text,
       style: TextStyle(
         fontSize: 14.sp,
         fontStyle: FontStyle.italic,
-        color: c.textSecondary,
+        color: HomePalette.subtitleGrey,
         height: 1.4,
       ),
     );

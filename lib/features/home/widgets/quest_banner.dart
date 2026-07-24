@@ -204,17 +204,12 @@ class _StreakCounter extends StatelessWidget {
       buildWhen: (a, b) => a.streak != b.streak,
       builder: (context, state) {
         return GestureDetector(
-          onTap: withHaptic(() => Navigator.of(context).push(
-                MaterialPageRoute(
-                  fullscreenDialog: true,
-                  builder: (_) => const StreakDetailScreen(),
-                ),
-              )),
+          onTap: withHaptic(() => showStreakDetailSheet(context)),
           behavior: HitTestBehavior.opaque,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset('assets/home_page/streak_icon.png', width: 34.w),
+              Image.asset('assets/home_page/streak_icon.png', width: 40.w),
               SizedBox(width: 4.w),
               Text(
                 '${state.streak}',

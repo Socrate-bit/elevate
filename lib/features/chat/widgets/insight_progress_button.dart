@@ -31,7 +31,9 @@ class InsightProgressButton extends StatelessWidget {
 
         return GestureDetector(
           onTap: withHaptic(() {
-            AnalyticsService.capture(AnalyticsService.chatInsightsFormingOpened);
+            AnalyticsService.capture(
+              AnalyticsService.chatInsightsFormingOpened,
+            );
             showInsightFormingSheet(context, cubit);
           }),
           child: ClipOval(
@@ -62,8 +64,9 @@ class InsightProgressButton extends StatelessWidget {
                       height: size,
                       child: CircularProgressIndicator(
                         value: progress,
-                        strokeWidth: 2.5,
-                        backgroundColor: Colors.white.withValues(alpha: 0.3),
+                        strokeWidth: 10,
+
+                        backgroundColor: Colors.black.withValues(alpha: 0.075),
                         valueColor: AlwaysStoppedAnimation(
                           ready ? Colors.white : ChatPalette.accent,
                         ),

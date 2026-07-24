@@ -36,24 +36,27 @@ class JournalInsightList extends StatelessWidget {
         if (state.insights.isEmpty) {
           return const _JournalEmptyState();
         }
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 18.w),
-          child: Column(
-            children: [
-              for (final ji in state.insights)
-                Padding(
-                  padding: EdgeInsets.only(bottom: 10.h),
-                  child: _InsightCard(entry: ji),
+        // Rows inside the single white panel, split by hairline dividers.
+        return Column(
+          children: [
+            for (var i = 0; i < state.insights.length; i++) ...[
+              if (i > 0)
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: HomePalette.subtitleGrey.withValues(alpha: 0.12),
                 ),
+              _InsightCard(entry: state.insights[i]),
             ],
-          ),
+          ],
         );
       },
     );
   }
 }
 
-/// One insight as a white card: icon tile, title, body preview, date, chevron.
+/// One insight as a row inside the white panel: icon tile, title, body preview,
+/// date, chevron.
 class _InsightCard extends StatelessWidget {
   final JournalInsight entry;
 
@@ -63,6 +66,7 @@ class _InsightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dateLabel = DateFormat('MMM d, h:mm a').format(entry.createdAt);
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: withHaptic(() {
         AnalyticsService.capture(AnalyticsService.chatInsightOpened);
         Navigator.of(context).push(
@@ -71,19 +75,8 @@ class _InsightCard extends StatelessWidget {
           ),
         );
       }),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-        decoration: BoxDecoration(
-          color: HomePalette.cardWhite,
-          borderRadius: BorderRadius.circular(18.r),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x12000000),
-              blurRadius: 6,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.h),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -498,6 +498,8 @@
   "chatInsightCardCta": "Read insight",
 
   "journalTitle": "Journal",
+  "journalInsightsLabel": "Insights",
+  "journalWisdomLabel": "Wisdom",
   "journalInsightsEmptyTitle": "No insights yet",
   "journalInsightsEmptyBody": "Your insights from chats with Appy will show up here.",
   "journalInsightsEmptyCta": "Start chatting",

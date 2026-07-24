@@ -25,8 +25,9 @@ class TrophyRevealScreen extends StatefulWidget {
 
 class _TrophyRevealScreenState extends State<TrophyRevealScreen>
     with TickerProviderStateMixin {
-  late final ConfettiController _confetti =
-      ConfettiController(duration: const Duration(seconds: 4));
+  late final ConfettiController _confetti = ConfettiController(
+    duration: const Duration(seconds: 4),
+  );
 
   // Anticipation loop while generating.
   late final AnimationController _pulse = AnimationController(
@@ -135,29 +136,30 @@ class _TrophyRevealScreenState extends State<TrophyRevealScreen>
                     ),
                     const Spacer(),
                     // Black "Done" button dismisses the reveal.
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 32.h),
-                      child: GestureDetector(
-                        onTap: withMediumHaptic(() => Navigator.pop(context)),
-                        child: Container(
-                          width: double.infinity,
-                          height: 52.h,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(16.r),
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)!.trophyDetailDone,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                    if (revealed)
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 32.h),
+                        child: GestureDetector(
+                          onTap: withMediumHaptic(() => Navigator.pop(context)),
+                          child: Container(
+                            width: double.infinity,
+                            height: 52.h,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                            child: Text(
+                              AppLocalizations.of(context)!.trophyDetailDone,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -203,9 +205,10 @@ class _GeneratingBadge extends StatelessWidget {
           ),
           // Gently breathing grey hexagon.
           ScaleTransition(
-            scale: Tween<double>(begin: 0.92, end: 1.04).animate(
-              CurvedAnimation(parent: pulse, curve: Curves.easeInOut),
-            ),
+            scale: Tween<double>(
+              begin: 0.92,
+              end: 1.04,
+            ).animate(CurvedAnimation(parent: pulse, curve: Curves.easeInOut)),
             child: HexagonBadge(
               size: 140.w,
               color: const Color(0xFFCBBBA6),
@@ -324,7 +327,7 @@ class _Citation extends StatelessWidget {
                 trophy.title.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 26.sp,
+                  fontSize: 21.sp,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.5,
                   color: color,

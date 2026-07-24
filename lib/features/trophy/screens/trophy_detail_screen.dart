@@ -53,7 +53,7 @@ class TrophyDetailScreen extends StatelessWidget {
                             trophy.title.toUpperCase(),
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 22.sp,
+                              fontSize: 21.sp,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 1.5,
                               color: color,

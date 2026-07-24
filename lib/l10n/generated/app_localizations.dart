@@ -2606,6 +2606,18 @@ abstract class AppLocalizations {
   /// **'Journal'**
   String get journalTitle;
 
+  /// No description provided for @journalInsightsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights'**
+  String get journalInsightsLabel;
+
+  /// No description provided for @journalWisdomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wisdom'**
+  String get journalWisdomLabel;
+
   /// No description provided for @journalInsightsEmptyTitle.
   ///
   /// In en, this message translates to:

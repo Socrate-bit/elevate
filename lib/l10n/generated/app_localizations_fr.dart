@@ -1382,6 +1382,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get journalTitle => 'Journal';
 
   @override
+  String get journalInsightsLabel => 'Insights';
+
+  @override
+  String get journalWisdomLabel => 'Sagesse';
+
+  @override
   String get journalInsightsEmptyTitle => 'Pas encore d\'insights';
 
   @override
