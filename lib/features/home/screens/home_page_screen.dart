@@ -11,6 +11,8 @@ import '../../navigation/appy_nav_bar.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../routines/cubit/routine_cubit.dart';
+import '../../shop/cubit/shop_cubit.dart';
+import '../../shop/cubit/shop_state.dart';
 import '../cubit/streak_cubit.dart';
 import '../cubit/streak_state.dart';
 import '../cubit/home_page_cubit.dart';
@@ -45,6 +47,9 @@ class _HomeViewState extends State<_HomeView> {
   final _petKey = GlobalKey();
   final _stackKey = GlobalKey();
 
+  // Scrolls the page back to the top when the shop modal opens.
+  final _scroll = ScrollController();
+
   // Fires on every awarded completion (celebration burst).
   late final ConfettiController _confetti =
       ConfettiController(duration: const Duration(seconds: 2));
@@ -66,7 +71,18 @@ class _HomeViewState extends State<_HomeView> {
   void dispose() {
     _coinTimer?.cancel();
     _confetti.dispose();
+    _scroll.dispose();
     super.dispose();
+  }
+
+  /// Animates the page back to the top (used when the shop modal opens).
+  void _scrollToTop() {
+    if (!_scroll.hasClients) return;
+    _scroll.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   // Pet frame width relative to screen width.
@@ -132,16 +148,26 @@ class _HomeViewState extends State<_HomeView> {
           ],
         ),
       ),
-      body: BlocListener<AdventureCubit, AdventureState>(
-        listenWhen: (a, b) => a.rewardNonce != b.rewardNonce,
-        listener: (context, _) {
-          _confetti.play();
-          HapticFeedback.heavyImpact();
-          _flashCoins();
-        },
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<AdventureCubit, AdventureState>(
+            listenWhen: (a, b) => a.rewardNonce != b.rewardNonce,
+            listener: (context, _) {
+              _confetti.play();
+              HapticFeedback.heavyImpact();
+              _flashCoins();
+            },
+          ),
+          // Reset the scroll to the top whenever the shop modal opens.
+          BlocListener<ShopCubit, ShopState>(
+            listenWhen: (a, b) => !a.isOpen && b.isOpen,
+            listener: (context, _) => _scrollToTop(),
+          ),
+        ],
         child: Stack(
           children: [
             SingleChildScrollView(
+              controller: _scroll,
               physics: const AlwaysScrollableScrollPhysics(),
               child: Stack(
                 key: _stackKey,

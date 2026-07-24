@@ -9,6 +9,8 @@ import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../adventure/models/game_profile.dart';
 import '../../adventure/screens/adventure_success_screen.dart';
+import '../../shop/cubit/shop_cubit.dart';
+import '../../shop/cubit/shop_state.dart';
 import '../../shop/widgets/shop_sheet.dart';
 import '../cubit/streak_cubit.dart';
 import '../cubit/streak_state.dart';
@@ -25,20 +27,31 @@ class QuestBanner extends StatelessWidget {
 
     return Column(
       children: [
-        Padding(
-          padding: EdgeInsets.only(right: 18.w, left: 18.w, bottom: 12.h),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              const Spacer(),
-              const _StreakCounter(),
-              SizedBox(width: 24.w),
-              _PerchIcon(
-                asset: 'assets/home_page/shop_icon.png',
-                onTap: () => showShopSheet(context),
+        // Streak + shop shortcut — hidden while the shop modal is open (its
+        // slot is kept so the banner below doesn't shift).
+        BlocBuilder<ShopCubit, ShopState>(
+          buildWhen: (a, b) => a.isOpen != b.isOpen,
+          builder: (context, shop) => Visibility(
+            visible: !shop.isOpen,
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            child: Padding(
+              padding: EdgeInsets.only(right: 18.w, left: 18.w, bottom: 12.h),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Spacer(),
+                  const _StreakCounter(),
+                  SizedBox(width: 24.w),
+                  _PerchIcon(
+                    asset: 'assets/home_page/shop_icon.png',
+                    onTap: () => showShopSheet(context),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
         Padding(
