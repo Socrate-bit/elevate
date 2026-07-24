@@ -49,21 +49,25 @@ class AdventureCubit extends Cubit<AdventureState> {
     }
   }
 
-  /// Completing a task: award coins (== the task's XP) + a strike, then signal
-  /// the confetti listener.
+  /// Completing a task: award coins + strikes (both == the task's points),
+  /// then signal the confetti listener.
   Future<void> awardForCompletion(int xp) async {
     try {
-      await AdventureService.awardCompletion(coins: xp, now: DateTime.now());
+      await AdventureService.awardCompletion(
+        coins: xp,
+        strikes: xp,
+        now: DateTime.now(),
+      );
       emit(state.copyWith(rewardNonce: state.rewardNonce + 1));
     } catch (e) {
       debugPrint('[AdventureCubit] awardForCompletion failed: $e');
     }
   }
 
-  /// Un-checking a task: reverse the coins + strike it granted.
+  /// Un-checking a task: reverse the coins + strikes it granted.
   Future<void> removeForCompletion(int xp) async {
     try {
-      await AdventureService.removeCompletion(coins: xp);
+      await AdventureService.removeCompletion(coins: xp, strikes: xp);
     } catch (e) {
       debugPrint('[AdventureCubit] removeForCompletion failed: $e');
     }

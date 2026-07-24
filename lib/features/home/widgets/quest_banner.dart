@@ -9,6 +9,8 @@ import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../adventure/models/game_profile.dart';
 import '../../adventure/screens/adventure_success_screen.dart';
+import '../cubit/streak_cubit.dart';
+import '../cubit/streak_state.dart';
 
 /// Teal quest banner with lightning icon, adventure title and a progress
 /// pill / action button reflecting the live adventure state. The coin balance
@@ -29,7 +31,7 @@ class QuestBanner extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               const Spacer(),
-              const _CoinCounter(),
+              const _StreakCounter(),
               SizedBox(width: 24.w),
               _PerchIcon(asset: 'assets/home_page/shop_icon.png', onTap: () {}),
             ],
@@ -173,27 +175,23 @@ class _PerchIcon extends StatelessWidget {
   }
 }
 
-/// Live coin balance perched on the banner (no coin artwork exists yet, so a
-/// Material coin icon is used).
-class _CoinCounter extends StatelessWidget {
-  const _CoinCounter();
+/// Live daily-streak count perched on the banner (consecutive days with a
+/// completed activity).
+class _StreakCounter extends StatelessWidget {
+  const _StreakCounter();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AdventureCubit, AdventureState>(
-      buildWhen: (a, b) => a.profile.coins != b.profile.coins,
-      builder: (context, adv) {
+    return BlocBuilder<StreakCubit, StreakState>(
+      buildWhen: (a, b) => a.streak != b.streak,
+      builder: (context, state) {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.monetization_on_rounded,
-              size: 34.w,
-              color: HomePalette.progressYellow,
-            ),
+            Image.asset('assets/home_page/streak_icon.png', width: 34.w),
             SizedBox(width: 4.w),
             Text(
-              '${adv.profile.coins}',
+              '${state.streak}',
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w800,

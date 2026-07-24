@@ -30,11 +30,13 @@ class AdventureService {
     });
   }
 
-  /// Awards a completion: `+coins` and `+1 strike`. While walking, every
-  /// [kStrikesPerReduction] strikes shortens the timer by [kReductionPerStep]
-  /// (floored at [now]); in debug builds any new strike finishes it instantly.
+  /// Awards a completion: `+coins` and `+strikes` (the task's strike value).
+  /// While walking, every [kStrikesPerReduction] strikes shortens the timer by
+  /// [kReductionPerStep] (floored at [now]); in debug builds any new strike
+  /// finishes it instantly.
   static Future<void> awardCompletion({
     required int coins,
+    required int strikes,
     required DateTime now,
   }) async {
     try {
@@ -44,18 +46,24 @@ class AdventureService {
             ? GameProfile.fromMap(snap.data()!)
             : const GameProfile();
 
-        final newStrikes = profile.strikes + 1;
+        final newStrikes = profile.strikes + strikes;
         var endMs = profile.adventureEndMs;
 
         if (profile.phase == AdventurePhase.walking && endMs != null) {
           if (kDebugMode) {
             // Debug shortcut: any new strike finishes the adventure.
             endMs = now.millisecondsSinceEpoch;
-          } else if (newStrikes % kStrikesPerReduction == 0) {
-            final reduced = endMs - kReductionPerStep.inMilliseconds;
-            endMs = reduced < now.millisecondsSinceEpoch
-                ? now.millisecondsSinceEpoch
-                : reduced;
+          } else {
+            // Reduce once per reduction threshold crossed by this award.
+            final steps = (newStrikes ~/ kStrikesPerReduction) -
+                (profile.strikes ~/ kStrikesPerReduction);
+            if (steps > 0) {
+              final reduced =
+                  endMs - steps * kReductionPerStep.inMilliseconds;
+              endMs = reduced < now.millisecondsSinceEpoch
+                  ? now.millisecondsSinceEpoch
+                  : reduced;
+            }
           }
         }
 
@@ -74,8 +82,11 @@ class AdventureService {
   }
 
   /// Reverses a completion (task un-checked): `-coins` (floored at 0), and
-  /// `-1 strike` while charging (walking strikes are left untouched).
-  static Future<void> removeCompletion({required int coins}) async {
+  /// `-strikes` while charging (walking strikes are left untouched).
+  static Future<void> removeCompletion({
+    required int coins,
+    required int strikes,
+  }) async {
     try {
       await _db.runTransaction((tx) async {
         final snap = await tx.get(_gameDoc);
@@ -84,7 +95,7 @@ class AdventureService {
 
         final newCoins = (profile.coins - coins).clamp(0, 1 << 31).toInt();
         final newStrikes = profile.phase == AdventurePhase.charging
-            ? (profile.strikes - 1).clamp(0, 1 << 31).toInt()
+            ? (profile.strikes - strikes).clamp(0, 1 << 31).toInt()
             : profile.strikes;
 
         tx.set(

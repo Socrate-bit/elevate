@@ -8,7 +8,7 @@
 const kHeartMax = 4;
 
 /// One heart is lost per this much inactivity since the last activity.
-const kHeartDecayInterval = Duration(hours: 8);
+const kHeartDecayInterval = Duration(hours: 12);
 
 /// Pet mood animations, keyed by remaining hearts.
 const _petSad = 'assets/home/sad_pet.gif';

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,8 +49,22 @@ class _HomeViewState extends State<_HomeView> {
   late final ConfettiController _confetti =
       ConfettiController(duration: const Duration(seconds: 2));
 
+  // Coin total flashes in over the settings for 3s after each earn.
+  bool _showCoins = false;
+  Timer? _coinTimer;
+
+  /// Surfaces the coin total, then hides it again after 3 seconds.
+  void _flashCoins() {
+    setState(() => _showCoins = true);
+    _coinTimer?.cancel();
+    _coinTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _showCoins = false);
+    });
+  }
+
   @override
   void dispose() {
+    _coinTimer?.cancel();
     _confetti.dispose();
     super.dispose();
   }
@@ -91,13 +107,37 @@ class _HomeViewState extends State<_HomeView> {
         shadowColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         backgroundColor: Colors.transparent,
-        title: const HomeTopBar(),
+        // The coin flash lives in the app-bar layer so it draws over the
+        // settings icon (a body overlay would sit behind the app bar).
+        title: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const HomeTopBar(),
+            Positioned(
+              top: 24.h,
+              right: 18.w,
+              child: IgnorePointer(
+                child: AnimatedSlide(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                  offset: _showCoins ? Offset.zero : const Offset(0, -0.5),
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 300),
+                    opacity: _showCoins ? 1 : 0,
+                    child: const _CoinFlash(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
       body: BlocListener<AdventureCubit, AdventureState>(
         listenWhen: (a, b) => a.rewardNonce != b.rewardNonce,
         listener: (context, _) {
           _confetti.play();
           HapticFeedback.heavyImpact();
+          _flashCoins();
         },
         child: Stack(
           children: [
@@ -193,6 +233,52 @@ class _HomeViewState extends State<_HomeView> {
         ),
       ),
       bottomNavigationBar: const AppyNavBar(),
+    );
+  }
+}
+
+/// Floating card showing the live coin total, shadowed so it reads as an
+/// overlay perched above the settings icon.
+class _CoinFlash extends StatelessWidget {
+  const _CoinFlash();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AdventureCubit, AdventureState>(
+      buildWhen: (a, b) => a.profile.coins != b.profile.coins,
+      builder: (context, adv) => Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(21.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.monetization_on_rounded,
+              size: 28.w,
+              color: HomePalette.progressYellow,
+            ),
+            SizedBox(width: 6.w),
+            Text(
+              '${adv.profile.coins}',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w800,
+                color: HomePalette.progressBrown,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
