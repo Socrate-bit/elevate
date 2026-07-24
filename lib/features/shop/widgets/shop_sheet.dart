@@ -26,14 +26,13 @@ Future<void> showShopSheet(BuildContext context) async {
   shop.dismiss();
 }
 
-/// A shop tab: its icon asset plus the coming-soon call-to-action and emoji
-/// shown in its body.
+/// A shop tab: its icon asset (used both in the tab bar and the coming-soon
+/// body) plus the call-to-action shown in its body.
 class _ShopTab {
   final String icon;
   final String cta;
-  final String emoji;
 
-  const _ShopTab({required this.icon, required this.cta, required this.emoji});
+  const _ShopTab({required this.icon, required this.cta});
 }
 
 /// Half-height shop modal with a tab per customization category. Each tab is a
@@ -46,27 +45,11 @@ class _ShopSheet extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     const iconBase = 'assets/shop/shop_tab';
     final tabs = <_ShopTab>[
-      _ShopTab(
-        icon: '$iconBase/image.png',
-        cta: l10n.shopCtaBackground,
-        emoji: '🌄',
-      ),
-      _ShopTab(icon: '$iconBase/cap.png', cta: l10n.shopCtaHat, emoji: '🎩'),
-      _ShopTab(
-        icon: '$iconBase/safety-glasses.png',
-        cta: l10n.shopCtaGlass,
-        emoji: '🕶️',
-      ),
-      _ShopTab(
-        icon: '$iconBase/scarf.png',
-        cta: l10n.shopCtaScarf,
-        emoji: '🧣',
-      ),
-      _ShopTab(
-        icon: '$iconBase/palette.png',
-        cta: l10n.shopCtaColor,
-        emoji: '🎨',
-      ),
+      _ShopTab(icon: '$iconBase/image.png', cta: l10n.shopCtaBackground),
+      _ShopTab(icon: '$iconBase/cap.png', cta: l10n.shopCtaHat),
+      _ShopTab(icon: '$iconBase/safety-glasses.png', cta: l10n.shopCtaGlass),
+      _ShopTab(icon: '$iconBase/scarf.png', cta: l10n.shopCtaScarf),
+      _ShopTab(icon: '$iconBase/palette.png', cta: l10n.shopCtaColor),
     ];
 
     // Half the screen height so the streak and shop icons above stay visible.
@@ -94,10 +77,9 @@ class _ShopSheet extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 8.h),
-              // Category tabs — icon only, black when selected, grey otherwise.
+              // Category tabs — icon only, spread across the full width,
+              // black when selected, grey otherwise.
               TabBar(
-                isScrollable: true,
-                tabAlignment: TabAlignment.center,
                 indicatorColor: Colors.black,
                 indicatorWeight: 3,
                 labelColor: Colors.black,
@@ -129,15 +111,15 @@ class _TabIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       asset,
-      width: 26.w,
-      height: 26.w,
+      width: 34.w,
+      height: 34.w,
       color: IconTheme.of(context).color,
     );
   }
 }
 
-/// Placeholder body for a shop tab: an emoji, its call-to-action, and a
-/// "coming soon" note.
+/// Placeholder body for a shop tab: the category icon, its call-to-action, and
+/// a "coming soon" note — vertically centered.
 class _ComingSoon extends StatelessWidget {
   final _ShopTab tab;
 
@@ -151,8 +133,14 @@ class _ComingSoon extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 32.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(tab.emoji, style: TextStyle(fontSize: 48.sp)),
+            Image.asset(
+              tab.icon,
+              width: 64.w,
+              height: 64.w,
+              color: HomePalette.titleDark,
+            ),
             SizedBox(height: 16.h),
             Text(
               tab.cta,
