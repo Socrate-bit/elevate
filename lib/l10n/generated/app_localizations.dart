@@ -2222,6 +2222,42 @@ abstract class AppLocalizations {
   /// **'+ {xp} XP'**
   String homePageXp(int xp);
 
+  /// No description provided for @adventureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Forest Adventure'**
+  String get adventureTitle;
+
+  /// No description provided for @adventureStrikeProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} / {total} strikes'**
+  String adventureStrikeProgress(int done, int total);
+
+  /// No description provided for @adventureStartButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Adventure'**
+  String get adventureStartButton;
+
+  /// No description provided for @adventureDiscoverButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover the surprise'**
+  String get adventureDiscoverButton;
+
+  /// No description provided for @adventureRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{h}h {m}m left'**
+  String adventureRemaining(int h, int m);
+
+  /// No description provided for @adventureSuccessLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Trophy Earned'**
+  String get adventureSuccessLabel;
+
   /// No description provided for @navJournal.
   ///
   /// In en, this message translates to:

@@ -1,9 +1,13 @@
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/appy_nav_bar.dart';
+import '../../adventure/cubit/adventure_cubit.dart';
+import '../../adventure/cubit/adventure_state.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../cubit/heart_cubit.dart';
 import '../cubit/heart_state.dart';
@@ -38,6 +42,16 @@ class _HomeView extends StatefulWidget {
 class _HomeViewState extends State<_HomeView> {
   final _petKey = GlobalKey();
   final _stackKey = GlobalKey();
+
+  // Fires on every awarded completion (celebration burst).
+  late final ConfettiController _confetti =
+      ConfettiController(duration: const Duration(seconds: 2));
+
+  @override
+  void dispose() {
+    _confetti.dispose();
+    super.dispose();
+  }
 
   // Pet frame width relative to screen width.
   static const _petWidthFactor = 0.45;
@@ -79,10 +93,18 @@ class _HomeViewState extends State<_HomeView> {
         backgroundColor: Colors.transparent,
         title: const HomeTopBar(),
       ),
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
+      body: BlocListener<AdventureCubit, AdventureState>(
+        listenWhen: (a, b) => a.rewardNonce != b.rewardNonce,
+        listener: (context, _) {
+          _confetti.play();
+          HapticFeedback.heavyImpact();
+        },
         child: Stack(
-          key: _stackKey,
+          children: [
+            SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Stack(
+                key: _stackKey,
           children: [
             // Scene background fills the content; grass continues below it
             // (and the Scaffold background is grass too) so the green reaches
@@ -100,16 +122,34 @@ class _HomeViewState extends State<_HomeView> {
                       // Pet sits in the flow: it can never overlap the content
                       // below. Both dimensions are fixed (the gif is square) so
                       // the first-frame paws measurement is already final. The
-                      // mood animation follows the pet's remaining hearts.
-                      BlocBuilder<HeartCubit, HeartState>(
-                        buildWhen: (a, b) => a.hearts != b.hearts,
-                        builder: (context, state) => Image.asset(
-                          HeartService.petAssetForHearts(state.hearts),
-                          key: _petKey,
-                          width: w * _petWidthFactor,
-                          height: w * _petWidthFactor,
-                          gaplessPlayback: true,
-                        ),
+                      // The walking gif plays while the pet is away on an
+                      // adventure; otherwise its mood animation follows the
+                      // pet's remaining hearts.
+                      BlocBuilder<AdventureCubit, AdventureState>(
+                        buildWhen: (a, b) =>
+                            (a.isWalking && !a.isArrived) !=
+                            (b.isWalking && !b.isArrived),
+                        builder: (context, adv) {
+                          if (adv.isWalking && !adv.isArrived) {
+                            return Image.asset(
+                              'assets/home/walking_pet.gif',
+                              key: _petKey,
+                              width: w * _petWidthFactor,
+                              height: w * _petWidthFactor,
+                              gaplessPlayback: true,
+                            );
+                          }
+                          return BlocBuilder<HeartCubit, HeartState>(
+                            buildWhen: (a, b) => a.hearts != b.hearts,
+                            builder: (context, state) => Image.asset(
+                              HeartService.petAssetForHearts(state.hearts),
+                              key: _petKey,
+                              width: w * _petWidthFactor,
+                              height: w * _petWidthFactor,
+                              gaplessPlayback: true,
+                            ),
+                          );
+                        },
                       ),
                       SizedBox(height: 10.h),
                     ],
@@ -126,6 +166,28 @@ class _HomeViewState extends State<_HomeView> {
                   ),
                 ),
               ],
+            ),
+                ],
+              ),
+            ),
+            // Celebration burst on task completion, from the top center.
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confetti,
+                blastDirectionality: BlastDirectionality.explosive,
+                numberOfParticles: 18,
+                maxBlastForce: 20,
+                minBlastForce: 6,
+                gravity: 0.25,
+                emissionFrequency: 0.05,
+                colors: const [
+                  Color(0xFFFEB114),
+                  Color(0xFFEC5B3A),
+                  Color(0xFF1EA49A),
+                  Color(0xFF76A93F),
+                ],
+              ),
             ),
           ],
         ),

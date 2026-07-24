@@ -1168,6 +1168,28 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get adventureTitle => 'Aventure en forêt';
+
+  @override
+  String adventureStrikeProgress(int done, int total) {
+    return '$done / $total coups';
+  }
+
+  @override
+  String get adventureStartButton => 'Partir à l\'aventure';
+
+  @override
+  String get adventureDiscoverButton => 'Découvrir la surprise';
+
+  @override
+  String adventureRemaining(int h, int m) {
+    return '${h}h ${m}min restantes';
+  }
+
+  @override
+  String get adventureSuccessLabel => 'Trophée obtenu';
+
+  @override
   String get navJournal => 'Journal';
 
   @override

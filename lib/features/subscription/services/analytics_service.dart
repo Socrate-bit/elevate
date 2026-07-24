@@ -57,6 +57,11 @@ class AnalyticsService {
   static const badgeEarned = 'badge_earned';
   static const streakBroken = 'streak_broken'; // props: {streak}
 
+  // Adventure / gamification
+  static const coinEarned = 'coin_earned'; // props: {coins}
+  static const adventureStarted = 'adventure_started';
+  static const adventureCompleted = 'adventure_completed'; // props: {wisdom_id}
+
   // Onboarding
   static const onboardingStep = 'onboarding_step';
 

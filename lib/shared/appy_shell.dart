@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../features/adventure/cubit/adventure_cubit.dart';
 import '../features/home/screens/home_page_screen.dart';
 import '../features/journal/screens/journal_page_screen.dart';
 import '../features/quest/screens/quest_page_screen.dart';
@@ -15,8 +16,13 @@ class AppyShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => AppNavCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => AppNavCubit()),
+        // App-wide game state (coins / strikes / adventure), shared by the
+        // home scene, quest banner and the plan's completion toggles.
+        BlocProvider(create: (_) => AdventureCubit()),
+      ],
       child: BlocBuilder<AppNavCubit, int>(
         builder: (context, index) {
           return IndexedStack(
