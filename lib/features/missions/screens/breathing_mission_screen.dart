@@ -8,7 +8,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:elevate/l10n/generated/app_localizations.dart';
 
 import '../../../shared/theme/app_theme.dart';
-import '../widgets/levio_brand_header.dart';
 import '../widgets/mission_complete_screen.dart';
 
 enum _BreathingPhase { inhale, holdIn, exhale, holdOut }
@@ -166,50 +165,43 @@ class _BreathingMissionScreenState extends State<BreathingMissionScreen>
       body: SafeArea(
         child: Stack(
           children: [
-            Column(
-              children: [
-                const LevioBrandHeader(),
-                Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _phaseLabel(l10n),
-                          style: TextStyle(
-                            fontSize: 32.sp,
-                            fontWeight: FontWeight.w600,
-                            color: c.textPrimary,
-                          ),
-                        ),
-                        SizedBox(height: 32.h),
-                        SizedBox(
-                          width: 260.w,
-                          height: 260.w,
-                          child: AnimatedBuilder(
-                            animation: _controller,
-                            builder: (_, _) => CustomPaint(
-                              painter: _BreathingPainter(
-                                progress: _controller.value,
-                                outerColor: c.primary,
-                                innerColor: c.primary,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 32.h),
-                        Text(
-                          l10n.breathingRoundLabel(_round + 1, widget.rounds),
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: c.textSecondary,
-                          ),
-                        ),
-                      ],
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _phaseLabel(l10n),
+                    style: TextStyle(
+                      fontSize: 32.sp,
+                      fontWeight: FontWeight.w600,
+                      color: c.textPrimary,
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(height: 32.h),
+                  SizedBox(
+                    width: 260.w,
+                    height: 260.w,
+                    child: AnimatedBuilder(
+                      animation: _controller,
+                      builder: (_, _) => CustomPaint(
+                        painter: _BreathingPainter(
+                          progress: _controller.value,
+                          outerColor: c.primary,
+                          innerColor: c.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 32.h),
+                  Text(
+                    l10n.breathingRoundLabel(_round + 1, widget.rounds),
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: c.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
             if (widget.isPreview)
               Positioned(
