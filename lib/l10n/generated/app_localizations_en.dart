@@ -1276,10 +1276,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get journalTitle => 'Journal';
 
   @override
-  String get journalMonthlyInsight => 'Monthly Insight';
+  String get journalInsightsEmptyTitle => 'No insights yet';
 
   @override
-  String get journalInputCues => 'Input Cues';
+  String get journalInsightsEmptyBody =>
+      'Your insights from chats with Appy will show up here.';
+
+  @override
+  String get journalInsightsEmptyCta => 'Start chatting';
 
   @override
   String get shopComingSoon => 'Coming soon';

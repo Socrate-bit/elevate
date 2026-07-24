@@ -1,16 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
 import '../../navigation/appy_nav_bar.dart';
-import '../widgets/journal_entry_card.dart';
+import '../cubit/journal_cubit.dart';
 import '../widgets/journal_header.dart';
-import '../widgets/journal_insight_card.dart';
+import '../widgets/journal_insight_list.dart';
 
-/// Journal page ("Appy" design) — pure UI on mock data. Hosted by [AppyShell],
-/// which provides the shared nav state; the bar swaps between sibling pages.
+/// Journal page ("Appy" design) — lists every generated insight (newest first)
+/// via [JournalCubit]. Hosted by [AppyShell], which provides the shared nav
+/// state; the bar swaps between sibling pages.
 class JournalPage extends StatelessWidget {
   const JournalPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => JournalCubit()..start(),
+      child: const _JournalView(),
+    );
+  }
+}
+
+class _JournalView extends StatelessWidget {
+  const _JournalView();
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +61,7 @@ class JournalPage extends StatelessWidget {
               children: [
                 // Clear the floating app bar (status bar + toolbar).
                 SizedBox(height: topInset + 52.h + 8.h),
-                const JournalInsightCard(),
-                SizedBox(height: 18.h),
-                const JournalEntryList(),
+                const JournalInsightList(),
                 // Clear the floating bottom nav bar.
                 SizedBox(height: 90.h),
               ],

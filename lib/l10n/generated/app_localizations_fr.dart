@@ -1288,10 +1288,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get journalTitle => 'Journal';
 
   @override
-  String get journalMonthlyInsight => 'Bilan du mois';
+  String get journalInsightsEmptyTitle => 'Pas encore d\'insights';
 
   @override
-  String get journalInputCues => 'Pistes d\'écriture';
+  String get journalInsightsEmptyBody =>
+      'Tes insights issus de tes échanges avec Appy apparaîtront ici.';
+
+  @override
+  String get journalInsightsEmptyCta => 'Commencer à discuter';
 
   @override
   String get shopComingSoon => 'Bientôt disponible';

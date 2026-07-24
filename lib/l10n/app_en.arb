@@ -469,8 +469,9 @@
   "chatInsightCardCta": "Read insight",
 
   "journalTitle": "Journal",
-  "journalMonthlyInsight": "Monthly Insight",
-  "journalInputCues": "Input Cues",
+  "journalInsightsEmptyTitle": "No insights yet",
+  "journalInsightsEmptyBody": "Your insights from chats with Appy will show up here.",
+  "journalInsightsEmptyCta": "Start chatting",
 
   "shopComingSoon": "Coming soon",
   "shopCtaBackground": "Change background",
