@@ -12,9 +12,10 @@ import '../models/mood_entry.dart';
 import 'mood_face.dart';
 
 /// Opens a full-screen-style bottom sheet for picking a mood.
-void showMoodPickerSheet(BuildContext context) {
+/// Resolves to the picked [MoodValue], or `null` if dismissed without a choice.
+Future<MoodValue?> showMoodPickerSheet(BuildContext context) {
   final cubit = context.read<MoodCubit>();
-  showModalBottomSheet<void>(
+  return showModalBottomSheet<MoodValue>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -139,7 +140,7 @@ class _MoodPickerSheet extends StatelessWidget {
                                     .read<MoodCubit>()
                                     .saveMood(mood, source: 'modal');
                                 if (context.mounted) {
-                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop(mood);
                                 }
                               },
                       );

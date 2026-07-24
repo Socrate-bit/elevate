@@ -2219,8 +2219,44 @@ abstract class AppLocalizations {
   /// No description provided for @homePagePlanEmpty.
   ///
   /// In en, this message translates to:
-  /// **'Nothing planned for today. Tap + to add a task.'**
+  /// **'You\'re all set for today. Nice work!'**
   String get homePagePlanEmpty;
+
+  /// No description provided for @defaultTaskMoodName.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood check-in'**
+  String get defaultTaskMoodName;
+
+  /// No description provided for @defaultTaskMoodSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How are you feeling right now?'**
+  String get defaultTaskMoodSubtitle;
+
+  /// No description provided for @defaultTaskBreathingName.
+  ///
+  /// In en, this message translates to:
+  /// **'Breathing'**
+  String get defaultTaskBreathingName;
+
+  /// No description provided for @defaultTaskBreathingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a mindful moment'**
+  String get defaultTaskBreathingSubtitle;
+
+  /// No description provided for @defaultTaskIntrospectionName.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick introspection'**
+  String get defaultTaskIntrospectionName;
+
+  /// No description provided for @defaultTaskIntrospectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open up with Appy'**
+  String get defaultTaskIntrospectionSubtitle;
 
   /// No description provided for @homePageEdit.
   ///

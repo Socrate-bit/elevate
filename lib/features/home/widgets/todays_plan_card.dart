@@ -9,12 +9,13 @@ import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../chat/screens/chat_page_screen.dart';
 import '../../missions/screens/breathing_mission_screen.dart';
+import '../../missions/widgets/mission_complete_screen.dart';
 import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../../routines/models/routine.dart';
 import '../../routines/models/routine_palette.dart';
 import '../../routines/screens/routine_form_screen.dart';
-import 'home_action_sheet.dart';
+import '../models/default_task.dart';
 
 /// "Today's Plan" section (Finch-style): a header on the green background, then
 /// each routine relevant today in its own white card. Backed by real routines.
@@ -31,12 +32,15 @@ class TodaysPlanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Built-in daily prompts still pending today (hidden once completed).
+    final pendingDefaults =
+        kDefaultTasks.where((t) => !completedIds.contains(t.id)).toList();
     return Padding(
       padding: EdgeInsets.fromLTRB(18.w, 0, 18.w, 90.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: calendar, title + subtitle (white over green), Add button.
+          // Header: calendar, title + subtitle (white over green).
           Row(
             children: [
               Icon(Icons.calendar_month_rounded, color: Colors.white),
@@ -63,17 +67,22 @@ class TodaysPlanCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Add a routine / start something.
-              GestureDetector(
-                onTap: withHaptic(() => _openAddSheet(context)),
-                child: Icon(Icons.add, size: 30.sp, color: Colors.white),
-              ),
             ],
           ),
           SizedBox(height: 14.h),
-          if (routines.isEmpty)
+          if (pendingDefaults.isEmpty && routines.isEmpty)
             _EmptyPlan(text: l10n.homePagePlanEmpty)
-          else
+          else ...[
+            // Built-in daily prompts first, then the user's routines.
+            ...pendingDefaults.map(
+              (t) => Padding(
+                padding: EdgeInsets.only(bottom: 10.h),
+                child: _DefaultTaskCard(
+                  task: t,
+                  onTap: () => _startDefaultTask(context, t),
+                ),
+              ),
+            ),
             ...routines.map(
               (r) => Padding(
                 padding: EdgeInsets.only(bottom: 10.h),
@@ -86,6 +95,7 @@ class TodaysPlanCard extends StatelessWidget {
                 ),
               ),
             ),
+          ],
         ],
       ),
     );
@@ -118,43 +128,44 @@ class TodaysPlanCard extends StatelessWidget {
     );
   }
 
-  /// Opens the shared "add" sheet (Chat / Action / Habit / Mood / Breathing).
-  Future<void> _openAddSheet(BuildContext context) async {
-    final routineCubit = context.read<RoutineCubit>();
-    final action = await showHomeActionSheet(context);
-    if (action == null || !context.mounted) return;
-    switch (action) {
-      case HomeAction.startChat:
+  /// Runs a default task's underlying feature; each marks itself done on
+  /// success (mood recorded, breathing finished, or a first chat message sent).
+  Future<void> _startDefaultTask(BuildContext context, DefaultTask task) async {
+    final adventure = context.read<AdventureCubit>();
+    switch (task.kind) {
+      case DefaultTaskKind.mood:
+        final saved = await showMoodPickerSheet(context);
+        if (saved != null) {
+          await DefaultTaskCompletion.complete(task: task, adventure: adventure);
+        }
+      case DefaultTaskKind.breathing:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (bc) => BreathingMissionScreen(
+              onComplete: () async {
+                await DefaultTaskCompletion.complete(
+                  task: task,
+                  adventure: adventure,
+                );
+                if (bc.mounted) {
+                  Navigator.of(bc).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (_) => const MissionCompleteScreen(),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+        );
+      case DefaultTaskKind.introspection:
+        // Completion is recorded by ChatCubit when the first message is sent.
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const ChatPage(fullScreen: true)),
         );
-      case HomeAction.action:
-        _pushForm(context, routineCubit, RoutineType.action);
-      case HomeAction.habit:
-        _pushForm(context, routineCubit, RoutineType.habit);
-      case HomeAction.mood:
-        showMoodPickerSheet(context);
-      case HomeAction.breathing:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const BreathingMissionScreen(isPreview: true),
-          ),
-        );
     }
-  }
-
-  void _pushForm(BuildContext context, RoutineCubit cubit, RoutineType type) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: cubit,
-          child: RoutineFormScreen(initialType: type),
-        ),
-      ),
-    );
   }
 }
 
@@ -177,6 +188,106 @@ class _EmptyPlan extends StatelessWidget {
           text,
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 13.sp, color: HomePalette.subtitleGrey),
+        ),
+      ),
+    );
+  }
+}
+
+/// A built-in daily prompt as a white card. Same look as a routine card, but
+/// the whole card is tappable to start its feature; completion is driven by
+/// that feature (not a manual check), so it shows a "start" affordance.
+class _DefaultTaskCard extends StatelessWidget {
+  final DefaultTask task;
+  final VoidCallback onTap;
+
+  const _DefaultTaskCard({required this.task, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final tile = routineColor(task.colorKey);
+    return GestureDetector(
+      onTap: withHaptic(onTap),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+        decoration: BoxDecoration(
+          color: HomePalette.cardWhite,
+          borderRadius: BorderRadius.circular(18.r),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x14000000),
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Circular emoji tile, tinted by the task's color.
+            Container(
+              width: 44.w,
+              height: 44.w,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: tile.withAlpha(40),
+                shape: BoxShape.circle,
+              ),
+              child: Text(task.emoji, style: TextStyle(fontSize: 22.sp)),
+            ),
+            SizedBox(width: 12.w),
+            // Title + subtitle.
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    defaultTaskName(l10n, task.kind),
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w800,
+                      color: HomePalette.titleDark,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 1.h),
+                  Text(
+                    defaultTaskSubtitle(l10n, task.kind),
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: HomePalette.subtitleGrey,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            // XP reward: number + lightning.
+            Text(
+              '${task.xp}',
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w800,
+                color: HomePalette.titleDark,
+              ),
+            ),
+            SizedBox(width: 3.w),
+            Image.asset('assets/home/light.png', width: 16.w),
+            SizedBox(width: 10.w),
+            // "Start" affordance (the whole card handles the tap).
+            Container(
+              width: 40.w,
+              height: 40.w,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: tile.withAlpha(40),
+                borderRadius: BorderRadius.circular(90.r),
+              ),
+              child: Icon(Icons.play_arrow_rounded, size: 26.sp, color: tile),
+            ),
+          ],
         ),
       ),
     );

@@ -1162,8 +1162,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homePageTodaysPlanSubtitle => 'Petits pas, grands changements.';
 
   @override
-  String get homePagePlanEmpty =>
-      'Rien de prévu aujourd\'hui. Appuyez sur + pour ajouter une tâche.';
+  String get homePagePlanEmpty => 'Tout est fait pour aujourd\'hui. Bravo !';
+
+  @override
+  String get defaultTaskMoodName => 'Point d\'humeur';
+
+  @override
+  String get defaultTaskMoodSubtitle => 'Comment te sens-tu en ce moment ?';
+
+  @override
+  String get defaultTaskBreathingName => 'Respiration';
+
+  @override
+  String get defaultTaskBreathingSubtitle =>
+      'Prends un instant en pleine conscience';
+
+  @override
+  String get defaultTaskIntrospectionName => 'Petite introspection';
+
+  @override
+  String get defaultTaskIntrospectionSubtitle => 'Confie-toi à Appy';
 
   @override
   String get homePageEdit => 'Modifier';

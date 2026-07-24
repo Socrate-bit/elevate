@@ -161,6 +161,23 @@ class ActivityService {
     }
   }
 
+  /// Whether a completed activity for [sourceId] already exists today.
+  /// Used to keep default-task completions idempotent per day.
+  static Future<bool> hasCompletedToday(String sourceId) async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59).millisecondsSinceEpoch;
+
+    final snap = await _activities
+        .where('sourceId', isEqualTo: sourceId)
+        .where('completed', isEqualTo: true)
+        .where('timestamp', isGreaterThanOrEqualTo: startOfDay)
+        .where('timestamp', isLessThanOrEqualTo: endOfDay)
+        .limit(1)
+        .get();
+    return snap.docs.isNotEmpty;
+  }
+
   /// Returns the most recent pending (incomplete) activity for the given source.
   static Future<Activity?> getPendingActivity(String sourceId) async {
     final snap = await _activities
