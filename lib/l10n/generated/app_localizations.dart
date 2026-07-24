@@ -2450,17 +2450,23 @@ abstract class AppLocalizations {
   /// **'Journal'**
   String get journalTitle;
 
-  /// No description provided for @journalMonthlyInsight.
+  /// No description provided for @journalInsightsEmptyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Monthly Insight'**
-  String get journalMonthlyInsight;
+  /// **'No insights yet'**
+  String get journalInsightsEmptyTitle;
 
-  /// No description provided for @journalInputCues.
+  /// No description provided for @journalInsightsEmptyBody.
   ///
   /// In en, this message translates to:
-  /// **'Input Cues'**
-  String get journalInputCues;
+  /// **'Your insights from chats with Appy will show up here.'**
+  String get journalInsightsEmptyBody;
+
+  /// No description provided for @journalInsightsEmptyCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Start chatting'**
+  String get journalInsightsEmptyCta;
 
   /// No description provided for @shopComingSoon.
   ///
