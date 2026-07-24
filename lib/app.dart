@@ -9,7 +9,6 @@ import 'package:device_preview/device_preview.dart';
 import 'config/app_config.dart';
 import 'features/mood/cubit/mood_cubit.dart';
 import 'features/chat/cubit/chat_list_cubit.dart';
-import 'features/home/cubit/heart_cubit.dart';
 import 'features/home/cubit/streak_cubit.dart';
 import 'features/memory/cubit/memory_cubit.dart';
 import 'features/onboarding/cubit/onboarding_cubit.dart';
@@ -33,7 +32,6 @@ class AppyApp extends StatelessWidget {
         BlocProvider(create: (_) => MoodCubit()),
         BlocProvider(create: (_) => SettingsCubit()),
         BlocProvider(create: (_) => RoutineCubit()),
-        BlocProvider(create: (_) => HeartCubit()),
         BlocProvider(create: (_) => StreakCubit()),
         BlocProvider(create: (_) => SubscriptionCubit()),
         BlocProvider(create: (_) => OnboardingCubit()),
