@@ -9,12 +9,10 @@ import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
 import '../../adventure/models/game_profile.dart';
 import '../../adventure/screens/adventure_success_screen.dart';
-import '../cubit/heart_cubit.dart';
-import '../cubit/heart_state.dart';
 
 /// Teal quest banner with lightning icon, adventure title and a progress
-/// pill / action button reflecting the live adventure state. The coin balance,
-/// streak and shop shortcuts perch on the banner's top-right corner.
+/// pill / action button reflecting the live adventure state. The coin balance
+/// and shop shortcut perch on the banner's top-right corner.
 class QuestBanner extends StatelessWidget {
   const QuestBanner({super.key});
 
@@ -32,8 +30,6 @@ class QuestBanner extends StatelessWidget {
             children: [
               const Spacer(),
               const _CoinCounter(),
-              SizedBox(width: 16.w),
-              const _StreakSign(),
               SizedBox(width: 24.w),
               _PerchIcon(asset: 'assets/home_page/shop_icon.png', onTap: () {}),
             ],
@@ -198,41 +194,6 @@ class _CoinCounter extends StatelessWidget {
             SizedBox(width: 4.w),
             Text(
               '${adv.profile.coins}',
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-/// Streak sign perched on the banner: the flame asset with the live streak
-/// count. Reads the count from [HeartCubit], kept reactive to activity updates
-/// and heart-driven streak breaks.
-class _StreakSign extends StatelessWidget {
-  const _StreakSign();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<HeartCubit, HeartState>(
-      buildWhen: (a, b) => a.streak != b.streak,
-      builder: (context, state) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              'assets/home_page/streak_icon.png',
-              width: 40.w,
-              height: 40.w,
-            ),
-            SizedBox(width: 4.w),
-            Text(
-              '${state.streak}',
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.w800,

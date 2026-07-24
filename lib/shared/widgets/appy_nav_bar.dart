@@ -10,7 +10,7 @@ import '../app_nav_cubit.dart';
 import '../theme/app_theme.dart';
 import '../utils/haptic_utils.dart';
 
-/// Liquid-glass bottom navigation bar (3 tabs: Home, Quest, Journal) driven by
+/// Liquid-glass bottom navigation bar (2 tabs: Home, Journal) driven by
 /// [AppNavCubit], with a circular chat button perched to its right that opens
 /// the chat full-page. Shared by all Appy pages.
 class AppyNavBar extends StatelessWidget {
@@ -45,11 +45,6 @@ class AppyNavBar extends StatelessWidget {
                       thickness: 1,
                       label: l10n.navHome,
                       icon: const Icon(Icons.home_rounded),
-                    ),
-                    GlassBottomBarTab(
-                      thickness: 1,
-                      label: l10n.navQuest,
-                      icon: const Icon(Icons.flag_rounded),
                     ),
                     GlassBottomBarTab(
                       label: l10n.navJournal,

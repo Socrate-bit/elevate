@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 
 import 'chat_form.dart';
 import 'chat_insight.dart';
-import 'chat_mission_suggestion.dart';
 import 'chat_mood_check_in.dart';
 import 'chat_routine_mutation.dart';
 
@@ -10,15 +9,13 @@ import 'chat_routine_mutation.dart';
 enum ChatRole { user, model }
 
 /// A single chat turn — either user text or a model reply (text, form,
-/// mission suggestion, mood check-in, routine-mutation confirmation, or a
-/// distilled insight).
+/// mood check-in, routine-mutation confirmation, or a distilled insight).
 class ChatMessage extends Equatable {
   final String id;
   final String conversationId;
   final ChatRole role;
   final String text;
   final ChatForm? form;
-  final ChatMissionSuggestion? missionSuggestion;
   final ChatMoodCheckIn? moodCheckIn;
   final ChatRoutineMutation? routineMutation;
   final ChatInsight? insight;
@@ -31,7 +28,6 @@ class ChatMessage extends Equatable {
     required this.text,
     required this.createdAt,
     this.form,
-    this.missionSuggestion,
     this.moodCheckIn,
     this.routineMutation,
     this.insight,
@@ -43,7 +39,6 @@ class ChatMessage extends Equatable {
     ChatRole? role,
     String? text,
     ChatForm? form,
-    ChatMissionSuggestion? missionSuggestion,
     ChatMoodCheckIn? moodCheckIn,
     ChatRoutineMutation? routineMutation,
     ChatInsight? insight,
@@ -54,7 +49,6 @@ class ChatMessage extends Equatable {
     role: role ?? this.role,
     text: text ?? this.text,
     form: form ?? this.form,
-    missionSuggestion: missionSuggestion ?? this.missionSuggestion,
     moodCheckIn: moodCheckIn ?? this.moodCheckIn,
     routineMutation: routineMutation ?? this.routineMutation,
     insight: insight ?? this.insight,
@@ -65,7 +59,6 @@ class ChatMessage extends Equatable {
     'role': role.name,
     'text': text,
     'form': form?.toMap(),
-    'missionSuggestion': missionSuggestion?.toMap(),
     'moodCheckIn': moodCheckIn?.toMap(),
     'routineMutation': routineMutation?.toMap(),
     'insight': insight?.toMap(),
@@ -79,7 +72,6 @@ class ChatMessage extends Equatable {
   ) {
     final roleStr = m['role'] as String? ?? 'user';
     final formMap = m['form'] as Map<String, dynamic>?;
-    final missionMap = m['missionSuggestion'] as Map<String, dynamic>?;
     final moodMap = m['moodCheckIn'] as Map<String, dynamic>?;
     final routineMap = m['routineMutation'] as Map<String, dynamic>?;
     final insightMap = m['insight'] as Map<String, dynamic>?;
@@ -89,9 +81,6 @@ class ChatMessage extends Equatable {
       role: roleStr == 'model' ? ChatRole.model : ChatRole.user,
       text: m['text'] as String? ?? '',
       form: formMap == null ? null : ChatForm.fromMap(formMap),
-      missionSuggestion: missionMap == null
-          ? null
-          : ChatMissionSuggestion.fromMap(missionMap),
       moodCheckIn: moodMap == null ? null : ChatMoodCheckIn.fromMap(moodMap),
       routineMutation: routineMap == null
           ? null
@@ -110,7 +99,6 @@ class ChatMessage extends Equatable {
     role,
     text,
     form,
-    missionSuggestion,
     moodCheckIn,
     routineMutation,
     insight,

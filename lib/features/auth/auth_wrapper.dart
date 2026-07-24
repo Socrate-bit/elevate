@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'auth_service.dart';
-import '../alarms/cubit/alarm_cubit.dart';
 import '../chat/cubit/chat_list_cubit.dart';
 import '../memory/cubit/memory_cubit.dart';
 import '../onboarding/cubit/onboarding_cubit.dart';
@@ -16,7 +15,7 @@ import '../subscription/screens/app_gate_wrapper.dart';
 /// Top-level reactive auth gate. Routes between OnboardingScreen and
 /// AppGateWrapper based on FirebaseAuth state and OnboardingCubit progress.
 ///
-/// - Not auth → side effects (clear settings, cancel native alarms) → onboarding.
+/// - Not auth → side effects (clear settings, chat, memory) → onboarding.
 /// - Auth + onboarding in progress → onboarding (so the in-flow user keeps
 ///   seeing it across the auth flip during sign-in step).
 /// - Auth + not in progress → AppGateWrapper.
@@ -49,7 +48,6 @@ class AuthWrapper extends StatelessWidget {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 context.read<SubscriptionCubit>().resetIdentity();
                 context.read<SettingsCubit>().clearAll();
-                context.read<AlarmCubit>().cancelAllNative();
                 context.read<ChatListCubit>().clear();
                 context.read<MemoryCubit>().clear();
                 // hook: cancel any other user-scoped resources here
@@ -58,7 +56,6 @@ class AuthWrapper extends StatelessWidget {
             }
             context.read<SubscriptionCubit>().identifyUser(snap.data!.uid);
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.read<AlarmCubit>().loadAlarm();
               context.read<ChatListCubit>().start();
               context.read<MemoryCubit>().start();
             });

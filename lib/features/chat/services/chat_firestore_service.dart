@@ -28,12 +28,6 @@ abstract interface class ChatRepository {
     int selectedIndex,
   );
 
-  Future<void> updateMessageMissionSuggestion(
-    String conversationId,
-    String messageId,
-    bool accepted,
-  );
-
   Future<void> updateMessageMoodCheckIn(
     String conversationId,
     String messageId,
@@ -138,15 +132,6 @@ class ChatFirestoreService implements ChatRepository {
   ) => _messages(
     conversationId,
   ).doc(messageId).update({'form.selectedIndex': selectedIndex});
-
-  @override
-  Future<void> updateMessageMissionSuggestion(
-    String conversationId,
-    String messageId,
-    bool accepted,
-  ) => _messages(
-    conversationId,
-  ).doc(messageId).update({'missionSuggestion.accepted': accepted});
 
   @override
   Future<void> updateMessageMoodCheckIn(

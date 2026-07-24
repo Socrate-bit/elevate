@@ -6,7 +6,7 @@ import '../../subscription/services/analytics_service.dart';
 import '../models/game_profile.dart';
 
 /// Firestore-backed store for the coin / strike / adventure game state.
-/// Static (mirrors [StreakService]); lives at `users/{uid}/meta/game`.
+/// Static; lives at `users/{uid}/meta/game`.
 class AdventureService {
   static FirebaseFirestore get _db => FirebaseFirestore.instance;
 

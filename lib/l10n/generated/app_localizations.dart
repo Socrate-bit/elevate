@@ -1940,6 +1940,18 @@ abstract class AppLocalizations {
   /// **'Start a quick mission'**
   String get homeAddMissionDesc;
 
+  /// No description provided for @homeAddBreathingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Breathing'**
+  String get homeAddBreathingTitle;
+
+  /// No description provided for @homeAddBreathingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Box breathing exercise'**
+  String get homeAddBreathingDesc;
+
   /// No description provided for @routinePickerTitle.
   ///
   /// In en, this message translates to:

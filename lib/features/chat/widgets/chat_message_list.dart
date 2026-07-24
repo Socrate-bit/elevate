@@ -6,14 +6,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
-import '../../missions/models/mission.dart';
-import '../../missions/screens/mission_confirm_screen.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../cubit/chat_cubit.dart';
 import '../services/chat_message.dart';
 import 'chat_form_card.dart';
 import 'chat_insight_card.dart';
-import 'chat_mission_card.dart';
 import 'chat_mood_check_in_card.dart';
 import 'chat_routine_card.dart';
 
@@ -145,23 +142,13 @@ class _MessageRow extends StatelessWidget {
     final m = message;
     final isModel = m.role == ChatRole.model;
 
-    // Interactive cards are always model turns. Same dispatch order as the
-    // legacy chat screen: form → mission → mood → routine → text.
+    // Interactive cards are always model turns. Dispatch order:
+    // form → mood → routine → insight → text.
     if (isModel && m.form != null) {
       return _CardWrap(
         child: ChatFormCard(
           form: m.form!,
           onAnswer: (idx) => context.read<ChatCubit>().answerForm(m.id, idx),
-        ),
-      );
-    }
-    if (isModel && m.missionSuggestion != null) {
-      return _CardWrap(
-        child: ChatMissionCard(
-          suggestion: m.missionSuggestion!,
-          onAccept: () => _acceptMission(context, m),
-          onDecline: () =>
-              context.read<ChatCubit>().declineMissionSuggestion(m.id),
         ),
       );
     }
@@ -183,30 +170,6 @@ class _MessageRow extends StatelessWidget {
       return _CardWrap(child: ChatInsightCard(insight: m.insight!));
     }
     return _TextBubble(message: m);
-  }
-
-  /// Accept a mission suggestion, then push the mission confirm/run flow —
-  /// on completion pop back and post the validated message. Mirrors the legacy
-  /// chat screen so behavior stays identical.
-  Future<void> _acceptMission(BuildContext context, ChatMessage m) async {
-    await context.read<ChatCubit>().acceptMissionSuggestion(m.id);
-    if (!context.mounted) return;
-    final missionType = missionTypeFromString(m.missionSuggestion!.missionType);
-    final l10n = AppLocalizations.of(context)!;
-    final cubit = context.read<ChatCubit>();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => MissionConfirmScreen(
-          missionType: missionType,
-          onMissionComplete: () {
-            // Pop the mission sequence, then the confirm screen.
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
-            cubit.sendText(l10n.chatMissionValidated);
-          },
-        ),
-      ),
-    );
   }
 
   Future<void> _startRoutineNow(BuildContext context, String routineId) async {

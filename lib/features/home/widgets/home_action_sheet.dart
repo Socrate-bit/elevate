@@ -6,10 +6,10 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 
-enum HomeAction { startChat, action, habit, mood, mission }
+enum HomeAction { startChat, action, habit, mood, breathing }
 
 /// Bottom-sheet with a full-width Start Chat tile at the top, then 2×2 grid:
-/// Action, Habit, Mood, Mission.
+/// Action, Habit, Mood, Breathing.
 Future<HomeAction?> showHomeActionSheet(BuildContext context) {
   final c = AppColors.of(context);
   final l10n = AppLocalizations.of(context)!;
@@ -116,7 +116,7 @@ Future<HomeAction?> showHomeActionSheet(BuildContext context) {
               ],
             ),
             SizedBox(height: 12.h),
-            // Mood | Mission
+            // Mood | Breathing
             Row(
               children: [
                 Expanded(
@@ -130,10 +130,10 @@ Future<HomeAction?> showHomeActionSheet(BuildContext context) {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: _ActionTile(
-                    icon: Icons.explore_rounded,
-                    label: l10n.missionPickerTitle,
-                    description: l10n.homeAddMissionDesc,
-                    onTap: () => Navigator.pop(ctx, HomeAction.mission),
+                    icon: Icons.air_rounded,
+                    label: l10n.homeAddBreathingTitle,
+                    description: l10n.homeAddBreathingDesc,
+                    onTap: () => Navigator.pop(ctx, HomeAction.breathing),
                   ),
                 ),
               ],

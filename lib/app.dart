@@ -7,9 +7,7 @@ import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:device_preview/device_preview.dart';
 
 import 'config/app_config.dart';
-import 'features/alarms/cubit/alarm_cubit.dart';
 import 'features/mood/cubit/mood_cubit.dart';
-import 'features/alarms/screens/alarm_stop_screen.dart';
 import 'features/chat/cubit/chat_list_cubit.dart';
 import 'features/home/cubit/heart_cubit.dart';
 import 'features/memory/cubit/memory_cubit.dart';
@@ -31,12 +29,8 @@ class SkeletonApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => MoodCubit()),
         BlocProvider(create: (_) => SettingsCubit()),
-        BlocProvider(create: (_) => AlarmCubit()),
         BlocProvider(create: (_) => RoutineCubit()),
-        BlocProvider(
-          create: (context) =>
-              HeartCubit(routineCubit: context.read<RoutineCubit>()),
-        ),
+        BlocProvider(create: (_) => HeartCubit()),
         BlocProvider(create: (_) => SubscriptionCubit()),
         BlocProvider(create: (_) => OnboardingCubit()),
         BlocProvider(create: (_) => ChatListCubit()),
@@ -68,23 +62,6 @@ class SkeletonApp extends StatelessWidget {
             initialRoute: '/',
             routes: {
               '/': (_) => AuthWrapper(navigatorKey: navigatorKey),
-            },
-            onGenerateRoute: (settings) {
-              if (settings.name == '/alarm-dismiss') {
-                final args = settings.arguments as Map<String, String>;
-                final alarmId = args['alarmId']!;
-                final nativeAlarmId = args['nativeAlarmId'] ?? alarmId;
-                final label = args['label'] ?? 'Alarm';
-
-                return MaterialPageRoute(
-                  builder: (_) => AlarmStopScreen(
-                    alarmId: alarmId,
-                    nativeAlarmId: nativeAlarmId,
-                    alarmLabel: label,
-                  ),
-                );
-              }
-              return null;
             },
           ),
         ),
