@@ -1282,11 +1282,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trophyRevealGenerating => 'Uncovering your wisdom…';
 
   @override
-  String get trophiesTitle => 'Trophies';
+  String get trophiesTitle => 'Wisdom';
 
   @override
   String get trophiesEmpty =>
-      'No trophies yet. Complete an adventure to earn your first citation.';
+      'No wisdom yet. Complete an adventure to earn your first citation.';
 
   @override
   String get trophyDetailDone => 'Done';

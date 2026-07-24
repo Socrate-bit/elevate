@@ -2441,13 +2441,13 @@ abstract class AppLocalizations {
   /// No description provided for @trophiesTitle.
   ///
   /// In en, this message translates to:
-  /// **'Trophies'**
+  /// **'Wisdom'**
   String get trophiesTitle;
 
   /// No description provided for @trophiesEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No trophies yet. Complete an adventure to earn your first citation.'**
+  /// **'No wisdom yet. Complete an adventure to earn your first citation.'**
   String get trophiesEmpty;
 
   /// No description provided for @trophyDetailDone.

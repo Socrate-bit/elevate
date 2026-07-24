@@ -117,27 +117,8 @@ class _TrophyRevealScreenState extends State<TrophyRevealScreen>
               ),
               SafeArea(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.all(16.w),
-                      child: GestureDetector(
-                        onTap: withHaptic(() => Navigator.pop(context)),
-                        child: Container(
-                          width: 36.w,
-                          height: 36.h,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            size: 18.sp,
-                            color: const Color(0xFF3D2B1F),
-                          ),
-                        ),
-                      ),
-                    ),
                     const Spacer(),
                     Center(
                       child: revealed
@@ -153,7 +134,30 @@ class _TrophyRevealScreenState extends State<TrophyRevealScreen>
                           : _GeneratingLabel(),
                     ),
                     const Spacer(),
-                    SizedBox(height: 40.h),
+                    // Black "Done" button dismisses the reveal.
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 32.h),
+                      child: GestureDetector(
+                        onTap: withMediumHaptic(() => Navigator.pop(context)),
+                        child: Container(
+                          width: double.infinity,
+                          height: 52.h,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)!.trophyDetailDone,
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
