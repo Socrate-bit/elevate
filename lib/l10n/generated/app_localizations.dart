@@ -2306,6 +2306,30 @@ abstract class AppLocalizations {
   /// **'Trophy Earned'**
   String get adventureSuccessLabel;
 
+  /// No description provided for @trophyRevealGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncovering your trophy…'**
+  String get trophyRevealGenerating;
+
+  /// No description provided for @trophiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trophies'**
+  String get trophiesTitle;
+
+  /// No description provided for @trophiesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No trophies yet. Complete an adventure to earn your first citation.'**
+  String get trophiesEmpty;
+
+  /// No description provided for @trophyEarnedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Earned {date}'**
+  String trophyEarnedOn(String date);
+
   /// No description provided for @navJournal.
   ///
   /// In en, this message translates to:

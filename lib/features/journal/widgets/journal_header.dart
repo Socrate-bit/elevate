@@ -3,8 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../../shared/utils/haptic_utils.dart';
+import '../../subscription/services/analytics_service.dart';
+import '../../trophy/screens/trophies_grid_screen.dart';
 
-/// Page header: just the "Journal" title.
+/// Page header: the "Journal" title with a trophies-gallery shortcut on the right.
 class JournalHeader extends StatelessWidget {
   const JournalHeader({super.key});
 
@@ -20,6 +23,20 @@ class JournalHeader extends StatelessWidget {
             style: TextStyle(
               fontSize: 26.sp,
               fontWeight: FontWeight.w800,
+              color: HomePalette.headlineGreen,
+            ),
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: withHaptic(() {
+              AnalyticsService.capture(AnalyticsService.trophiesOpened);
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const TrophiesGridScreen()),
+              );
+            }),
+            child: Icon(
+              Icons.emoji_events_rounded,
+              size: 26.sp,
               color: HomePalette.headlineGreen,
             ),
           ),

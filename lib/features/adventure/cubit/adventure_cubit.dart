@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../data/wisdom_trophies.dart';
 import '../models/game_profile.dart';
 import '../services/adventure_service.dart';
 import 'adventure_state.dart';
@@ -79,19 +78,6 @@ class AdventureCubit extends Cubit<AdventureState> {
       await AdventureService.startAdventure(DateTime.now());
     } catch (e) {
       debugPrint('[AdventureCubit] startAdventure failed: $e');
-    }
-  }
-
-  /// Claims the reward and resets the bar. Returns the earned trophy so the UI
-  /// can push the success screen; null on failure.
-  Future<WisdomTrophy?> discover() async {
-    try {
-      final trophy = pickRandomWisdom();
-      await AdventureService.discover(trophy.id);
-      return trophy;
-    } catch (e) {
-      debugPrint('[AdventureCubit] discover failed: $e');
-      return null;
     }
   }
 

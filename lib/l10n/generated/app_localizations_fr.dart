@@ -1214,6 +1214,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get adventureSuccessLabel => 'Trophée obtenu';
 
   @override
+  String get trophyRevealGenerating => 'Révélation de ton trophée…';
+
+  @override
+  String get trophiesTitle => 'Trophées';
+
+  @override
+  String get trophiesEmpty =>
+      'Aucun trophée pour l\'instant. Termine une aventure pour obtenir ta première citation.';
+
+  @override
+  String trophyEarnedOn(String date) {
+    return 'Obtenu le $date';
+  }
+
+  @override
   String get navJournal => 'Journal';
 
   @override
