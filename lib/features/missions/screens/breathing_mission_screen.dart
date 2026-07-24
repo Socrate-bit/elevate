@@ -123,10 +123,10 @@ class _BreathingMissionScreenState extends State<BreathingMissionScreen>
       if (mounted) Navigator.of(context).pop();
       return;
     }
-    if (widget.onComplete != null) {
-      widget.onComplete!();
-      return;
-    }
+    // Notify the caller (e.g. to mark the task complete), then show the
+    // completion screen from this screen's own still-mounted context — the
+    // caller's context may have been unmounted by the intro's pushReplacement.
+    widget.onComplete?.call();
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const MissionCompleteScreen()),
