@@ -1293,11 +1293,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trophyRevealGenerating => 'Révélation de ta sagesse…';
 
   @override
-  String get trophiesTitle => 'Trophées';
+  String get trophiesTitle => 'Sagesse';
 
   @override
   String get trophiesEmpty =>
-      'Aucun trophée pour l\'instant. Termine une aventure pour obtenir ta première citation.';
+      'Aucune sagesse pour l\'instant. Termine une aventure pour obtenir ta première citation.';
 
   @override
   String get trophyDetailDone => 'Terminé';
