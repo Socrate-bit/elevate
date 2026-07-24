@@ -7,6 +7,7 @@ import 'package:elevate/l10n/l10n_helpers.dart';
 import '../../../shared/app_nav_cubit.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
+import '../../adventure/cubit/adventure_cubit.dart';
 import '../../missions/models/mission.dart';
 import '../../missions/screens/mission_picker_screen.dart';
 import '../../missions/screens/photo_mission_screen.dart';
@@ -96,13 +97,18 @@ class TodaysPlanCard extends StatelessWidget {
   /// un-validates the routine for today.
   Future<void> _toggle(BuildContext context, Routine r, bool done) async {
     final cubit = context.read<RoutineCubit>();
+    final adventure = context.read<AdventureCubit>();
     if (done) {
       await cubit.unvalidate(r.id);
+      // Un-checking reverses the coins + strike it granted.
+      await adventure.removeForCompletion(r.xp);
       return;
     }
     final objectCheck = r.objectCheck;
     if (objectCheck == null || objectCheck.isEmpty) {
       await cubit.validate(r.id);
+      // Award coins (== the task's XP) + a strike; fires confetti on home.
+      await adventure.awardForCompletion(r.xp);
       return;
     }
     final nav = Navigator.of(context);
@@ -114,6 +120,7 @@ class TodaysPlanCard extends StatelessWidget {
           onComplete: () async {
             nav.pop();
             await cubit.validate(r.id);
+            await adventure.awardForCompletion(r.xp);
           },
         ),
       ),
