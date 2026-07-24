@@ -53,6 +53,7 @@ bool isTrophyColorKey(String key) => kRoutineColors.containsKey(key);
 const List<Trophy> kFallbackCitations = [
   Trophy(
     id: '',
+    title: 'Beginning',
     quote: 'The journey of a thousand miles begins with a single step.',
     author: 'Lao Tzu',
     source: 'Tao Te Ching',
@@ -62,6 +63,7 @@ const List<Trophy> kFallbackCitations = [
   ),
   Trophy(
     id: '',
+    title: 'Discipline',
     quote:
         'We are what we repeatedly do. Excellence, then, is not an act, but a habit.',
     author: 'Will Durant',
@@ -72,6 +74,7 @@ const List<Trophy> kFallbackCitations = [
   ),
   Trophy(
     id: '',
+    title: 'Perseverance',
     quote: 'The only way out is through.',
     author: 'Robert Frost',
     source: 'A Servant to Servants',
@@ -81,6 +84,7 @@ const List<Trophy> kFallbackCitations = [
   ),
   Trophy(
     id: '',
+    title: 'Contentment',
     quote: 'Very little is needed to make a happy life; it is all within yourself.',
     author: 'Marcus Aurelius',
     source: 'Meditations',
@@ -90,6 +94,7 @@ const List<Trophy> kFallbackCitations = [
   ),
   Trophy(
     id: '',
+    title: 'Strength',
     quote: 'What lies behind us and what lies before us are tiny matters compared to what lies within us.',
     author: 'Ralph Waldo Emerson',
     source: '',
@@ -99,6 +104,7 @@ const List<Trophy> kFallbackCitations = [
   ),
   Trophy(
     id: '',
+    title: 'Opportunity',
     quote: 'In the middle of difficulty lies opportunity.',
     author: 'Albert Einstein',
     source: '',
@@ -108,6 +114,7 @@ const List<Trophy> kFallbackCitations = [
   ),
   Trophy(
     id: '',
+    title: 'Purpose',
     quote: 'He who has a why to live can bear almost any how.',
     author: 'Friedrich Nietzsche',
     source: 'Twilight of the Idols',
@@ -117,6 +124,7 @@ const List<Trophy> kFallbackCitations = [
   ),
   Trophy(
     id: '',
+    title: 'Healing',
     quote: 'The wound is the place where the Light enters you.',
     author: 'Rumi',
     source: '',

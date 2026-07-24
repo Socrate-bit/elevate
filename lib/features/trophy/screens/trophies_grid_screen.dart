@@ -123,12 +123,12 @@ class _TrophyCell extends StatelessWidget {
             ),
             SizedBox(height: 10.h),
             Text(
-              trophy.author,
+              trophy.title.isNotEmpty ? trophy.title : trophy.author,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w700,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w800,
                 color: c.textPrimary,
               ),
             ),

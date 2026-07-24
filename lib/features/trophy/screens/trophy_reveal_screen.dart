@@ -214,18 +214,21 @@ class _GeneratingBadge extends StatelessWidget {
   }
 }
 
-/// "Uncovering your trophy…" label under the anticipation badge.
+/// "Uncovering your wisdom…" label under the anticipation badge.
 class _GeneratingLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Text(
-      l10n.trophyRevealGenerating,
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 15.sp,
-        fontWeight: FontWeight.w600,
-        color: const Color(0xFF6B5540),
+    return SizedBox(
+      width: double.infinity,
+      child: Text(
+        l10n.trophyRevealGenerating,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 18.sp,
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF6B5540),
+        ),
       ),
     );
   }
@@ -286,6 +289,7 @@ class _Citation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final color = trophyColor(trophy.colorKey);
     final slide = Tween<Offset>(
       begin: const Offset(0, 0.25),
       end: Offset.zero,
@@ -302,7 +306,7 @@ class _Citation extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              l10n.adventureSuccessLabel.toUpperCase(),
+              l10n.wisdomUnlockedLabel.toUpperCase(),
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.bold,
@@ -310,6 +314,19 @@ class _Citation extends StatelessWidget {
                 color: const Color(0xFFE05C1A),
               ),
             ),
+            if (trophy.title.isNotEmpty) ...[
+              SizedBox(height: 10.h),
+              Text(
+                trophy.title.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 26.sp,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
+                  color: color,
+                ),
+              ),
+            ],
             SizedBox(height: 20.h),
             Text(
               '“${trophy.quote}”',

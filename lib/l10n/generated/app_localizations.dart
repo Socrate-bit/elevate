@@ -2426,10 +2426,16 @@ abstract class AppLocalizations {
   /// **'Trophy Earned'**
   String get adventureSuccessLabel;
 
+  /// No description provided for @wisdomUnlockedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Wisdom Unlocked'**
+  String get wisdomUnlockedLabel;
+
   /// No description provided for @trophyRevealGenerating.
   ///
   /// In en, this message translates to:
-  /// **'Uncovering your trophy…'**
+  /// **'Uncovering your wisdom…'**
   String get trophyRevealGenerating;
 
   /// No description provided for @trophiesTitle.
@@ -2443,6 +2449,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No trophies yet. Complete an adventure to earn your first citation.'**
   String get trophiesEmpty;
+
+  /// No description provided for @trophyDetailDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get trophyDetailDone;
 
   /// No description provided for @trophyEarnedOn.
   ///

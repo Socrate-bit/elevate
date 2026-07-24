@@ -41,6 +41,7 @@ class TrophyRevealCubit extends Cubit<TrophyRevealState> {
       final trophy = generated != null
           ? Trophy(
               id: id,
+              title: generated.title,
               quote: generated.quote,
               author: generated.author,
               source: generated.source,

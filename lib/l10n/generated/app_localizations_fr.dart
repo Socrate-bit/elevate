@@ -1287,7 +1287,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get adventureSuccessLabel => 'Trophée obtenu';
 
   @override
-  String get trophyRevealGenerating => 'Révélation de ton trophée…';
+  String get wisdomUnlockedLabel => 'Sagesse débloquée';
+
+  @override
+  String get trophyRevealGenerating => 'Révélation de ta sagesse…';
 
   @override
   String get trophiesTitle => 'Trophées';
@@ -1295,6 +1298,9 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get trophiesEmpty =>
       'Aucun trophée pour l\'instant. Termine une aventure pour obtenir ta première citation.';
+
+  @override
+  String get trophyDetailDone => 'Terminé';
 
   @override
   String trophyEarnedOn(String date) {

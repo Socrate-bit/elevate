@@ -80,6 +80,7 @@ class MemoryExtraction {
 /// a figure or book plus a badge [iconKey]/[colorKey] the model picked to match
 /// its mood. The trophy layer maps this into a persisted trophy.
 class GeneratedCitation {
+  final String title;
   final String quote;
   final String author;
   final String source;
@@ -87,6 +88,7 @@ class GeneratedCitation {
   final String colorKey;
 
   const GeneratedCitation({
+    required this.title,
     required this.quote,
     required this.author,
     required this.source,
@@ -303,6 +305,8 @@ Use plain prose replies for everything else.
       'uplifting or wise citation about growth, resilience, or self-compassion. '
       'Do NOT return any citation listed as already earned. '
       'Return JSON matching the schema:\n'
+      '- `title`: a SINGLE evocative word naming the wisdom (e.g. "Resilience", '
+      '"Courage", "Stillness"). Exactly one word, capitalized, no punctuation.\n'
       '- `quote`: the citation, verbatim, no surrounding quotation marks.\n'
       '- `author`: the person the quote is attributed to (or the book\'s author).\n'
       '- `source`: the book/work title if it comes from one, else an empty string.\n'
@@ -449,6 +453,9 @@ Use plain prose replies for everything else.
         responseMimeType: 'application/json',
         responseSchema: Schema.object(
           properties: {
+            'title': Schema.string(
+              description: 'Single evocative word naming the wisdom.',
+            ),
             'quote': Schema.string(
               description: 'Verbatim citation, no surrounding quotation marks.',
             ),
@@ -762,7 +769,14 @@ Use plain prose replies for everything else.
     final quote = decoded['quote']?.toString().trim() ?? '';
     final author = decoded['author']?.toString().trim() ?? '';
     if (quote.isEmpty || author.isEmpty) return null;
+    // Keep the title to a single word, stripping any stray punctuation.
+    final rawTitle = decoded['title']?.toString().trim() ?? '';
+    final title = rawTitle.split(RegExp(r'\s+')).first.replaceAll(
+      RegExp(r'[^A-Za-zÀ-ÿ-]'),
+      '',
+    );
     return GeneratedCitation(
+      title: title,
       quote: quote,
       author: author,
       source: decoded['source']?.toString().trim() ?? '',

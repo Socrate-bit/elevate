@@ -6,6 +6,9 @@ import 'package:equatable/equatable.dart';
 class Trophy extends Equatable {
   final String id;
 
+  /// A single evocative word naming the wisdom (e.g. "Resilience").
+  final String title;
+
   /// The verbatim citation.
   final String quote;
 
@@ -28,6 +31,7 @@ class Trophy extends Equatable {
 
   const Trophy({
     required this.id,
+    this.title = '',
     required this.quote,
     required this.author,
     this.source = '',
@@ -40,6 +44,7 @@ class Trophy extends Equatable {
   DateTime get createdAt => DateTime.fromMillisecondsSinceEpoch(createdAtMs);
 
   Map<String, dynamic> toMap() => {
+    'title': title,
     'quote': quote,
     'author': author,
     'source': source,
@@ -51,6 +56,7 @@ class Trophy extends Equatable {
 
   factory Trophy.fromMap(String id, Map<String, dynamic> m) => Trophy(
     id: id,
+    title: m['title'] as String? ?? '',
     quote: m['quote'] as String? ?? '',
     author: m['author'] as String? ?? '',
     source: m['source'] as String? ?? '',
@@ -63,6 +69,7 @@ class Trophy extends Equatable {
   @override
   List<Object?> get props => [
     id,
+    title,
     quote,
     author,
     source,
