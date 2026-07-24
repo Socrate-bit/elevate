@@ -30,9 +30,19 @@ class MemoryExtractorService {
   final GeminiClient _gemini;
   final Uuid _uuid;
 
+  /// Conversations currently being extracted, guarding against overlapping runs
+  /// (e.g. leave-extraction still in flight when the user reopens and the
+  /// on-enter scan fires) — concurrent runs would bypass life-event dedup.
+  final Set<String> _inFlight = {};
+
   /// Extracts memory from [conversationId] and writes results to Firestore.
   /// Returns true if extraction ran end-to-end successfully.
   Future<bool> extractFromConversation(String conversationId) async {
+    // Skip if an extraction for this conversation is already running.
+    if (!_inFlight.add(conversationId)) {
+      debugPrint('[MemoryExtractor] skip $conversationId: already in flight');
+      return false;
+    }
     try {
       final messages = await _chatRepo.getMessages(conversationId);
       final hasUserMsg = messages.any((m) => m.role == ChatRole.user);
@@ -94,6 +104,8 @@ class MemoryExtractorService {
     } catch (e, st) {
       debugPrint('[MemoryExtractor] extract failed for $conversationId: $e\n$st');
       return false;
+    } finally {
+      _inFlight.remove(conversationId);
     }
   }
 }

@@ -160,10 +160,15 @@ class TodaysPlanCard extends StatelessWidget {
           ),
         );
       case DefaultTaskKind.introspection:
-        // Completion is recorded by ChatCubit when the first message is sent.
+        // Restart the intro workflow: open chat with the 3-option starter card
+        // shown, even on the ongoing conversation. Completion is recorded by
+        // ChatCubit when the first message is sent.
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const ChatPage(fullScreen: true)),
+          MaterialPageRoute(
+            builder: (_) =>
+                const ChatPage(fullScreen: true, forceStarter: true),
+          ),
         );
     }
   }

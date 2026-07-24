@@ -33,7 +33,16 @@ class ChatPage extends StatelessWidget {
   /// bar is hidden and a back button is overlaid to pop back.
   final bool fullScreen;
 
-  const ChatPage({super.key, this.fullScreen = false});
+  /// When true, the 3-option starter card is shown even if the resumed
+  /// conversation already has messages — lets the introspection task "restart
+  /// the workflow" on the ongoing conversation.
+  final bool forceStarter;
+
+  const ChatPage({
+    super.key,
+    this.fullScreen = false,
+    this.forceStarter = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +82,9 @@ class ChatPage extends StatelessWidget {
                 SizedBox(height: 6.h),
                 // The header lives inside the conversation gate so the insight
                 // progress button can read the ChatCubit provided there.
-                const Expanded(child: _ChatConversationGate()),
+                Expanded(
+                  child: _ChatConversationGate(forceStarter: forceStarter),
+                ),
               ],
             ),
           ),
@@ -111,7 +122,10 @@ class ChatPage extends StatelessWidget {
 /// full-page pushed route, so this gate is created on open and disposed on
 /// close — which is what drives the on-enter / on-leave memory extraction.
 class _ChatConversationGate extends StatefulWidget {
-  const _ChatConversationGate();
+  const _ChatConversationGate({this.forceStarter = false});
+
+  /// Forces the starter card to show on the resumed conversation.
+  final bool forceStarter;
 
   @override
   State<_ChatConversationGate> createState() => _ChatConversationGateState();
@@ -206,7 +220,7 @@ class _ChatConversationGateState extends State<_ChatConversationGate> {
                 adventureCubit: context.read<AdventureCubit>(),
                 autoStart: _autoStart,
               ),
-              child: const _ChatView(),
+              child: _ChatView(forceStarter: widget.forceStarter),
             ),
     );
   }
@@ -259,7 +273,10 @@ class _ResolvingPlaceholder extends StatelessWidget {
 /// Owns the text/scroll controllers and the ephemeral "suggestions dismissed"
 /// flag (kept out of [ChatState] so the backend contract stays clean).
 class _ChatView extends StatefulWidget {
-  const _ChatView();
+  const _ChatView({this.forceStarter = false});
+
+  /// Shows the starter card even when the conversation already has messages.
+  final bool forceStarter;
 
   @override
   State<_ChatView> createState() => _ChatViewState();
@@ -291,7 +308,9 @@ class _ChatViewState extends State<_ChatView> {
         setState(() => _suggestionsDismissed = true);
         _composerFocus.requestFocus();
       case ChatStarterAction.sendAsMessage:
-        // Send the label as the opening user message (card auto-hides then).
+        // Send the label as a user message; dismiss so the card also hides
+        // when forced open on a conversation that already has messages.
+        setState(() => _suggestionsDismissed = true);
         _send(context, suggestion.label);
     }
   }
@@ -335,7 +354,11 @@ class _ChatViewState extends State<_ChatView> {
             final hasUserMessage = state.messages.any(
               (m) => m.role == ChatRole.user,
             );
-            if (_suggestionsDismissed || hasUserMessage) {
+            // Normally the card hides once the user has spoken; when forced
+            // (introspection "restart workflow") it shows regardless, until the
+            // user picks an option or dismisses it.
+            if (_suggestionsDismissed ||
+                (!widget.forceStarter && hasUserMessage)) {
               return const SizedBox.shrink();
             }
             return Padding(
