@@ -1351,13 +1351,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chatPageStartConversation => 'Démarrer une conversation';
 
   @override
-  String get chatPageSuggestTalkDay => 'Parler de ma journée';
+  String get chatStarterAsk => 'Pose-moi une question inspirante';
 
   @override
-  String get chatPageSuggestComfort => 'J\'ai besoin de réconfort';
+  String get chatStarterKnow => 'Je sais déjà de quoi je veux parler';
 
   @override
-  String get chatPageSuggestReflect => 'M\'aider à réfléchir';
+  String get chatStarterOff => 'Je ne me sens pas bien';
 
   @override
   String get chatPageComposerHint => 'Votre message';

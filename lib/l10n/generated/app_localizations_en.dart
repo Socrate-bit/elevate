@@ -1340,13 +1340,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatPageStartConversation => 'Start a conversation';
 
   @override
-  String get chatPageSuggestTalkDay => 'Talk about my day';
+  String get chatStarterAsk => 'Ask me an insightful question';
 
   @override
-  String get chatPageSuggestComfort => 'I need comfort';
+  String get chatStarterKnow => 'I know already what I wanna talk about';
 
   @override
-  String get chatPageSuggestReflect => 'Help me reflect';
+  String get chatStarterOff => 'I just feel not right';
 
   @override
   String get chatPageComposerHint => 'Your message';

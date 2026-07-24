@@ -12,6 +12,7 @@ import '../../../shared/utils/haptic_utils.dart';
 /// (tap → [onSend]). Controlled by the parent, which owns [controller].
 class ChatComposerBar extends StatelessWidget {
   final TextEditingController controller;
+  final FocusNode? focusNode;
   final String hint;
   final bool isListening;
   final VoidCallback onSend;
@@ -20,6 +21,7 @@ class ChatComposerBar extends StatelessWidget {
   const ChatComposerBar({
     super.key,
     required this.controller,
+    this.focusNode,
     required this.hint,
     required this.isListening,
     required this.onSend,
@@ -55,6 +57,7 @@ class ChatComposerBar extends StatelessWidget {
                         Expanded(
                           child: TextField(
                             controller: controller,
+                            focusNode: focusNode,
                             onSubmitted: (_) {
                               if (controller.text.trim().isNotEmpty) onSend();
                             },
