@@ -60,9 +60,10 @@ class JournalCubit extends Cubit<JournalState> {
     for (final c in conversations) {
       final lastMs = c.lastMessageAt.millisecondsSinceEpoch;
       if (_seenLastMs[c.id] == lastMs) continue;
-      _seenLastMs[c.id] = lastMs;
       try {
         final messages = await _repo.getMessages(c.id);
+        // Mark seen only after a successful fetch so a transient error retries.
+        _seenLastMs[c.id] = lastMs;
         _byConversation[c.id] = messages
             .where((m) => m.insight != null)
             .map(
@@ -78,6 +79,7 @@ class JournalCubit extends Cubit<JournalState> {
       }
     }
 
+    if (isClosed) return;
     final all = _byConversation.values.expand((e) => e).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     debugPrint('[JournalCubit] loaded ${all.length} insights');
