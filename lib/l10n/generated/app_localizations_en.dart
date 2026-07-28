@@ -1416,4 +1416,191 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shopCtaColor => 'Change color';
+
+  @override
+  String get onboardingAppyPrivacyTitle =>
+      'Your mental health is personal and private';
+
+  @override
+  String get onboardingAppyPrivacyFootnote =>
+      'Encrypted data — only you can see it';
+
+  @override
+  String get onboardingAppySignInTitle => 'Welcome';
+
+  @override
+  String get onboardingAppySignInSubtitle =>
+      'Sign in to pick up where you left off, or start fresh.';
+
+  @override
+  String get onboardingAppyImNew => 'I\'m new here';
+
+  @override
+  String get onboardingAppySignUpTitle => 'Save your progress';
+
+  @override
+  String get onboardingAppySignUpSubtitle =>
+      'Create an account so Appy remembers you.';
+
+  @override
+  String get onboardingAppyMultiSelectHint => 'Select all that apply.';
+
+  @override
+  String get onboardingAppyAgeQuestion => 'How old are you?';
+
+  @override
+  String get onboardingAppyAgeUnder18 => 'Under 18';
+
+  @override
+  String get onboardingAppyAge1824 => '18–24';
+
+  @override
+  String get onboardingAppyAge2534 => '25–34';
+
+  @override
+  String get onboardingAppyAge3544 => '35–44';
+
+  @override
+  String get onboardingAppyAge4554 => '45–54';
+
+  @override
+  String get onboardingAppyAge55 => '55+';
+
+  @override
+  String get onboardingAppyIdentityQuestion => 'What do you identify with?';
+
+  @override
+  String get onboardingAppyIdentityWoman => 'Woman';
+
+  @override
+  String get onboardingAppyIdentityMan => 'Man';
+
+  @override
+  String get onboardingAppyIdentityNonBinary => 'Non-binary';
+
+  @override
+  String get onboardingAppyIdentityTrans => 'Transgender';
+
+  @override
+  String get onboardingAppyIdentityPreferNot => 'Prefer not to say';
+
+  @override
+  String get onboardingAppyIdentityOther => 'Something else';
+
+  @override
+  String get onboardingAppyFeelingsQuestion => 'How do you feel lately?';
+
+  @override
+  String get onboardingAppyFeelingTired => 'Tired or low on energy';
+
+  @override
+  String get onboardingAppyFeelingAnxious => 'Anxious or stressed';
+
+  @override
+  String get onboardingAppyFeelingLonely => 'Lonely or disconnected';
+
+  @override
+  String get onboardingAppyFeelingStuck => 'Stuck or lacking direction';
+
+  @override
+  String get onboardingAppyFeelingDown => 'Down or empty';
+
+  @override
+  String get onboardingAppyFeelingHardOnSelf => 'Hard on myself';
+
+  @override
+  String get onboardingAppyFeelingOverwhelmed => 'Overwhelmed by everything';
+
+  @override
+  String get onboardingAppyFeelingGood => 'Pretty good, actually';
+
+  @override
+  String get onboardingAppyFeelingOther => 'Something else';
+
+  @override
+  String get onboardingAppyLifeTitle =>
+      'How\'s each part of your life right now?';
+
+  @override
+  String get onboardingAppyLifeSubtitle =>
+      'Rate each from 1 (low) to 5 (great).';
+
+  @override
+  String get onboardingAppyLifeHealth => 'Health, diet, sleep & fitness';
+
+  @override
+  String get onboardingAppyLifeSupport => 'Healthy people that support me';
+
+  @override
+  String get onboardingAppyLifeSafety => 'Safety & money stress-free';
+
+  @override
+  String get onboardingAppyLifeEnvironment => 'Healthy, pleasant environment';
+
+  @override
+  String get onboardingAppyLifeSelfCare => 'Self-talk & care';
+
+  @override
+  String get onboardingAppyLifeEnjoyment => 'Things I enjoy weekly';
+
+  @override
+  String get onboardingAppyLifeJob => 'Fulfilling job';
+
+  @override
+  String get onboardingAppyLifeMeaning => 'Meaning & direction in life';
+
+  @override
+  String get onboardingAppyProblemTitle =>
+      'Most of what holds us back is invisible to us';
+
+  @override
+  String get onboardingAppyProblemBody =>
+      'Everyone has blind spots — patterns, beliefs, and old stories that quietly shape our decisions. Not because something\'s wrong with us. It\'s simply human. But what we can\'t see, we can\'t change.';
+
+  @override
+  String get onboardingAppyProblemCta => 'So how do we see it?';
+
+  @override
+  String get onboardingAppySolutionTitle =>
+      'You just need someone to think out loud with';
+
+  @override
+  String get onboardingAppySolutionBody =>
+      'Talking to someone who listens without judging is how blind spots come into view. Appy is there whenever you need it — at 2am, mid-spiral, or on a good day. It remembers what matters to you, asks the questions that bring clarity, and helps you take the next step.';
+
+  @override
+  String get onboardingAppySolutionCta => 'Meet Appy';
+
+  @override
+  String get onboardingAppyPresentTitle => 'Hi, I\'m Appy';
+
+  @override
+  String get onboardingAppyPresentBody =>
+      'I\'m here to listen, help you untangle your thoughts, and keep track of what matters to you. No judgment, no waiting room, no time limit.';
+
+  @override
+  String get onboardingAppyPresentFootnote =>
+      'Everything you share stays between us';
+
+  @override
+  String get onboardingAppyNameQuestion => 'What\'s your name?';
+
+  @override
+  String get onboardingAppyNameHint => 'Your name';
+
+  @override
+  String get onboardingAppyToneQuestion =>
+      'How do you want Appy to talk to you?';
+
+  @override
+  String get onboardingAppyToneExploration => 'Exploration';
+
+  @override
+  String get onboardingAppyToneValidate => 'Validate and listen';
+
+  @override
+  String get onboardingAppyToneChallenging => 'Challenging';
+
+  @override
+  String get onboardingAppyToneSolution => 'Solution oriented';
 }

@@ -2695,6 +2695,354 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change color'**
   String get shopCtaColor;
+
+  /// No description provided for @onboardingAppyPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your mental health is personal and private'**
+  String get onboardingAppyPrivacyTitle;
+
+  /// No description provided for @onboardingAppyPrivacyFootnote.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted data — only you can see it'**
+  String get onboardingAppyPrivacyFootnote;
+
+  /// No description provided for @onboardingAppySignInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome'**
+  String get onboardingAppySignInTitle;
+
+  /// No description provided for @onboardingAppySignInSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to pick up where you left off, or start fresh.'**
+  String get onboardingAppySignInSubtitle;
+
+  /// No description provided for @onboardingAppyImNew.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m new here'**
+  String get onboardingAppyImNew;
+
+  /// No description provided for @onboardingAppySignUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your progress'**
+  String get onboardingAppySignUpTitle;
+
+  /// No description provided for @onboardingAppySignUpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account so Appy remembers you.'**
+  String get onboardingAppySignUpSubtitle;
+
+  /// No description provided for @onboardingAppyMultiSelectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all that apply.'**
+  String get onboardingAppyMultiSelectHint;
+
+  /// No description provided for @onboardingAppyAgeQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How old are you?'**
+  String get onboardingAppyAgeQuestion;
+
+  /// No description provided for @onboardingAppyAgeUnder18.
+  ///
+  /// In en, this message translates to:
+  /// **'Under 18'**
+  String get onboardingAppyAgeUnder18;
+
+  /// No description provided for @onboardingAppyAge1824.
+  ///
+  /// In en, this message translates to:
+  /// **'18–24'**
+  String get onboardingAppyAge1824;
+
+  /// No description provided for @onboardingAppyAge2534.
+  ///
+  /// In en, this message translates to:
+  /// **'25–34'**
+  String get onboardingAppyAge2534;
+
+  /// No description provided for @onboardingAppyAge3544.
+  ///
+  /// In en, this message translates to:
+  /// **'35–44'**
+  String get onboardingAppyAge3544;
+
+  /// No description provided for @onboardingAppyAge4554.
+  ///
+  /// In en, this message translates to:
+  /// **'45–54'**
+  String get onboardingAppyAge4554;
+
+  /// No description provided for @onboardingAppyAge55.
+  ///
+  /// In en, this message translates to:
+  /// **'55+'**
+  String get onboardingAppyAge55;
+
+  /// No description provided for @onboardingAppyIdentityQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you identify with?'**
+  String get onboardingAppyIdentityQuestion;
+
+  /// No description provided for @onboardingAppyIdentityWoman.
+  ///
+  /// In en, this message translates to:
+  /// **'Woman'**
+  String get onboardingAppyIdentityWoman;
+
+  /// No description provided for @onboardingAppyIdentityMan.
+  ///
+  /// In en, this message translates to:
+  /// **'Man'**
+  String get onboardingAppyIdentityMan;
+
+  /// No description provided for @onboardingAppyIdentityNonBinary.
+  ///
+  /// In en, this message translates to:
+  /// **'Non-binary'**
+  String get onboardingAppyIdentityNonBinary;
+
+  /// No description provided for @onboardingAppyIdentityTrans.
+  ///
+  /// In en, this message translates to:
+  /// **'Transgender'**
+  String get onboardingAppyIdentityTrans;
+
+  /// No description provided for @onboardingAppyIdentityPreferNot.
+  ///
+  /// In en, this message translates to:
+  /// **'Prefer not to say'**
+  String get onboardingAppyIdentityPreferNot;
+
+  /// No description provided for @onboardingAppyIdentityOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else'**
+  String get onboardingAppyIdentityOther;
+
+  /// No description provided for @onboardingAppyFeelingsQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you feel lately?'**
+  String get onboardingAppyFeelingsQuestion;
+
+  /// No description provided for @onboardingAppyFeelingTired.
+  ///
+  /// In en, this message translates to:
+  /// **'Tired or low on energy'**
+  String get onboardingAppyFeelingTired;
+
+  /// No description provided for @onboardingAppyFeelingAnxious.
+  ///
+  /// In en, this message translates to:
+  /// **'Anxious or stressed'**
+  String get onboardingAppyFeelingAnxious;
+
+  /// No description provided for @onboardingAppyFeelingLonely.
+  ///
+  /// In en, this message translates to:
+  /// **'Lonely or disconnected'**
+  String get onboardingAppyFeelingLonely;
+
+  /// No description provided for @onboardingAppyFeelingStuck.
+  ///
+  /// In en, this message translates to:
+  /// **'Stuck or lacking direction'**
+  String get onboardingAppyFeelingStuck;
+
+  /// No description provided for @onboardingAppyFeelingDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Down or empty'**
+  String get onboardingAppyFeelingDown;
+
+  /// No description provided for @onboardingAppyFeelingHardOnSelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard on myself'**
+  String get onboardingAppyFeelingHardOnSelf;
+
+  /// No description provided for @onboardingAppyFeelingOverwhelmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwhelmed by everything'**
+  String get onboardingAppyFeelingOverwhelmed;
+
+  /// No description provided for @onboardingAppyFeelingGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Pretty good, actually'**
+  String get onboardingAppyFeelingGood;
+
+  /// No description provided for @onboardingAppyFeelingOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Something else'**
+  String get onboardingAppyFeelingOther;
+
+  /// No description provided for @onboardingAppyLifeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How\'s each part of your life right now?'**
+  String get onboardingAppyLifeTitle;
+
+  /// No description provided for @onboardingAppyLifeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate each from 1 (low) to 5 (great).'**
+  String get onboardingAppyLifeSubtitle;
+
+  /// No description provided for @onboardingAppyLifeHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health, diet, sleep & fitness'**
+  String get onboardingAppyLifeHealth;
+
+  /// No description provided for @onboardingAppyLifeSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy people that support me'**
+  String get onboardingAppyLifeSupport;
+
+  /// No description provided for @onboardingAppyLifeSafety.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety & money stress-free'**
+  String get onboardingAppyLifeSafety;
+
+  /// No description provided for @onboardingAppyLifeEnvironment.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy, pleasant environment'**
+  String get onboardingAppyLifeEnvironment;
+
+  /// No description provided for @onboardingAppyLifeSelfCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Self-talk & care'**
+  String get onboardingAppyLifeSelfCare;
+
+  /// No description provided for @onboardingAppyLifeEnjoyment.
+  ///
+  /// In en, this message translates to:
+  /// **'Things I enjoy weekly'**
+  String get onboardingAppyLifeEnjoyment;
+
+  /// No description provided for @onboardingAppyLifeJob.
+  ///
+  /// In en, this message translates to:
+  /// **'Fulfilling job'**
+  String get onboardingAppyLifeJob;
+
+  /// No description provided for @onboardingAppyLifeMeaning.
+  ///
+  /// In en, this message translates to:
+  /// **'Meaning & direction in life'**
+  String get onboardingAppyLifeMeaning;
+
+  /// No description provided for @onboardingAppyProblemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Most of what holds us back is invisible to us'**
+  String get onboardingAppyProblemTitle;
+
+  /// No description provided for @onboardingAppyProblemBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyone has blind spots — patterns, beliefs, and old stories that quietly shape our decisions. Not because something\'s wrong with us. It\'s simply human. But what we can\'t see, we can\'t change.'**
+  String get onboardingAppyProblemBody;
+
+  /// No description provided for @onboardingAppyProblemCta.
+  ///
+  /// In en, this message translates to:
+  /// **'So how do we see it?'**
+  String get onboardingAppyProblemCta;
+
+  /// No description provided for @onboardingAppySolutionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You just need someone to think out loud with'**
+  String get onboardingAppySolutionTitle;
+
+  /// No description provided for @onboardingAppySolutionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Talking to someone who listens without judging is how blind spots come into view. Appy is there whenever you need it — at 2am, mid-spiral, or on a good day. It remembers what matters to you, asks the questions that bring clarity, and helps you take the next step.'**
+  String get onboardingAppySolutionBody;
+
+  /// No description provided for @onboardingAppySolutionCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Meet Appy'**
+  String get onboardingAppySolutionCta;
+
+  /// No description provided for @onboardingAppyPresentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, I\'m Appy'**
+  String get onboardingAppyPresentTitle;
+
+  /// No description provided for @onboardingAppyPresentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m here to listen, help you untangle your thoughts, and keep track of what matters to you. No judgment, no waiting room, no time limit.'**
+  String get onboardingAppyPresentBody;
+
+  /// No description provided for @onboardingAppyPresentFootnote.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything you share stays between us'**
+  String get onboardingAppyPresentFootnote;
+
+  /// No description provided for @onboardingAppyNameQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s your name?'**
+  String get onboardingAppyNameQuestion;
+
+  /// No description provided for @onboardingAppyNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get onboardingAppyNameHint;
+
+  /// No description provided for @onboardingAppyToneQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you want Appy to talk to you?'**
+  String get onboardingAppyToneQuestion;
+
+  /// No description provided for @onboardingAppyToneExploration.
+  ///
+  /// In en, this message translates to:
+  /// **'Exploration'**
+  String get onboardingAppyToneExploration;
+
+  /// No description provided for @onboardingAppyToneValidate.
+  ///
+  /// In en, this message translates to:
+  /// **'Validate and listen'**
+  String get onboardingAppyToneValidate;
+
+  /// No description provided for @onboardingAppyToneChallenging.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenging'**
+  String get onboardingAppyToneChallenging;
+
+  /// No description provided for @onboardingAppyToneSolution.
+  ///
+  /// In en, this message translates to:
+  /// **'Solution oriented'**
+  String get onboardingAppyToneSolution;
 }
 
 class _AppLocalizationsDelegate

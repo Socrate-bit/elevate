@@ -10,6 +10,14 @@ class OnboardingState extends Equatable {
   final bool isInProgress;
   final bool isComplete;
 
+  // v2 (Appy) onboarding answers. See OnboardingScreenV2.
+  final String? ageRange;
+  final Set<String> identities;
+  final Set<String> feelings;
+  final Map<String, int> lifeRatings;
+  final String? name;
+  final String? tone;
+
   const OnboardingState({
     this.currentPage = 0,
     this.surveyAnswers = const {},
@@ -17,6 +25,12 @@ class OnboardingState extends Equatable {
     this.referralStatus = ReferralStatus.none,
     this.isInProgress = false,
     this.isComplete = false,
+    this.ageRange,
+    this.identities = const {},
+    this.feelings = const {},
+    this.lifeRatings = const {},
+    this.name,
+    this.tone,
   });
 
   OnboardingState copyWith({
@@ -26,6 +40,12 @@ class OnboardingState extends Equatable {
     ReferralStatus? referralStatus,
     bool? isInProgress,
     bool? isComplete,
+    String? ageRange,
+    Set<String>? identities,
+    Set<String>? feelings,
+    Map<String, int>? lifeRatings,
+    String? name,
+    String? tone,
   }) =>
       OnboardingState(
         currentPage: currentPage ?? this.currentPage,
@@ -34,6 +54,12 @@ class OnboardingState extends Equatable {
         referralStatus: referralStatus ?? this.referralStatus,
         isInProgress: isInProgress ?? this.isInProgress,
         isComplete: isComplete ?? this.isComplete,
+        ageRange: ageRange ?? this.ageRange,
+        identities: identities ?? this.identities,
+        feelings: feelings ?? this.feelings,
+        lifeRatings: lifeRatings ?? this.lifeRatings,
+        name: name ?? this.name,
+        tone: tone ?? this.tone,
       );
 
   @override
@@ -44,5 +70,11 @@ class OnboardingState extends Equatable {
         referralStatus,
         isInProgress,
         isComplete,
+        ageRange,
+        identities,
+        feelings,
+        lifeRatings,
+        name,
+        tone,
       ];
 }
