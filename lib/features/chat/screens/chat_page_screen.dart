@@ -326,29 +326,29 @@ class _ChatViewState extends State<_ChatView> {
             },
           ),
         ),
-        // Starter suggestions — visible until dismissed or the user has spoken.
-        BlocBuilder<ChatCubit, ChatState>(
-          buildWhen: (a, b) => a.messages != b.messages,
-          builder: (context, state) {
-            final hasUserMessage = state.messages.any(
-              (m) => m.role == ChatRole.user,
-            );
-            // Normally the card hides once the user has spoken; when forced
-            // (introspection "restart workflow") it shows regardless, until the
-            // user picks an option or dismisses it.
-            if (_suggestionsDismissed ||
-                (!widget.forceStarter && hasUserMessage)) {
-              return const SizedBox.shrink();
-            }
-            return Padding(
-              padding: EdgeInsets.only(bottom: 10.h),
-              child: ChatSuggestionsCard(
-                onPick: (suggestion) => _onStarterPick(context, suggestion),
-                onDismiss: () => setState(() => _suggestionsDismissed = true),
-              ),
-            );
-          },
-        ),
+        // // Starter suggestions — visible until dismissed or the user has spoken.
+        // BlocBuilder<ChatCubit, ChatState>(
+        //   buildWhen: (a, b) => a.messages != b.messages,
+        //   builder: (context, state) {
+        //     final hasUserMessage = state.messages.any(
+        //       (m) => m.role == ChatRole.user,
+        //     );
+        //     // Normally the card hides once the user has spoken; when forced
+        //     // (introspection "restart workflow") it shows regardless, until the
+        //     // user picks an option or dismisses it.
+        //     if (_suggestionsDismissed ||
+        //         (!widget.forceStarter && hasUserMessage)) {
+        //       return const SizedBox.shrink();
+        //     }
+        //     return Padding(
+        //       padding: EdgeInsets.only(bottom: 10.h),
+        //       child: ChatSuggestionsCard(
+        //         onPick: (suggestion) => _onStarterPick(context, suggestion),
+        //         onDismiss: () => setState(() => _suggestionsDismissed = true),
+        //       ),
+        //     );
+        //   },
+        // ),
         // Hairline separating the conversation from the composer.
         Divider(height: 1, thickness: 1, color: ChatPalette.cardBorder),
         // Composer: snug above the keyboard when open, clear of the floating nav
