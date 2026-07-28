@@ -7,7 +7,7 @@ import '../chat/cubit/chat_list_cubit.dart';
 import '../memory/cubit/memory_cubit.dart';
 import '../onboarding/cubit/onboarding_cubit.dart';
 import '../onboarding/cubit/onboarding_state.dart';
-import '../onboarding/screens/onboarding_screen.dart';
+import '../onboarding/screens/onboarding_screen_v2.dart';
 import '../settings/cubit/settings_cubit.dart';
 import '../subscription/cubit/subscription_cubit.dart';
 import '../subscription/screens/app_gate_wrapper.dart';
@@ -52,7 +52,7 @@ class AuthWrapper extends StatelessWidget {
                 context.read<MemoryCubit>().clear();
                 // hook: cancel any other user-scoped resources here
               });
-              return const OnboardingScreen();
+              return const OnboardingScreenV2();
             }
             context.read<SubscriptionCubit>().identifyUser(snap.data!.uid);
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -60,7 +60,7 @@ class AuthWrapper extends StatelessWidget {
               context.read<MemoryCubit>().start();
             });
             if (ob.isInProgress) {
-              return const OnboardingScreen();
+              return const OnboardingScreenV2();
             }
             return AppGateWrapper(navigatorKey: navigatorKey);
           },
