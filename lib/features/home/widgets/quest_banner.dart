@@ -7,7 +7,6 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
-import '../../adventure/models/game_profile.dart';
 import '../../trophy/cubit/trophy_reveal_cubit.dart';
 import '../../trophy/screens/trophy_reveal_screen.dart';
 import '../../shop/cubit/shop_cubit.dart';
@@ -44,6 +43,8 @@ class QuestBanner extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  // Current level — sits opposite the streak + shop icons.
+                  const _LevelBadge(),
                   const Spacer(),
                   const _StreakCounter(),
                   SizedBox(width: 24.w),
@@ -108,7 +109,7 @@ class QuestBanner extends StatelessWidget {
                                 ? l10n.adventureRemaining(
                                     _clock(adv.remaining))
                                 : l10n.adventureStrikeProgress(
-                                    adv.profile.strikes, kStrikeGoal),
+                                    adv.profile.strikes, adv.profile.strikeGoal),
                           ),
                         ],
                       ),
@@ -189,6 +190,28 @@ class _PerchIcon extends StatelessWidget {
     return GestureDetector(
       onTap: withHaptic(onTap),
       child: Image.asset(asset, width: 40.w, height: 40.w),
+    );
+  }
+}
+
+/// Current adventure level, shown above the level-progression (adventure) bar.
+/// Rebuilds only when the level changes.
+class _LevelBadge extends StatelessWidget {
+  const _LevelBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return BlocBuilder<AdventureCubit, AdventureState>(
+      buildWhen: (a, b) => a.profile.level != b.profile.level,
+      builder: (context, adv) => Text(
+        l10n.levelLabel(adv.profile.level),
+        style: TextStyle(
+          fontSize: 18.sp,
+          fontWeight: FontWeight.w800,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }

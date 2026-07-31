@@ -2432,6 +2432,12 @@ abstract class AppLocalizations {
   /// **'+ {xp} XP'**
   String homePageXp(int xp);
 
+  /// No description provided for @levelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Level {level}'**
+  String levelLabel(int level);
+
   /// No description provided for @adventureTitle.
   ///
   /// In en, this message translates to:

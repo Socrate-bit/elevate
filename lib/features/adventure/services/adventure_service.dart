@@ -141,8 +141,9 @@ class AdventureService {
     }
   }
 
-  /// Claims the reward: records the earned trophy [trophyId] and resets to a
-  /// fresh charging bar.
+  /// Claims the reward: records the earned trophy [trophyId], advances to the
+  /// next level (raising the next bar's strike goal), and resets to a fresh
+  /// charging bar.
   static Future<void> completeAdventure(String trophyId) async {
     try {
       await _db.runTransaction((tx) async {
@@ -151,12 +152,14 @@ class AdventureService {
             ? GameProfile.fromMap(snap.data()!)
             : const GameProfile();
 
+        final newLevel = profile.level + 1;
         tx.set(
           _gameDoc,
           profile
               .copyWith(
                 phase: AdventurePhase.charging,
                 strikes: 0,
+                level: newLevel,
                 trophies: [...profile.trophies, trophyId],
                 clearWindow: true,
               )
