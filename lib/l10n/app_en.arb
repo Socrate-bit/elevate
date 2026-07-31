@@ -429,6 +429,13 @@
   "routineCardObjectCheck": "Photo check: {object}",
   "@routineCardObjectCheck": { "placeholders": { "object": { "type": "String" } } },
   "routineHabitNoSchedule": "No schedule",
+  "routineDetailRecurrence": "Recurrence",
+  "routineDetailDescription": "Description",
+  "routineDetailReward": "Reward",
+  "routineDetailNoDescription": "No description",
+  "routineDetailAnytime": "Anytime",
+  "routineDetailPoints": "{xp} pts",
+  "@routineDetailPoints": { "placeholders": { "xp": { "type": "int" } } },
 
   "chatRoutineCreated": "Created '{name}'",
   "@chatRoutineCreated": { "placeholders": { "name": { "type": "String" } } },

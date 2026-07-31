@@ -13,7 +13,7 @@ import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../../routines/models/routine.dart';
 import '../../routines/models/routine_palette.dart';
-import '../../routines/screens/routine_form_screen.dart';
+import '../../routines/screens/routine_detail_screen.dart';
 import '../../tools/models/tools_mock_data.dart';
 import '../../tools/tools_launcher.dart';
 import '../models/default_task.dart';
@@ -109,7 +109,7 @@ class TodaysPlanCard extends StatelessWidget {
               routine: r,
               done: completedIds.contains(r.id),
               onToggle: () => _toggle(context, r, completedIds.contains(r.id)),
-              onEdit: () => _edit(context, r),
+              onOpen: () => _openDetail(context, r),
             ),
           ),
         ),
@@ -131,14 +131,12 @@ class TodaysPlanCard extends StatelessWidget {
     await adventure.awardForCompletion(r.xp);
   }
 
-  void _edit(BuildContext context, Routine r) {
+  /// Opens the read-only task detail page.
+  void _openDetail(BuildContext context, Routine r) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: context.read<RoutineCubit>(),
-          child: RoutineFormScreen(routine: r),
-        ),
+        builder: (_) => RoutineDetailScreen(routine: r),
       ),
     );
   }
@@ -409,13 +407,13 @@ class _TaskCard extends StatelessWidget {
   final Routine routine;
   final bool done;
   final VoidCallback onToggle;
-  final VoidCallback onEdit;
+  final VoidCallback onOpen;
 
   const _TaskCard({
     required this.routine,
     required this.done,
     required this.onToggle,
-    required this.onEdit,
+    required this.onOpen,
   });
 
   @override
@@ -429,10 +427,10 @@ class _TaskCard extends StatelessWidget {
     final opensSession = tool != null && tool.hasSession;
     return GestureDetector(
       onTap: withHaptic(
-        opensSession ? () => openToolSession(context, tool) : onEdit,
+        opensSession ? () => openToolSession(context, tool) : onOpen,
       ),
-      // Keep tool tasks manageable (edit/delete) via long-press.
-      onLongPress: opensSession ? withHaptic(onEdit) : null,
+      // Tool tasks open their session on tap; long-press shows their details.
+      onLongPress: opensSession ? withHaptic(onOpen) : null,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
         decoration: BoxDecoration(

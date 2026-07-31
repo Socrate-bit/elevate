@@ -439,7 +439,11 @@ class ChatCubit extends Cubit<ChatState> {
         args['type']?.toString() ??
         (existing?.type == RoutineType.habit ? 'habit' : 'action');
     final type = typeStr == 'habit' ? RoutineType.habit : RoutineType.action;
-    final name = args['name']?.toString().trim();
+    final rawName = args['name']?.toString().trim();
+    // Titles are capped at 3 words (safety net for the model).
+    final name = (rawName == null || rawName.isEmpty)
+        ? rawName
+        : rawName.split(RegExp(r'\s+')).take(3).join(' ');
     if ((name == null || name.isEmpty) && existing == null) return null;
 
     final emoji = (args['emoji']?.toString() ?? '').isNotEmpty
