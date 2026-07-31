@@ -180,7 +180,7 @@ class _MessageRow extends StatelessWidget {
       );
     }
     if (isModel && m.insight != null) {
-      return _CardWrap(child: ChatInsightCard(insight: m.insight!));
+      return _CardWrap(child: ChatInsightCard(message: m));
     }
     return _TextBubble(message: m);
   }

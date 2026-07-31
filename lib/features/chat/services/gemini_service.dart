@@ -127,6 +127,12 @@ abstract interface class GeminiClient {
   /// isn't enough material to say something meaningful.
   Future<ChatInsight?> generateInsight({required List<ChatMessage> history});
 
+  /// Assesses how ready the conversation is to yield a meaningful insight, as a
+  /// value in [0,1]. 1.0 means an insight can now be generated (deep enough
+  /// exploration/resolution over more than five messages). Returns null when the
+  /// assessment fails so callers can keep the previous value.
+  Future<double?> assessInsightProgress({required List<ChatMessage> history});
+
   /// Produces a real, verbatim citation from a well-known figure or book,
   /// thematically tied to [context] (a general one if it's empty), that is not
   /// already in [avoid]. Also picks an [iconKey]/[colorKey] from the allowed
@@ -307,6 +313,20 @@ Use plain prose replies for everything else.
       'If the conversation is too short or thin to say anything meaningful, return '
       'empty strings for all three fields.';
 
+  static const _insightProgressSystemInstruction =
+      'You track how close a coaching conversation is to yielding ONE genuinely '
+      'useful insight to reflect back to the user. Weigh two things: depth '
+      '(has the user explored something meaningfully, reached some clarity, a '
+      'reframe, or a resolution?) and length (a real insight needs more than '
+      'five messages of substance). Return JSON matching the schema with a single '
+      '`progress` field, a number from 0.0 to 1.0:\n'
+      '- 1.0 means an insight can be generated right now: the exchange has more '
+      'than five messages AND the exploration or resolution is satisfying.\n'
+      '- Values in between reflect partial progress as the conversation deepens.\n'
+      '- Near 0.0 for a thin or just-started exchange.\n'
+      'Never return 1.0 when there are five or fewer messages, or when nothing '
+      'meaningful has been explored yet.';
+
   static const _citationSystemInstruction =
       'You award a "wisdom trophy": ONE real, verbatim quotation from a well-known '
       'real figure (philosopher, writer, scientist, leader) or a real book. '
@@ -467,6 +487,24 @@ Use plain prose replies for everything else.
             ),
             'body': Schema.string(
               description: '1–3 short paragraphs delivering the insight.',
+            ),
+          },
+        ),
+      ),
+    );
+  }
+
+  GenerativeModel _buildInsightProgressModel() {
+    return FirebaseAI.googleAI().generativeModel(
+      model: _modelName,
+      systemInstruction: Content.system(_insightProgressSystemInstruction),
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: Schema.object(
+          properties: {
+            'progress': Schema.number(
+              description:
+                  'Readiness for an insight, 0.0 (thin) to 1.0 (ready now).',
             ),
           },
         ),
@@ -776,6 +814,44 @@ Use plain prose replies for everything else.
     // The model returns empty fields when there isn't enough to say.
     if (title.isEmpty || body.isEmpty) return null;
     return ChatInsight(title: title, quote: quote, body: body);
+  }
+
+  @override
+  Future<double?> assessInsightProgress({
+    required List<ChatMessage> history,
+  }) async {
+    try {
+      final transcript = _renderTranscript(history);
+      if (transcript.trim().isEmpty) return 0.0;
+      final prompt =
+          'Conversation transcript (since the last insight):\n$transcript\n\n'
+          'Return JSON per the schema with the insight-readiness progress.';
+
+      final response = await _buildInsightProgressModel()
+          .generateContent([Content.text(prompt)])
+          .timeout(const Duration(seconds: 20));
+      final text = response.text?.trim() ?? '';
+      if (text.isEmpty) return null;
+      return _parseProgress(text);
+    } catch (e, st) {
+      debugPrint('[GeminiService] assessInsightProgress failed: $e\n$st');
+      return null;
+    }
+  }
+
+  static double? _parseProgress(String jsonText) {
+    final dynamic decoded;
+    try {
+      decoded = jsonDecode(jsonText);
+    } catch (e) {
+      debugPrint('[GeminiService] assessInsightProgress invalid JSON: $e');
+      return null;
+    }
+    if (decoded is! Map) return null;
+    final raw = decoded['progress'];
+    final value = raw is num ? raw.toDouble() : double.tryParse('$raw');
+    if (value == null) return null;
+    return value.clamp(0.0, 1.0);
   }
 
   @override

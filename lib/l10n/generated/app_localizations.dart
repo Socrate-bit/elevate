@@ -2648,6 +2648,36 @@ abstract class AppLocalizations {
   /// **'Read insight'**
   String get chatInsightCardCta;
 
+  /// No description provided for @chatInsightRewardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Insight unlocked!'**
+  String get chatInsightRewardTitle;
+
+  /// No description provided for @chatInsightRewardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You took a moment to reflect. Here\'s your reward.'**
+  String get chatInsightRewardBody;
+
+  /// No description provided for @chatInsightRewardXp.
+  ///
+  /// In en, this message translates to:
+  /// **'+{amount} XP'**
+  String chatInsightRewardXp(int amount);
+
+  /// No description provided for @chatInsightRewardPieces.
+  ///
+  /// In en, this message translates to:
+  /// **'+{amount} pieces'**
+  String chatInsightRewardPieces(int amount);
+
+  /// No description provided for @chatInsightRewardDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Awesome'**
+  String get chatInsightRewardDone;
+
   /// No description provided for @journalTitle.
   ///
   /// In en, this message translates to:

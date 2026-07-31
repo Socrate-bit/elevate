@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
@@ -6,32 +7,29 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../subscription/services/analytics_service.dart';
+import '../cubit/chat_cubit.dart';
 import '../screens/insight_detail_screen.dart';
-import '../services/chat_insight.dart';
+import '../screens/insight_reward_screen.dart';
+import '../services/chat_message.dart';
 import 'insight_progress_button.dart';
 
 /// Inline card announcing a generated insight. Shows the insight title; tapping
-/// opens the full [InsightDetailScreen].
+/// opens the full [InsightDetailScreen]. The first open also grants a one-time
+/// reward and, once the reader closes, celebrates it on the win page.
 class ChatInsightCard extends StatelessWidget {
-  final ChatInsight insight;
+  final ChatMessage message;
 
-  const ChatInsightCard({super.key, required this.insight});
+  const ChatInsightCard({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final insight = message.insight!;
 
     return Align(
       alignment: Alignment.centerLeft,
       child: GestureDetector(
-        onTap: withHaptic(() {
-          AnalyticsService.capture(AnalyticsService.chatInsightOpened);
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => InsightDetailScreen(insight: insight),
-            ),
-          );
-        }),
+        onTap: withHaptic(() => _openInsight(context)),
         child: Container(
           constraints: BoxConstraints(maxWidth: 0.82.sw),
           margin: EdgeInsets.symmetric(vertical: 4.h),
@@ -107,6 +105,28 @@ class ChatInsightCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// Opens the reader; on the first-ever open, grants the reward and celebrates
+  /// it on the win page once the reader is closed.
+  Future<void> _openInsight(BuildContext context) async {
+    final cubit = context.read<ChatCubit>();
+    AnalyticsService.capture(AnalyticsService.chatInsightOpened);
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => InsightDetailScreen(insight: message.insight!),
+      ),
+    );
+    if (!context.mounted) return;
+    // Grant the one-time reward; only then show the celebration.
+    final rewarded = await cubit.revealInsightReward(message.id);
+    if (!rewarded || !context.mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            const InsightRewardScreen(xp: ChatCubit.kInsightRewardXp),
       ),
     );
   }
