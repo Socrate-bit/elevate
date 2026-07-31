@@ -2312,6 +2312,12 @@ abstract class AppLocalizations {
   /// **'I just completed it!'**
   String get chatActionCompleted;
 
+  /// No description provided for @chatMissionCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'I just completed the \"{mission}\" activity!'**
+  String chatMissionCompleted(String mission);
+
   /// No description provided for @homePageGreeting.
   ///
   /// In en, this message translates to:

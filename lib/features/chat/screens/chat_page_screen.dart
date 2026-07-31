@@ -259,18 +259,39 @@ class _ChatView extends StatefulWidget {
   State<_ChatView> createState() => _ChatViewState();
 }
 
-class _ChatViewState extends State<_ChatView> {
+class _ChatViewState extends State<_ChatView> with WidgetsBindingObserver {
   final _composer = TextEditingController();
   final _composerFocus = FocusNode();
   final _scrollController = ScrollController();
   bool _suggestionsDismissed = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Observe view-inset changes so we can keep the last message visible as the
+    // keyboard animates in/out (message-driven scrolling alone doesn't cover it).
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _composer.dispose();
     _composerFocus.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Fires on every keyboard animation frame — keep pinned to the latest message
+  /// so the composer never hides it once the keyboard is open.
+  @override
+  void didChangeMetrics() {
+    // Jump (not animate) so we track the growing extent frame-by-frame instead
+    // of lagging behind a 200ms tween as the keyboard slides in.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
   }
 
   /// Handles a tapped starter chip — each intent behaves differently.

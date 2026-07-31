@@ -120,7 +120,8 @@ class _BreathingMissionScreenState extends State<BreathingMissionScreen>
     HapticFeedback.mediumImpact();
 
     if (widget.isPreview) {
-      if (mounted) Navigator.of(context).pop();
+      // Pop with `true` so the caller (e.g. chat) knows the session completed.
+      if (mounted) Navigator.of(context).pop(true);
       return;
     }
     // Notify the caller (e.g. to mark the task complete), then show the

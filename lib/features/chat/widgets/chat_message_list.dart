@@ -56,7 +56,7 @@ class ChatMessageList extends StatelessWidget {
     final items = _buildItems();
     return ListView.builder(
       controller: controller,
-      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
@@ -106,7 +106,7 @@ class _DayPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
+      padding: EdgeInsets.symmetric(vertical: 16.h),
       child: Center(
         child: ClipRRect(
           borderRadius: BorderRadius.circular(100.r),
@@ -185,13 +185,23 @@ class _MessageRow extends StatelessWidget {
     return _TextBubble(message: m);
   }
 
-  /// Accept an activity suggestion, then open its guided session.
+  /// Accept an activity suggestion, then open its guided session. When the
+  /// session runs to completion, tell the model so it can continue the convo.
   Future<void> _acceptMission(BuildContext context, ChatMessage m) async {
     final cubit = context.read<ChatCubit>();
+    final l10n = AppLocalizations.of(context)!;
     await cubit.acceptMissionSuggestion(m.id);
     if (!context.mounted) return;
     final tool = ToolsMockData.byKey(m.missionSuggestion!.toolKey);
-    if (tool != null) openToolSession(context, tool);
+    if (tool == null) return;
+    final completed = await openToolSession(context, tool);
+    if (!completed) return;
+    // Report completion back to the model to resume the conversation.
+    try {
+      await cubit.sendText(l10n.chatMissionCompleted(tool.title));
+    } catch (e) {
+      debugPrint('[ChatMessageList] mission-completed notify failed: $e');
+    }
   }
 
   Future<void> _startRoutineNow(BuildContext context, String routineId) async {
@@ -344,7 +354,7 @@ class _TypingBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 94.w, top: 3.h, bottom: 3.h),
+      padding: EdgeInsets.only(left: 6.w, top: 3.h, bottom: 3.h),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(

@@ -439,6 +439,8 @@
   "chatActionStartNow": "Start now",
   "chatActionDone": "Done",
   "chatActionCompleted": "I just completed it!",
+  "chatMissionCompleted": "I just completed the \"{mission}\" activity!",
+  "@chatMissionCompleted": { "placeholders": { "mission": { "type": "String" } } },
 
   "homePageGreeting": "Good afternoon, {name} 🌿",
   "@homePageGreeting": { "placeholders": { "name": { "type": "String" } } },

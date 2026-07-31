@@ -144,7 +144,8 @@ class _VideoToolSessionScreenState extends State<VideoToolSessionScreen> {
       AnalyticsService.toolSessionCompleted,
       {'tool': widget.title},
     );
-    if (mounted) Navigator.of(context).pop();
+    // Pop with `true` so the caller (e.g. chat) knows the session completed.
+    if (mounted) Navigator.of(context).pop(true);
   }
 
   Future<void> _retry() async {

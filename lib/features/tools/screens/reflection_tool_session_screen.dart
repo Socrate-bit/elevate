@@ -51,7 +51,8 @@ class _ReflectionToolSessionScreenState
     final ok = await context.read<ReflectionCubit>().save();
     if (!mounted) return;
     if (ok) {
-      Navigator.of(context).pop();
+      // Pop with `true` so the caller (e.g. chat) knows the session completed.
+      Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.reflectionSaveError)),

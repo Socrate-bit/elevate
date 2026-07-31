@@ -1210,6 +1210,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatActionCompleted => 'I just completed it!';
 
   @override
+  String chatMissionCompleted(String mission) {
+    return 'I just completed the \"$mission\" activity!';
+  }
+
+  @override
   String homePageGreeting(String name) {
     return 'Good afternoon, $name 🌿';
   }
