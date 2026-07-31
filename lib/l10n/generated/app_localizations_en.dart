@@ -1278,6 +1278,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String levelLabel(int level) {
+    return 'Level $level';
+  }
+
+  @override
   String get adventureTitle => 'Forest Adventure';
 
   @override

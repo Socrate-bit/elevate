@@ -1,7 +1,13 @@
 import 'package:equatable/equatable.dart';
 
-/// Strikes needed to fill the adventure bar before it can be started.
-const kStrikeGoal = 30;
+/// Strikes needed to fill the level-1 adventure bar; each subsequent level
+/// requires [kStrikeGoalStep] more (level 1: 30, level 2: 40, level 3: 50…).
+const kBaseStrikeGoal = 30;
+const kStrikeGoalStep = 30;
+
+/// Strikes required to fill the bar (and level up) at [level] (1-based).
+int strikeGoalForLevel(int level) =>
+    kBaseStrikeGoal + (level - 1) * kStrikeGoalStep;
 
 /// Base loading time once the pet leaves on an adventure.
 const kAdventureDuration = Duration(hours: 8);
@@ -12,7 +18,7 @@ const kStrikesPerReduction = 10;
 const kReductionPerStep = Duration(minutes: 20);
 
 /// Adventure lifecycle phase.
-/// - [charging]: strikes accumulate toward [kStrikeGoal]; once full the UI
+/// - [charging]: strikes accumulate toward the level's goal; once full the UI
 ///   surfaces a "Start Adventure" button (derived, see [GameProfile.isReady]).
 /// - [walking]: the pet is away; strikes now count up to shorten the timer.
 enum AdventurePhase { charging, walking }
@@ -24,9 +30,13 @@ class GameProfile extends Equatable {
   final int coins;
 
   /// Strike count. Meaning depends on [phase]:
-  /// - charging: 0..[kStrikeGoal] (fills the adventure bar).
+  /// - charging: 0..[strikeGoal] (fills the adventure bar).
   /// - walking: counts up from 0, driving the timer reductions.
   final int strikes;
+
+  /// Current level (1-based). Bumped each time an adventure is completed; also
+  /// raises [strikeGoal], so every level takes more strikes to fill.
+  final int level;
 
   final AdventurePhase phase;
 
@@ -40,20 +50,25 @@ class GameProfile extends Equatable {
   const GameProfile({
     this.coins = 0,
     this.strikes = 0,
+    this.level = 1,
     this.phase = AdventurePhase.charging,
     this.adventureStartMs,
     this.adventureEndMs,
     this.trophies = const [],
   });
 
+  /// Strikes required to fill the bar at the current [level].
+  int get strikeGoal => strikeGoalForLevel(level);
+
   /// True while charging and the bar is full — ready to start an adventure.
-  bool get isReady => phase == AdventurePhase.charging && strikes >= kStrikeGoal;
+  bool get isReady => phase == AdventurePhase.charging && strikes >= strikeGoal;
 
   bool get isWalking => phase == AdventurePhase.walking;
 
   factory GameProfile.fromMap(Map<String, dynamic> data) => GameProfile(
     coins: (data['coins'] as int?) ?? 0,
     strikes: (data['strikes'] as int?) ?? 0,
+    level: (data['level'] as int?) ?? 1,
     phase: (data['phase'] as String?) == 'walking'
         ? AdventurePhase.walking
         : AdventurePhase.charging,
@@ -65,6 +80,7 @@ class GameProfile extends Equatable {
   Map<String, dynamic> toMap() => {
     'coins': coins,
     'strikes': strikes,
+    'level': level,
     'phase': phase == AdventurePhase.walking ? 'walking' : 'charging',
     'adventureStartMs': adventureStartMs,
     'adventureEndMs': adventureEndMs,
@@ -74,6 +90,7 @@ class GameProfile extends Equatable {
   GameProfile copyWith({
     int? coins,
     int? strikes,
+    int? level,
     AdventurePhase? phase,
     int? adventureStartMs,
     int? adventureEndMs,
@@ -82,6 +99,7 @@ class GameProfile extends Equatable {
   }) => GameProfile(
     coins: coins ?? this.coins,
     strikes: strikes ?? this.strikes,
+    level: level ?? this.level,
     phase: phase ?? this.phase,
     adventureStartMs: clearWindow ? null : (adventureStartMs ?? this.adventureStartMs),
     adventureEndMs: clearWindow ? null : (adventureEndMs ?? this.adventureEndMs),
@@ -92,6 +110,7 @@ class GameProfile extends Equatable {
   List<Object?> get props => [
     coins,
     strikes,
+    level,
     phase,
     adventureStartMs,
     adventureEndMs,

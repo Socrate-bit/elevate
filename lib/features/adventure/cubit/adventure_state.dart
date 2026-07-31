@@ -29,8 +29,9 @@ class AdventureState extends Equatable {
     return profile.isWalking && end != null && nowMs >= end;
   }
 
-  /// Charging bar fraction (strikes toward the goal).
-  double get chargeProgress => (profile.strikes / kStrikeGoal).clamp(0.0, 1.0);
+  /// Charging bar fraction (strikes toward the current level's goal).
+  double get chargeProgress =>
+      (profile.strikes / profile.strikeGoal).clamp(0.0, 1.0);
 
   /// Walking loading fraction (elapsed time toward the end).
   double get walkProgress {
