@@ -354,7 +354,7 @@ class _DefaultTaskCard extends StatelessWidget {
                 ],
               ),
             ),
-            // XP reward: number + lightning.
+            // XP reward: number + seedling.
             Text(
               '${task.xp}',
               style: TextStyle(
@@ -364,7 +364,7 @@ class _DefaultTaskCard extends StatelessWidget {
               ),
             ),
             SizedBox(width: 3.w),
-            Image.asset('assets/home/light.png', width: 16.w),
+            Text('🌱', style: TextStyle(fontSize: 14.sp)),
             SizedBox(width: 10.w),
             // Done: a locked green check. Otherwise a "start" affordance
             // (the whole card handles the tap).
@@ -490,7 +490,7 @@ class _TaskCard extends StatelessWidget {
                 ],
               ),
             ),
-            // XP reward: number + lightning.
+            // XP reward: number + seedling.
             Text(
               '${routine.xp}',
               style: TextStyle(
@@ -500,7 +500,7 @@ class _TaskCard extends StatelessWidget {
               ),
             ),
             SizedBox(width: 3.w),
-            Image.asset('assets/home/light.png', width: 16.w),
+            Text('🌱', style: TextStyle(fontSize: 14.sp)),
             SizedBox(width: 10.w),
             _CheckButton(
               done: done,
