@@ -1287,11 +1287,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String adventureStrikeProgress(int done, int total) {
-    return '$done / $total strikes';
+    return '$done / $total sprouts';
   }
 
   @override
-  String get adventureStartButton => 'Start Adventure';
+  String get adventureStartButton => 'Go find wisdom';
 
   @override
   String get adventureDiscoverButton => 'Discover the surprise';

@@ -363,8 +363,8 @@ class _DefaultTaskCard extends StatelessWidget {
                 color: HomePalette.titleDark,
               ),
             ),
-            SizedBox(width: 3.w),
-            Text('🌱', style: TextStyle(fontSize: 14.sp)),
+            SizedBox(width: 6.w),
+            Image.asset('assets/home_page/plant.png', width: 22.w),
             SizedBox(width: 10.w),
             // Done: a locked green check. Otherwise a "start" affordance
             // (the whole card handles the tap).
@@ -499,8 +499,8 @@ class _TaskCard extends StatelessWidget {
                 color: HomePalette.titleDark,
               ),
             ),
-            SizedBox(width: 3.w),
-            Text('🌱', style: TextStyle(fontSize: 14.sp)),
+            SizedBox(width: 6.w),
+            Image.asset('assets/home_page/plant.png', width: 22.w),
             SizedBox(width: 10.w),
             _CheckButton(
               done: done,

@@ -198,7 +198,7 @@ class _HomeViewState extends State<_HomeView> {
                         builder: (context, adv) {
                           if (adv.isWalking && !adv.isArrived) {
                             return Image.asset(
-                              'assets/home/walking_pet.gif',
+                              'assets/home/meditation.gif',
                               key: _petKey,
                               width: w * _petWidthFactor,
                               height: w * _petWidthFactor,

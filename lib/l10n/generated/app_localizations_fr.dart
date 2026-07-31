@@ -1263,7 +1263,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucune quête. Ajoutes-en une pour commencer.';
 
   @override
-  String get defaultTaskMoodName => 'Point d\'humeur';
+  String get defaultTaskMoodName => 'Mood check';
 
   @override
   String get defaultTaskMoodSubtitle => 'Comment te sens-tu en ce moment ?';
@@ -1299,11 +1299,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String adventureStrikeProgress(int done, int total) {
-    return '$done / $total coups';
+    return '$done / $total pousses';
   }
 
   @override
-  String get adventureStartButton => 'Partir à l\'aventure';
+  String get adventureStartButton => 'Partir en quête de sagesse';
 
   @override
   String get adventureDiscoverButton => 'Découvrir la surprise';

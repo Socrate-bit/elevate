@@ -67,6 +67,16 @@ class QuestBanner extends StatelessWidget {
               borderRadius: BorderRadius.circular(16.r),
             ),
             child: BlocBuilder<AdventureCubit, AdventureState>(
+              // Rebuild the banner only on phase / strike changes — not on the
+              // per-second `nowMs` tick. The walking countdown rebuilds on its
+              // own via the nested builder below, so the rest of the banner (and
+              // the wider home page) stays put while the clock runs.
+              buildWhen: (a, b) =>
+                  a.isArrived != b.isArrived ||
+                  a.isReady != b.isReady ||
+                  a.isWalking != b.isWalking ||
+                  a.profile.strikes != b.profile.strikes ||
+                  a.profile.strikeGoal != b.profile.strikeGoal,
               builder: (context, adv) {
                 // Action phases: a big white button inside the banner replaces
                 // the "aventure en forêt" title + the strike/progress pill.
@@ -86,7 +96,7 @@ class QuestBanner extends StatelessWidget {
                 // Charging / walking: lightning + title + progress pill.
                 return Row(
                   children: [
-                    Image.asset('assets/home/quests.png', width: 38.w),
+                    Image.asset('assets/home_page/quest_icon.png', width: 46.w),
                     SizedBox(width: 10.w),
                     Expanded(
                       child: Column(
@@ -101,16 +111,25 @@ class QuestBanner extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 6.h),
-                          _ProgressPill(
-                            progress: adv.isWalking
-                                ? adv.walkProgress
-                                : adv.chargeProgress,
-                            label: adv.isWalking
-                                ? l10n.adventureRemaining(
-                                    _clock(adv.remaining))
-                                : l10n.adventureStrikeProgress(
-                                    adv.profile.strikes, adv.profile.strikeGoal),
-                          ),
+                          // Walking: only the countdown pill tracks the clock,
+                          // so it gets its own builder that rebuilds on the
+                          // `nowMs` tick. Charging is strike-based, already
+                          // covered by the outer builder.
+                          if (adv.isWalking)
+                            BlocBuilder<AdventureCubit, AdventureState>(
+                              buildWhen: (a, b) => a.nowMs != b.nowMs,
+                              builder: (context, adv) => _ProgressPill(
+                                progress: adv.walkProgress,
+                                label: l10n.adventureRemaining(
+                                    _clock(adv.remaining)),
+                              ),
+                            )
+                          else
+                            _ProgressPill(
+                              progress: adv.chargeProgress,
+                              label: l10n.adventureStrikeProgress(
+                                  adv.profile.strikes, adv.profile.strikeGoal),
+                            ),
                         ],
                       ),
                     ),
@@ -207,7 +226,7 @@ class _LevelBadge extends StatelessWidget {
       builder: (context, adv) => Text(
         l10n.levelLabel(adv.profile.level),
         style: TextStyle(
-          fontSize: 18.sp,
+          fontSize: 24.sp,
           fontWeight: FontWeight.w800,
           color: Colors.white,
         ),

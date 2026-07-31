@@ -2447,13 +2447,13 @@ abstract class AppLocalizations {
   /// No description provided for @adventureStrikeProgress.
   ///
   /// In en, this message translates to:
-  /// **'{done} / {total} strikes'**
+  /// **'{done} / {total} sprouts'**
   String adventureStrikeProgress(int done, int total);
 
   /// No description provided for @adventureStartButton.
   ///
   /// In en, this message translates to:
-  /// **'Start Adventure'**
+  /// **'Go find wisdom'**
   String get adventureStartButton;
 
   /// No description provided for @adventureDiscoverButton.

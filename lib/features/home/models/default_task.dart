@@ -38,7 +38,7 @@ class DefaultTask {
 const DefaultTask kMoodTask = DefaultTask(
   id: 'default_task_mood',
   kind: DefaultTaskKind.mood,
-  emoji: '😊',
+  emoji: '☀️',
   colorKey: 'yellow',
   xp: 10,
 );
@@ -46,7 +46,7 @@ const DefaultTask kMoodTask = DefaultTask(
 const DefaultTask kBreathingTask = DefaultTask(
   id: 'default_task_breathing',
   kind: DefaultTaskKind.breathing,
-  emoji: '🌬️',
+  emoji: '🧘',
   colorKey: 'blue',
   xp: 10,
 );
@@ -54,7 +54,7 @@ const DefaultTask kBreathingTask = DefaultTask(
 const DefaultTask kIntrospectionTask = DefaultTask(
   id: 'default_task_introspection',
   kind: DefaultTaskKind.introspection,
-  emoji: '💭',
+  emoji: '🌳',
   colorKey: 'purple',
   xp: 10,
 );
