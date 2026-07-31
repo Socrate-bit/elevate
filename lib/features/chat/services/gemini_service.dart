@@ -570,6 +570,10 @@ Use plain prose replies for everything else.
 
       final calls = response.functionCalls.toList();
       if (calls.isNotEmpty) {
+        debugPrint(
+          '[GeminiService] function calls: '
+          '${calls.map((c) => "${c.name}(${c.args})").join(" | ")}',
+        );
         final call = calls.first;
         if (call.name == _toolChoices) {
           final args = call.args;
@@ -586,13 +590,18 @@ Use plain prose replies for everything else.
         }
         if (call.name == _toolMission) {
           final args = call.args;
-          final toolKey = args['tool_key']?.toString() ?? '';
+          // The model sometimes passes the key under `mission_type` or nests it;
+          // accept the common aliases so a suggestion never collapses to blank.
+          final toolKey = (args['tool_key'] ?? args['mission_type'] ?? args['tool'])
+                  ?.toString() ??
+              '';
           final reason = args['reason']?.toString() ?? '';
           if (toolKey.isNotEmpty) {
             return GeminiReply.missionSuggestion(
               ChatMissionSuggestion(toolKey: toolKey, reason: reason),
             );
           }
+          debugPrint('[GeminiService] suggest_mission called without a key: $args');
         }
         if (call.name == _toolMood) {
           final args = call.args;
@@ -610,6 +619,12 @@ Use plain prose replies for everything else.
       }
 
       final text = response.text?.trim() ?? '';
+      if (text.isEmpty) {
+        debugPrint(
+          '[GeminiService] empty text reply '
+          '(calls=${calls.map((c) => c.name).toList()})',
+        );
+      }
       return GeminiReply.text(text);
     } catch (e, st) {
       debugPrint('[GeminiService] send failed: $e\n$st');
@@ -899,6 +914,16 @@ Use plain prose replies for everything else.
               ),
             ]),
           );
+        } else if (m.missionSuggestion != null) {
+          final s = m.missionSuggestion!;
+          final status = s.accepted == null
+              ? 'Awaiting response.'
+              : s.accepted!
+                  ? 'User started it.'
+                  : 'User declined.';
+          out.add(Content.model([
+            TextPart('I suggested the ${s.toolKey} activity. $status'),
+          ]));
         } else if (m.text.isNotEmpty) {
           out.add(Content.model([TextPart(m.text)]));
         }

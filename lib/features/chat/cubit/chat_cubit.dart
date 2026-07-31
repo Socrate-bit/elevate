@@ -333,6 +333,18 @@ class ChatCubit extends Cubit<ChatState> {
       replyText = '';
     }
 
+    // Never persist an empty bubble: if the model returned no text and no
+    // interactive payload (e.g. a malformed tool call), drop it rather than
+    // showing a blank message.
+    final hasPayload = reply.form != null ||
+        reply.missionSuggestion != null ||
+        reply.moodCheckIn != null ||
+        mutation != null;
+    if (replyText.isEmpty && !hasPayload) {
+      debugPrint('[ChatCubit] dropping empty model reply (no text/payload)');
+      return;
+    }
+
     final modelMsg = ChatMessage(
       id: _uuid.v4(),
       conversationId: state.conversationId,
