@@ -86,7 +86,7 @@ class QuestBanner extends StatelessWidget {
                 // Charging / walking: lightning + title + progress pill.
                 return Row(
                   children: [
-                    Image.asset('assets/home/light.png', width: 38.w),
+                    Image.asset('assets/home/quests.png', width: 38.w),
                     SizedBox(width: 10.w),
                     Expanded(
                       child: Column(

@@ -141,6 +141,26 @@ class AdventureService {
     }
   }
 
+  /// Forfeits the current level-bar accumulation (strikes → 0) when the user
+  /// lets their hearts hit zero. No-op while walking or if there is nothing to
+  /// lose, so it's safe to call on every heart recompute.
+  static Future<void> forfeitStrikes() async {
+    try {
+      await _db.runTransaction((tx) async {
+        final snap = await tx.get(_gameDoc);
+        if (!snap.exists || snap.data() == null) return;
+        final profile = GameProfile.fromMap(snap.data()!);
+        if (profile.phase != AdventurePhase.charging || profile.strikes == 0) {
+          return;
+        }
+        tx.set(_gameDoc, profile.copyWith(strikes: 0).toMap());
+      });
+      debugPrint('[AdventureService] strikes forfeited (hearts depleted)');
+    } catch (e) {
+      debugPrint('[AdventureService] forfeitStrikes failed: $e');
+    }
+  }
+
   /// Claims the reward: records the earned trophy [trophyId], advances to the
   /// next level (raising the next bar's strike goal), and resets to a fresh
   /// charging bar.

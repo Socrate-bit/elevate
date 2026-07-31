@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../activity/models/activity.dart';
 import '../../activity/services/activity_service.dart';
+import '../../adventure/services/adventure_service.dart';
 import '../services/heart_service.dart';
 import '../services/streak_service.dart';
 import 'streak_state.dart';
@@ -49,6 +50,13 @@ class StreakCubit extends Cubit<StreakState> {
       }
     }
     final hearts = HeartService.computeHearts(lastActivityAt);
+
+    // Running out of hearts wipes the current level-bar accumulation. Fire only
+    // when first entering the zero-hearts state (transition, or first load) to
+    // avoid redundant writes; the service itself no-ops if nothing is at stake.
+    if (hearts <= 0 && (state.hearts > 0 || state.loading)) {
+      AdventureService.forfeitStrikes();
+    }
 
     emit(
       state.copyWith(

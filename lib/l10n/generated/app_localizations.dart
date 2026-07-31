@@ -2441,7 +2441,7 @@ abstract class AppLocalizations {
   /// No description provided for @adventureTitle.
   ///
   /// In en, this message translates to:
-  /// **'Forest Adventure'**
+  /// **'Next wisdom'**
   String get adventureTitle;
 
   /// No description provided for @adventureStrikeProgress.

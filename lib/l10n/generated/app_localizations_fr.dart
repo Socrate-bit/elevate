@@ -1295,7 +1295,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get adventureTitle => 'Aventure en forêt';
+  String get adventureTitle => 'Prochaine sagesse';
 
   @override
   String adventureStrikeProgress(int done, int total) {

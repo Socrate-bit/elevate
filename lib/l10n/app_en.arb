@@ -466,7 +466,7 @@
   "@homePageXp": { "placeholders": { "xp": { "type": "int" } } },
   "levelLabel": "Level {level}",
   "@levelLabel": { "placeholders": { "level": { "type": "int" } } },
-  "adventureTitle": "Forest Adventure",
+  "adventureTitle": "Next wisdom",
   "adventureStrikeProgress": "{done} / {total} strikes",
   "@adventureStrikeProgress": { "placeholders": { "done": { "type": "int" }, "total": { "type": "int" } } },
   "adventureStartButton": "Start Adventure",

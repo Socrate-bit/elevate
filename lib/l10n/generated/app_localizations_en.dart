@@ -1283,7 +1283,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get adventureTitle => 'Forest Adventure';
+  String get adventureTitle => 'Next wisdom';
 
   @override
   String adventureStrikeProgress(int done, int total) {
