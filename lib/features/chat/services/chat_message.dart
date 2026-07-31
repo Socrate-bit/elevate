@@ -22,6 +22,10 @@ class ChatMessage extends Equatable {
   final ChatMoodCheckIn? moodCheckIn;
   final ChatRoutineMutation? routineMutation;
   final ChatInsight? insight;
+
+  /// True once the user has opened this insight for the first time (only ever
+  /// set on insight messages). Gates the one-time open reward + win page.
+  final bool insightOpened;
   final DateTime createdAt;
 
   const ChatMessage({
@@ -35,6 +39,7 @@ class ChatMessage extends Equatable {
     this.moodCheckIn,
     this.routineMutation,
     this.insight,
+    this.insightOpened = false,
   });
 
   ChatMessage copyWith({
@@ -47,6 +52,7 @@ class ChatMessage extends Equatable {
     ChatMoodCheckIn? moodCheckIn,
     ChatRoutineMutation? routineMutation,
     ChatInsight? insight,
+    bool? insightOpened,
     DateTime? createdAt,
   }) => ChatMessage(
     id: id ?? this.id,
@@ -58,6 +64,7 @@ class ChatMessage extends Equatable {
     moodCheckIn: moodCheckIn ?? this.moodCheckIn,
     routineMutation: routineMutation ?? this.routineMutation,
     insight: insight ?? this.insight,
+    insightOpened: insightOpened ?? this.insightOpened,
     createdAt: createdAt ?? this.createdAt,
   );
 
@@ -69,6 +76,7 @@ class ChatMessage extends Equatable {
     'moodCheckIn': moodCheckIn?.toMap(),
     'routineMutation': routineMutation?.toMap(),
     'insight': insight?.toMap(),
+    'insightOpened': insightOpened,
     'createdAtMs': createdAt.millisecondsSinceEpoch,
   };
 
@@ -97,6 +105,7 @@ class ChatMessage extends Equatable {
           ? null
           : ChatRoutineMutation.fromMap(routineMap),
       insight: insightMap == null ? null : ChatInsight.fromMap(insightMap),
+      insightOpened: m['insightOpened'] as bool? ?? false,
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         m['createdAtMs'] as int? ?? 0,
       ),
@@ -114,6 +123,7 @@ class ChatMessage extends Equatable {
     moodCheckIn,
     routineMutation,
     insight,
+    insightOpened,
     createdAt,
   ];
 }

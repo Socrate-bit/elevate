@@ -39,6 +39,9 @@ abstract interface class ChatRepository {
     String messageId,
     String selectedMood,
   );
+
+  /// Flags an insight message as opened (first-open reward bookkeeping).
+  Future<void> markInsightOpened(String conversationId, String messageId);
 }
 
 /// Firestore-backed [ChatRepository].
@@ -156,4 +159,10 @@ class ChatFirestoreService implements ChatRepository {
   ) => _messages(
     conversationId,
   ).doc(messageId).update({'moodCheckIn.selectedMood': selectedMood});
+
+  @override
+  Future<void> markInsightOpened(String conversationId, String messageId) =>
+      _messages(
+        conversationId,
+      ).doc(messageId).update({'insightOpened': true});
 }

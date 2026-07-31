@@ -507,6 +507,14 @@
   "chatInsightCardLabel": "Insight",
   "chatInsightCardCta": "Lire l'insight",
 
+  "chatInsightRewardTitle": "Insight débloqué !",
+  "chatInsightRewardBody": "Tu as pris un moment pour réfléchir. Voici ta récompense.",
+  "chatInsightRewardXp": "+{amount} XP",
+  "@chatInsightRewardXp": { "placeholders": { "amount": { "type": "int" } } },
+  "chatInsightRewardPieces": "+{amount} pièces",
+  "@chatInsightRewardPieces": { "placeholders": { "amount": { "type": "int" } } },
+  "chatInsightRewardDone": "Génial",
+
   "journalTitle": "Journal",
   "journalInsightsLabel": "Insights",
   "journalWisdomLabel": "Sagesse",

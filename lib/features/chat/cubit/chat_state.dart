@@ -15,6 +15,11 @@ class ChatState extends Equatable {
   /// True while an insight is being generated (drives the forming animation).
   final bool isGeneratingInsight;
 
+  /// Model-assessed readiness of the current conversation to yield an insight,
+  /// in [0,1]. Reaches 1.0 when the model judges an insight can be generated
+  /// (deep enough exploration over more than five messages). Drives the ring.
+  final double insightProgress;
+
   const ChatState({
     required this.conversationId,
     this.messages = const [],
@@ -23,6 +28,7 @@ class ChatState extends Equatable {
     this.isListening = false,
     this.voicePartial = '',
     this.isGeneratingInsight = false,
+    this.insightProgress = 0.0,
   });
 
   ChatState copyWith({
@@ -33,6 +39,7 @@ class ChatState extends Equatable {
     bool? isListening,
     String? voicePartial,
     bool? isGeneratingInsight,
+    double? insightProgress,
   }) => ChatState(
     conversationId: conversationId ?? this.conversationId,
     messages: messages ?? this.messages,
@@ -41,6 +48,7 @@ class ChatState extends Equatable {
     isListening: isListening ?? this.isListening,
     voicePartial: voicePartial ?? this.voicePartial,
     isGeneratingInsight: isGeneratingInsight ?? this.isGeneratingInsight,
+    insightProgress: insightProgress ?? this.insightProgress,
   );
 
   /// Number of user turns since the most recent insight message (all user
@@ -54,6 +62,18 @@ class ChatState extends Equatable {
     return count;
   }
 
+  /// Messages accumulated since the most recent insight (all of them if there
+  /// is none yet), in chronological order. Feeds the model-driven progress
+  /// assessment so readiness resets after each insight.
+  List<ChatMessage> get messagesSinceLastInsight {
+    final out = <ChatMessage>[];
+    for (final m in messages.reversed) {
+      if (m.insight != null) break;
+      out.add(m);
+    }
+    return out.reversed.toList();
+  }
+
   @override
   List<Object?> get props => [
     conversationId,
@@ -63,5 +83,6 @@ class ChatState extends Equatable {
     isListening,
     voicePartial,
     isGeneratingInsight,
+    insightProgress,
   ];
 }

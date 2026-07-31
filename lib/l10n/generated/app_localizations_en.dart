@@ -1397,6 +1397,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatInsightCardCta => 'Read insight';
 
   @override
+  String get chatInsightRewardTitle => 'Insight unlocked!';
+
+  @override
+  String get chatInsightRewardBody =>
+      'You took a moment to reflect. Here\'s your reward.';
+
+  @override
+  String chatInsightRewardXp(int amount) {
+    return '+$amount XP';
+  }
+
+  @override
+  String chatInsightRewardPieces(int amount) {
+    return '+$amount pieces';
+  }
+
+  @override
+  String get chatInsightRewardDone => 'Awesome';
+
+  @override
   String get journalTitle => 'Journal';
 
   @override

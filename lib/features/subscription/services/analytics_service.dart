@@ -98,4 +98,5 @@ class AnalyticsService {
   static const chatInsightGenerated = 'chat_insight_generated';
   static const chatInsightOpened = 'chat_insight_opened';
   static const chatInsightsFormingOpened = 'chat_insights_forming_opened';
+  static const chatInsightRewarded = 'chat_insight_rewarded';
 }

@@ -70,25 +70,35 @@ class ChatCubit extends Cubit<ChatState> {
   /// once per chat session (the completion itself is also idempotent per day).
   bool _introspectionMarked = false;
 
-  /// The ring reaches "full" at this many user turns since the last insight —
-  /// the user may then tap to reveal one on demand.
-  static const _insightReadyThreshold = 5;
+  /// An insight requires more than this many messages of substance since the
+  /// last one before it can be revealed — a floor the model-driven progress
+  /// can't override.
+  static const _insightMinMessages = 5;
 
   /// If the user never taps, an insight is generated automatically after this
   /// many user turns since the last insight.
   static const _insightAutoThreshold = 20;
 
+  /// XP awarded (as coins + strikes) the first time an insight is opened.
+  static const kInsightRewardXp = 10;
+
   /// Guards against overlapping insight generations.
   bool _insightInFlight = false;
 
-  /// Fill of the insight ring in [0,1]; reaches 1 when a new insight is ready
-  /// to be revealed.
-  double get insightProgress =>
-      (state.userTurnsSinceLastInsight / _insightReadyThreshold).clamp(0.0, 1.0);
+  /// Guards against overlapping progress assessments.
+  bool _progressInFlight = false;
 
-  /// Whether the user may reveal an insight now (the ring is full).
+  /// Ensures the ring is assessed once when an existing conversation loads.
+  bool _initialProgressAssessed = false;
+
+  /// Fill of the insight ring in [0,1] — the model's latest readiness estimate.
+  double get insightProgress => state.insightProgress;
+
+  /// Whether the user may reveal an insight now: the model judged it ready and
+  /// the conversation has enough substance since the last insight.
   bool get isInsightReady =>
-      state.userTurnsSinceLastInsight >= _insightReadyThreshold;
+      state.insightProgress >= 1.0 &&
+      state.messagesSinceLastInsight.length > _insightMinMessages;
 
   void _subscribe() {
     _sub?.cancel();
@@ -97,6 +107,12 @@ class ChatCubit extends Cubit<ChatState> {
         .listen(
           (messages) {
             emit(state.copyWith(messages: messages, isLoading: false));
+            // Assess the ring once for a conversation opened with existing
+            // history so it reflects readiness without waiting for a new turn.
+            if (!_initialProgressAssessed && messages.isNotEmpty) {
+              _initialProgressAssessed = true;
+              unawaited(_assessInsightProgress());
+            }
           },
           onError: (e) {
             debugPrint('[ChatCubit] watchMessages error: $e');
@@ -244,9 +260,29 @@ class ChatCubit extends Cubit<ChatState> {
     } finally {
       emit(state.copyWith(isSending: false));
     }
-    // After the reply lands, auto-generate an insight if the user has gone long
-    // enough without one. Best-effort — never blocks or disrupts the chat.
-    unawaited(_maybeAutoGenerateInsight());
+    // After the reply lands, re-assess how ready the conversation is to yield an
+    // insight, then auto-generate one if the user has gone long enough without
+    // tapping. Both are best-effort — they never block or disrupt the chat.
+    unawaited(_assessInsightProgress().then((_) => _maybeAutoGenerateInsight()));
+  }
+
+  /// Asks the model to score how close the conversation is to an insight and
+  /// stores it as the ring's fill. Best-effort: keeps the previous value on
+  /// failure, and no-ops while another assessment or a generation is running.
+  Future<void> _assessInsightProgress() async {
+    if (_progressInFlight || _insightInFlight) return;
+    final since = state.messagesSinceLastInsight;
+    if (since.isEmpty) return;
+    _progressInFlight = true;
+    try {
+      final progress = await _gemini.assessInsightProgress(history: since);
+      if (progress == null || isClosed) return;
+      emit(state.copyWith(insightProgress: progress));
+    } catch (e) {
+      debugPrint('[ChatCubit] _assessInsightProgress failed: $e');
+    } finally {
+      _progressInFlight = false;
+    }
   }
 
   /// Auto path: fire when the conversation has run long enough without an
@@ -258,10 +294,10 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   /// Manual path: called from the "insights forming" sheet once the ring is
-  /// full. No-op until the ready threshold is reached.
+  /// full. No-op until the model judges an insight ready.
   Future<void> generateInsightNow() async {
     if (_insightInFlight) return;
-    if (state.userTurnsSinceLastInsight < _insightReadyThreshold) return;
+    if (!isInsightReady) return;
     await _generateInsight();
   }
 
@@ -291,12 +327,40 @@ class ChatCubit extends Cubit<ChatState> {
       await _repo.updateConversation(state.conversationId, lastMessageAt: now);
       AnalyticsService.capture(AnalyticsService.chatInsightGenerated);
       debugPrint('[ChatCubit] saved insight "${insight.title}"');
+      // The ring resets once an insight lands — the next one starts from zero.
+      emit(state.copyWith(insightProgress: 0.0));
     } catch (e) {
       debugPrint('[ChatCubit] _generateInsight failed: $e');
     } finally {
       _insightInFlight = false;
       emit(state.copyWith(isGeneratingInsight: false));
     }
+  }
+
+  /// Marks an insight message as opened and grants the one-time reward (coins +
+  /// strikes). Returns true only on the first open, so the caller can show the
+  /// win page then. No-op (returns false) for unknown, non-insight, or already
+  /// opened messages.
+  Future<bool> revealInsightReward(String messageId) async {
+    final idx = state.messages.indexWhere((m) => m.id == messageId);
+    if (idx == -1) return false;
+    final msg = state.messages[idx];
+    if (msg.insight == null || msg.insightOpened) return false;
+
+    // Optimistically flip the flag so a second tap can't double-reward.
+    final updated = List<ChatMessage>.from(state.messages)
+      ..[idx] = msg.copyWith(insightOpened: true);
+    emit(state.copyWith(messages: updated));
+
+    try {
+      await _repo.markInsightOpened(state.conversationId, messageId);
+    } catch (e) {
+      debugPrint('[ChatCubit] markInsightOpened failed: $e');
+    }
+    await _adventureCubit?.awardForCompletion(kInsightRewardXp);
+    AnalyticsService.capture(AnalyticsService.chatInsightRewarded);
+    debugPrint('[ChatCubit] insight opened reward granted ($messageId)');
+    return true;
   }
 
   /// Builds the full context string injected into Gemini's system prompt:
