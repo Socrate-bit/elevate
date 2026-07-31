@@ -2354,23 +2354,35 @@ abstract class AppLocalizations {
   /// **'{done} / {total}'**
   String homePageQuestProgress(int done, int total);
 
-  /// No description provided for @homePageTodaysPlan.
+  /// No description provided for @homePageRoutineSection.
   ///
   /// In en, this message translates to:
-  /// **'Today\'s Plan'**
-  String get homePageTodaysPlan;
+  /// **'Routine'**
+  String get homePageRoutineSection;
 
-  /// No description provided for @homePageTodaysPlanSubtitle.
+  /// No description provided for @homePageRoutineSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your daily inner work.'**
+  String get homePageRoutineSubtitle;
+
+  /// No description provided for @homePageQuestsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Quests'**
+  String get homePageQuestsSection;
+
+  /// No description provided for @homePageQuestsSubtitle.
   ///
   /// In en, this message translates to:
   /// **'Small steps, big changes.'**
-  String get homePageTodaysPlanSubtitle;
+  String get homePageQuestsSubtitle;
 
-  /// No description provided for @homePagePlanEmpty.
+  /// No description provided for @homePageQuestsEmpty.
   ///
   /// In en, this message translates to:
-  /// **'You\'re all set for today. Nice work!'**
-  String get homePagePlanEmpty;
+  /// **'No quests yet. Add one to get started.'**
+  String get homePageQuestsEmpty;
 
   /// No description provided for @defaultTaskMoodName.
   ///

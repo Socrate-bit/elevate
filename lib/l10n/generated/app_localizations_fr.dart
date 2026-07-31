@@ -1247,13 +1247,20 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get homePageTodaysPlan => 'Plan du jour';
+  String get homePageRoutineSection => 'Routine';
 
   @override
-  String get homePageTodaysPlanSubtitle => 'Petits pas, grands changements.';
+  String get homePageRoutineSubtitle => 'Ton travail intérieur du jour.';
 
   @override
-  String get homePagePlanEmpty => 'Tout est fait pour aujourd\'hui. Bravo !';
+  String get homePageQuestsSection => 'Quêtes';
+
+  @override
+  String get homePageQuestsSubtitle => 'Petits pas, grands changements.';
+
+  @override
+  String get homePageQuestsEmpty =>
+      'Aucune quête. Ajoutes-en une pour commencer.';
 
   @override
   String get defaultTaskMoodName => 'Point d\'humeur';

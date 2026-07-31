@@ -19,8 +19,10 @@ import '../../tools/tools_launcher.dart';
 import '../models/default_task.dart';
 import 'home_action_sheet.dart';
 
-/// "Today's Plan" section (Finch-style): a header on the green background, then
-/// each routine relevant today in its own white card. Backed by real routines.
+/// Today's plan on the green background, split into two sections: the fixed
+/// inner-work "Routine" (mood / breathing / introspection rituals) and the
+/// user-added "Quests" (their own routines and activities). Each section has a
+/// header and its own white cards.
 class TodaysPlanCard extends StatelessWidget {
   final List<Routine> routines;
   final Set<String> completedIds;
@@ -33,76 +35,85 @@ class TodaysPlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    // Built-in daily prompts still pending today (hidden once completed).
-    final pendingDefaults =
-        kDefaultTasks.where((t) => !completedIds.contains(t.id)).toList();
+    // Unchecked items first within each list (done items sink to the bottom),
+    // keeping their original order within each group.
+    final sortedDefaults = [
+      ...kDefaultTasks.where((t) => !completedIds.contains(t.id)),
+      ...kDefaultTasks.where((t) => completedIds.contains(t.id)),
+    ];
+    final sortedRoutines = [
+      ...routines.where((r) => !completedIds.contains(r.id)),
+      ...routines.where((r) => completedIds.contains(r.id)),
+    ];
+    // Once every routine ritual is done, surface the Quests section first.
+    final routineDone =
+        kDefaultTasks.every((t) => completedIds.contains(t.id));
+
+    final routineSection = _routineSection(context, sortedDefaults);
+    final questsSection = _questsSection(context, sortedRoutines);
+
     return Padding(
       padding: EdgeInsets.fromLTRB(18.w, 0, 18.w, 90.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header: calendar, title + subtitle (white over green).
-          Row(
-            children: [
-              Icon(Icons.calendar_month_rounded, color: Colors.white),
-              SizedBox(width: 10.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.homePageTodaysPlan,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      l10n.homePageTodaysPlanSubtitle,
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: Colors.white.withValues(alpha: 0.85),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Add a task / activity to today's plan.
-              _AddButton(onTap: () => showHomeAddSheet(context)),
-            ],
-          ),
-          SizedBox(height: 14.h),
-          if (pendingDefaults.isEmpty && routines.isEmpty)
-            _EmptyPlan(text: l10n.homePagePlanEmpty)
-          else ...[
-            // Built-in daily prompts first, then the user's routines.
-            ...pendingDefaults.map(
-              (t) => Padding(
-                padding: EdgeInsets.only(bottom: 10.h),
-                child: _DefaultTaskCard(
-                  task: t,
-                  onTap: () => _startDefaultTask(context, t),
-                ),
-              ),
-            ),
-            ...routines.map(
-              (r) => Padding(
-                padding: EdgeInsets.only(bottom: 10.h),
-                child: _TaskCard(
-                  routine: r,
-                  done: completedIds.contains(r.id),
-                  onToggle: () =>
-                      _toggle(context, r, completedIds.contains(r.id)),
-                  onEdit: () => _edit(context, r),
-                ),
-              ),
-            ),
-          ],
-        ],
+        children: routineDone
+            ? [...questsSection, SizedBox(height: 24.h), ...routineSection]
+            : [...routineSection, SizedBox(height: 24.h), ...questsSection],
       ),
     );
+  }
+
+  /// Inner-work Routine: the fixed daily rituals (not addable). They stay
+  /// visible once done — locked in a completed state, not hidden.
+  List<Widget> _routineSection(BuildContext context, List<DefaultTask> tasks) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      _SectionHeader(
+        icon: Icons.self_improvement_rounded,
+        title: l10n.homePageRoutineSection,
+        subtitle: l10n.homePageRoutineSubtitle,
+      ),
+      SizedBox(height: 14.h),
+      ...tasks.map(
+        (t) => Padding(
+          padding: EdgeInsets.only(bottom: 10.h),
+          child: _DefaultTaskCard(
+            task: t,
+            done: completedIds.contains(t.id),
+            onTap: () => _startDefaultTask(context, t),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  /// Quests: the tasks / activities the user added themselves.
+  List<Widget> _questsSection(BuildContext context, List<Routine> items) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      _SectionHeader(
+        icon: Icons.flag_rounded,
+        title: l10n.homePageQuestsSection,
+        subtitle: l10n.homePageQuestsSubtitle,
+        // Add a task / activity to the quests.
+        trailing: _AddButton(onTap: () => showHomeAddSheet(context)),
+      ),
+      SizedBox(height: 14.h),
+      if (items.isEmpty)
+        _EmptyPlan(text: l10n.homePageQuestsEmpty)
+      else
+        ...items.map(
+          (r) => Padding(
+            padding: EdgeInsets.only(bottom: 10.h),
+            child: _TaskCard(
+              routine: r,
+              done: completedIds.contains(r.id),
+              onToggle: () => _toggle(context, r, completedIds.contains(r.id)),
+              onEdit: () => _edit(context, r),
+            ),
+          ),
+        ),
+    ];
   }
 
   /// Validates or un-validates the routine for today.
@@ -169,6 +180,55 @@ class TodaysPlanCard extends StatelessWidget {
   }
 }
 
+/// A plan section header (white over green): icon, title + subtitle, and an
+/// optional trailing action (e.g. the add button on the Quests section).
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget? trailing;
+
+  const _SectionHeader({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.white),
+        SizedBox(width: 10.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
+              ),
+            ],
+          ),
+        ),
+        ?trailing,
+      ],
+    );
+  }
+}
+
 /// Round white "+" button in the plan header — opens the add-task sheet.
 class _AddButton extends StatelessWidget {
   final VoidCallback onTap;
@@ -223,16 +283,22 @@ class _EmptyPlan extends StatelessWidget {
 /// that feature (not a manual check), so it shows a "start" affordance.
 class _DefaultTaskCard extends StatelessWidget {
   final DefaultTask task;
+  final bool done;
   final VoidCallback onTap;
 
-  const _DefaultTaskCard({required this.task, required this.onTap});
+  const _DefaultTaskCard({
+    required this.task,
+    required this.done,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final tile = routineColor(task.colorKey);
     return GestureDetector(
-      onTap: withHaptic(onTap),
+      // Locked once completed today — can be started, but not un-done.
+      onTap: done ? null : withHaptic(onTap),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
         decoration: BoxDecoration(
@@ -300,17 +366,37 @@ class _DefaultTaskCard extends StatelessWidget {
             SizedBox(width: 3.w),
             Image.asset('assets/home/light.png', width: 16.w),
             SizedBox(width: 10.w),
-            // "Start" affordance (the whole card handles the tap).
-            Container(
-              width: 40.w,
-              height: 40.w,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: tile.withAlpha(40),
-                borderRadius: BorderRadius.circular(90.r),
-              ),
-              child: Icon(Icons.play_arrow_rounded, size: 26.sp, color: tile),
-            ),
+            // Done: a locked green check. Otherwise a "start" affordance
+            // (the whole card handles the tap).
+            done
+                ? Container(
+                    width: 40.w,
+                    height: 40.w,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 14, 165, 19),
+                      borderRadius: BorderRadius.circular(90.r),
+                    ),
+                    child: Icon(
+                      Icons.check_rounded,
+                      size: 28.sp,
+                      color: Colors.white,
+                    ),
+                  )
+                : Container(
+                    width: 40.w,
+                    height: 40.w,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: tile.withAlpha(40),
+                      borderRadius: BorderRadius.circular(90.r),
+                    ),
+                    child: Icon(
+                      Icons.play_arrow_rounded,
+                      size: 26.sp,
+                      color: tile,
+                    ),
+                  ),
           ],
         ),
       ),

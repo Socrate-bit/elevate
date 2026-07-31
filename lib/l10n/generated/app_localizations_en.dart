@@ -1237,13 +1237,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homePageTodaysPlan => 'Today\'s Plan';
+  String get homePageRoutineSection => 'Routine';
 
   @override
-  String get homePageTodaysPlanSubtitle => 'Small steps, big changes.';
+  String get homePageRoutineSubtitle => 'Your daily inner work.';
 
   @override
-  String get homePagePlanEmpty => 'You\'re all set for today. Nice work!';
+  String get homePageQuestsSection => 'Quests';
+
+  @override
+  String get homePageQuestsSubtitle => 'Small steps, big changes.';
+
+  @override
+  String get homePageQuestsEmpty => 'No quests yet. Add one to get started.';
 
   @override
   String get defaultTaskMoodName => 'Mood check-in';
