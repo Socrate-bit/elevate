@@ -2276,6 +2276,42 @@ abstract class AppLocalizations {
   /// **'No schedule'**
   String get routineHabitNoSchedule;
 
+  /// No description provided for @routineDetailRecurrence.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurrence'**
+  String get routineDetailRecurrence;
+
+  /// No description provided for @routineDetailDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get routineDetailDescription;
+
+  /// No description provided for @routineDetailReward.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward'**
+  String get routineDetailReward;
+
+  /// No description provided for @routineDetailNoDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No description'**
+  String get routineDetailNoDescription;
+
+  /// No description provided for @routineDetailAnytime.
+  ///
+  /// In en, this message translates to:
+  /// **'Anytime'**
+  String get routineDetailAnytime;
+
+  /// No description provided for @routineDetailPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'{xp} pts'**
+  String routineDetailPoints(int xp);
+
   /// No description provided for @chatRoutineCreated.
   ///
   /// In en, this message translates to:

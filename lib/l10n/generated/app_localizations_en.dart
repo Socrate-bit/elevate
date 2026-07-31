@@ -1186,6 +1186,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get routineHabitNoSchedule => 'No schedule';
 
   @override
+  String get routineDetailRecurrence => 'Recurrence';
+
+  @override
+  String get routineDetailDescription => 'Description';
+
+  @override
+  String get routineDetailReward => 'Reward';
+
+  @override
+  String get routineDetailNoDescription => 'No description';
+
+  @override
+  String get routineDetailAnytime => 'Anytime';
+
+  @override
+  String routineDetailPoints(int xp) {
+    return '$xp pts';
+  }
+
+  @override
   String chatRoutineCreated(String name) {
     return 'Created \'$name\'';
   }

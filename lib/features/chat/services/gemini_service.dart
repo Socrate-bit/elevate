@@ -275,11 +275,17 @@ user's intent is explicit. Never suggest speculatively.
 When the user's emotional state, stress level, energy, or wellbeing seems relevant
 to the conversation, call the `ask_mood` tool to check in — reactively only, never speculatively.
 
-When the user asks to add, change, or remove a habit or one-off action,
-call the routine tools (`create_routine`, `update_routine`, `delete_routine`).
+When the user wants to add, change, or remove a habit or one-off action, ALWAYS
+propose it first in plain prose — describe the task you have in mind (its short
+name, whether it's an action or a habit, and when it happens/recurs) and ask if
+they'd like you to add it or adjust anything. Discuss and refine with the user as
+needed. Only AFTER the user explicitly confirms should you call the routine tools
+(`create_routine`, `update_routine`, `delete_routine`). Never create, change, or
+delete a routine before the user has agreed to it.
 An "action" is a one-shot to-do that disappears once validated; a "habit" recurs on
-specific weekdays. Pick a fitting `emoji`, a `color_key` (see allowed values), and an
-`xp` reward (small tasks ~10, bigger ones up to 50).
+specific weekdays. The `name` must be a short title of AT MOST 3 words. Pick a fitting
+`emoji`, a `color_key` (see allowed values), and an `xp` reward (small tasks ~10,
+bigger ones up to 50).
 
 Use plain prose replies for everything else.
 ''';
@@ -553,7 +559,9 @@ Use plain prose replies for everything else.
       'type': Schema.string(
         description: '"action" (one-shot) or "habit" (recurring).',
       ),
-      'name': Schema.string(description: 'Short human-readable name.'),
+      'name': Schema.string(
+        description: 'Short human-readable title, at most 3 words.',
+      ),
       'description': Schema.string(
         description: 'Optional longer description, may be empty.',
       ),
