@@ -7,8 +7,8 @@ import 'package:elevate/l10n/generated/app_localizations.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
-import '../../missions/screens/breathing_intro_screen.dart';
-import '../../missions/widgets/mission_complete_screen.dart';
+import '../../missions/screens/breathing_mission_screen.dart';
+import '../../missions/widgets/breathing_rounds_sheet.dart';
 import '../../mood/widgets/mood_picker_sheet.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../../routines/models/routine.dart';
@@ -81,21 +81,20 @@ Future<void> showHomeAddSheet(BuildContext context) {
         }
       }
 
-      void openBreathing() {
+      Future<void> openBreathing() async {
         Navigator.pop(ctx);
+        // Let the user pick how many breaths before starting (default 3).
+        final rounds = await showBreathingRoundsSheet(navigator.context);
+        if (rounds == null) return;
         navigator.push(MaterialPageRoute(
-          builder: (bc) => BreathingIntroScreen(
-            onComplete: () async {
-              await DefaultTaskCompletion.complete(
-                task: kBreathingTask,
-                adventure: adventure,
-              );
-              if (bc.mounted) {
-                Navigator.of(bc).pushReplacement(MaterialPageRoute(
-                  builder: (_) => const MissionCompleteScreen(),
-                ));
-              }
-            },
+          builder: (_) => BreathingMissionScreen(
+            rounds: rounds,
+            // Mark the task complete; the breathing screen itself navigates
+            // to the completion screen once the animation finishes.
+            onComplete: () => DefaultTaskCompletion.complete(
+              task: kBreathingTask,
+              adventure: adventure,
+            ),
           ),
         ));
       }

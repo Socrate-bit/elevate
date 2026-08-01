@@ -6,6 +6,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
+import '../../companion/cubit/companion_cubit.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../../shop/cubit/shop_cubit.dart';
 import '../../shop/cubit/shop_state.dart';
@@ -30,19 +31,21 @@ class HomeTopBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Appy',
-                style: TextStyle(
-                  fontSize: 32.sp,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  shadows: const [
-                    Shadow(
-                      color: Color(0x40000000),
-                      blurRadius: 4,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
+              BlocBuilder<CompanionCubit, String>(
+                builder: (context, companionName) => Text(
+                  companionName,
+                  style: TextStyle(
+                    fontSize: 32.sp,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    shadows: const [
+                      Shadow(
+                        color: Color(0x40000000),
+                        blurRadius: 4,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: 4.h),

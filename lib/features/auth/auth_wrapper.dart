@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'auth_service.dart';
 import '../chat/cubit/chat_list_cubit.dart';
+import '../companion/cubit/companion_cubit.dart';
 import '../memory/cubit/memory_cubit.dart';
 import '../onboarding/cubit/onboarding_cubit.dart';
 import '../onboarding/cubit/onboarding_state.dart';
@@ -51,6 +52,7 @@ class AuthWrapper extends StatelessWidget {
                 context.read<SettingsCubit>().clearAll();
                 context.read<ChatListCubit>().clear();
                 context.read<MemoryCubit>().clear();
+                context.read<CompanionCubit>().clear();
                 // hook: cancel any other user-scoped resources here
               });
               // Fresh, signed-out user: show the welcome start screen first;
@@ -65,6 +67,7 @@ class AuthWrapper extends StatelessWidget {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               context.read<ChatListCubit>().start();
               context.read<MemoryCubit>().start();
+              context.read<CompanionCubit>().start();
             });
             if (ob.isInProgress) {
               return const OnboardingScreenV2();

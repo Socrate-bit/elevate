@@ -187,8 +187,8 @@ class _BreathingMissionScreenState extends State<BreathingMissionScreen>
                       builder: (_, _) => CustomPaint(
                         painter: _BreathingPainter(
                           progress: _controller.value,
-                          outerColor: c.primary,
-                          innerColor: c.primary,
+                          outerColor: AppColors.success,
+                          innerColor: AppColors.success,
                         ),
                       ),
                     ),

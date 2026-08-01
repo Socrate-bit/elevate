@@ -48,7 +48,7 @@ class MissionCompleteScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 56.h,
                   decoration: BoxDecoration(
-                    color: c.primary,
+                    color: c.textPrimary,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   alignment: Alignment.center,
@@ -57,7 +57,7 @@ class MissionCompleteScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: c.card,
                     ),
                   ),
                 ),

@@ -931,28 +931,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get missionPickerSubtitle => 'Choisissez une mission et commencez';
 
   @override
-  String get breathingIntroTitle => 'Respiration';
-
-  @override
-  String get breathingIntroDescription =>
-      'La respiration profonde est l\'un des moyens les plus efficaces pour réguler votre système nerveux.';
-
-  @override
-  String get breathingIntroStart => 'Commencer';
-
-  @override
-  String get breathingPhaseInhale => 'Inspirez';
+  String get breathingPhaseInhale => 'Inspirez à fond';
 
   @override
   String get breathingPhaseHold => 'Retenez';
 
   @override
-  String get breathingPhaseExhale => 'Expirez';
+  String get breathingPhaseExhale => 'Expirez à fond';
 
   @override
   String breathingRoundLabel(int current, int total) {
     return 'Cycle $current / $total';
   }
+
+  @override
+  String get breathingRoundsPickerTitle => 'Combien de respirations ?';
+
+  @override
+  String get breathingRoundsPickerStart => 'Commencer';
 
   @override
   String get toolSessionDone => 'Terminé';
@@ -1285,8 +1281,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homePageQuestsSubtitle => 'Petits pas, grands changements.';
 
   @override
-  String get homePageQuestsEmpty =>
-      'Aucune quête. Ajoutes-en une pour commencer.';
+  String homePageQuestsEmpty(String name) {
+    return 'Pas encore de quête. Parle à $name pour commencer.';
+  }
 
   @override
   String get defaultTaskMoodName => 'Mood check';

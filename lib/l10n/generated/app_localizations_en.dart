@@ -926,28 +926,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get missionPickerSubtitle => 'Pick a mission and start now';
 
   @override
-  String get breathingIntroTitle => 'Breathing';
-
-  @override
-  String get breathingIntroDescription =>
-      'Deep breathing is one of the most effective ways to regulate your nervous system.';
-
-  @override
-  String get breathingIntroStart => 'Start';
-
-  @override
-  String get breathingPhaseInhale => 'Inhale';
+  String get breathingPhaseInhale => 'Inhale fully';
 
   @override
   String get breathingPhaseHold => 'Hold';
 
   @override
-  String get breathingPhaseExhale => 'Exhale';
+  String get breathingPhaseExhale => 'Exhale fully';
 
   @override
   String breathingRoundLabel(int current, int total) {
     return 'Round $current / $total';
   }
+
+  @override
+  String get breathingRoundsPickerTitle => 'How many breaths?';
+
+  @override
+  String get breathingRoundsPickerStart => 'Start';
 
   @override
   String get toolSessionDone => 'Done';
@@ -1275,7 +1271,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homePageQuestsSubtitle => 'Small steps, big changes.';
 
   @override
-  String get homePageQuestsEmpty => 'No quests yet. Add one to get started.';
+  String homePageQuestsEmpty(String name) {
+    return 'No quest yet. Speak to $name to get started.';
+  }
 
   @override
   String get defaultTaskMoodName => 'Mood check-in';

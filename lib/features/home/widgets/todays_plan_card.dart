@@ -8,8 +8,10 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../chat/screens/chat_page_screen.dart';
-import '../../missions/screens/breathing_intro_screen.dart';
+import '../../missions/screens/breathing_mission_screen.dart';
+import '../../missions/widgets/breathing_rounds_sheet.dart';
 import '../../mood/widgets/mood_picker_sheet.dart';
+import '../../companion/cubit/companion_cubit.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../../routines/models/routine.dart';
 import '../../routines/models/routine_palette.dart';
@@ -17,7 +19,6 @@ import '../../routines/screens/routine_detail_screen.dart';
 import '../../tools/models/tools_mock_data.dart';
 import '../../tools/tools_launcher.dart';
 import '../models/default_task.dart';
-import 'home_action_sheet.dart';
 
 /// Today's plan on the green background, split into two sections: the fixed
 /// inner-work "Routine" (mood / breathing / introspection rituals) and the
@@ -90,17 +91,16 @@ class TodaysPlanCard extends StatelessWidget {
   /// Quests: the tasks / activities the user added themselves.
   List<Widget> _questsSection(BuildContext context, List<Routine> items) {
     final l10n = AppLocalizations.of(context)!;
+    final companionName = context.watch<CompanionCubit>().state;
     return [
       _SectionHeader(
         icon: Icons.flag_rounded,
         title: l10n.homePageQuestsSection,
         subtitle: l10n.homePageQuestsSubtitle,
-        // Add a task / activity to the quests.
-        trailing: _AddButton(onTap: () => showHomeAddSheet(context)),
       ),
       SizedBox(height: 14.h),
       if (items.isEmpty)
-        _EmptyPlan(text: l10n.homePageQuestsEmpty)
+        _EmptyPlan(text: l10n.homePageQuestsEmpty(companionName))
       else
         ...items.map(
           (r) => Padding(
@@ -169,10 +169,14 @@ class TodaysPlanCard extends StatelessWidget {
           await DefaultTaskCompletion.complete(task: task, adventure: adventure);
         }
       case DefaultTaskKind.breathing:
+        // Let the user pick how many breaths before starting (default 3).
+        final rounds = await showBreathingRoundsSheet(context);
+        if (rounds == null || !context.mounted) return;
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => BreathingIntroScreen(
+            builder: (_) => BreathingMissionScreen(
+              rounds: rounds,
               // Mark the task complete; the breathing screen itself navigates
               // to the completion screen once the animation finishes.
               onComplete: () =>
@@ -201,13 +205,11 @@ class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final Widget? trailing;
 
   const _SectionHeader({
     required this.icon,
     required this.title,
     required this.subtitle,
-    this.trailing,
   });
 
   @override
@@ -238,31 +240,7 @@ class _SectionHeader extends StatelessWidget {
             ],
           ),
         ),
-        ?trailing,
       ],
-    );
-  }
-}
-
-/// Round white "+" button in the plan header — opens the add-task sheet.
-class _AddButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _AddButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: withHaptic(onTap),
-      child: Container(
-        width: 34.w,
-        height: 34.w,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.28),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(Icons.add_rounded, color: Colors.white, size: 24.sp),
-      ),
     );
   }
 }

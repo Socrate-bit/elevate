@@ -1802,28 +1802,10 @@ abstract class AppLocalizations {
   /// **'Pick a mission and start now'**
   String get missionPickerSubtitle;
 
-  /// No description provided for @breathingIntroTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Breathing'**
-  String get breathingIntroTitle;
-
-  /// No description provided for @breathingIntroDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Deep breathing is one of the most effective ways to regulate your nervous system.'**
-  String get breathingIntroDescription;
-
-  /// No description provided for @breathingIntroStart.
-  ///
-  /// In en, this message translates to:
-  /// **'Start'**
-  String get breathingIntroStart;
-
   /// No description provided for @breathingPhaseInhale.
   ///
   /// In en, this message translates to:
-  /// **'Inhale'**
+  /// **'Inhale fully'**
   String get breathingPhaseInhale;
 
   /// No description provided for @breathingPhaseHold.
@@ -1835,7 +1817,7 @@ abstract class AppLocalizations {
   /// No description provided for @breathingPhaseExhale.
   ///
   /// In en, this message translates to:
-  /// **'Exhale'**
+  /// **'Exhale fully'**
   String get breathingPhaseExhale;
 
   /// No description provided for @breathingRoundLabel.
@@ -1843,6 +1825,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Round {current} / {total}'**
   String breathingRoundLabel(int current, int total);
+
+  /// No description provided for @breathingRoundsPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How many breaths?'**
+  String get breathingRoundsPickerTitle;
+
+  /// No description provided for @breathingRoundsPickerStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get breathingRoundsPickerStart;
 
   /// No description provided for @toolSessionDone.
   ///
@@ -2429,8 +2423,8 @@ abstract class AppLocalizations {
   /// No description provided for @homePageQuestsEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No quests yet. Add one to get started.'**
-  String get homePageQuestsEmpty;
+  /// **'No quest yet. Speak to {name} to get started.'**
+  String homePageQuestsEmpty(String name);
 
   /// No description provided for @defaultTaskMoodName.
   ///
