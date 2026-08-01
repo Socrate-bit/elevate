@@ -7,6 +7,8 @@ import 'package:uuid/uuid.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../home/models/default_task.dart';
 import '../../memory/cubit/memory_cubit.dart';
+import '../../memory/cubit/memory_state.dart';
+import '../../memory/models/life_rating.dart';
 import '../../mood/cubit/mood_cubit.dart';
 import '../../mood/models/mood_entry.dart';
 import '../../mood/services/mood_service.dart';
@@ -15,14 +17,19 @@ import '../../routines/models/routine.dart';
 import '../../routines/models/routine_palette.dart';
 import '../../subscription/services/analytics_service.dart';
 import '../services/chat_firestore_service.dart';
+import '../services/chat_form.dart';
+import '../services/chat_insight.dart';
 import '../services/chat_message.dart';
+import '../services/chat_mission_suggestion.dart';
+import '../services/chat_mood_check_in.dart';
 import '../services/chat_routine_mutation.dart';
 import '../services/gemini_service.dart';
 import '../services/voice_service.dart';
 import 'chat_state.dart';
 
 /// Owns the active conversation: messages stream, send-text, voice input,
-/// form answers, and routine mutations triggered by Gemini tool calls.
+/// form answers, and routine mutations. Each user turn calls the Answerer
+/// ([GeminiClient.answer]) and fires the background memory builder.
 class ChatCubit extends Cubit<ChatState> {
   ChatCubit({
     required String conversationId,
@@ -52,6 +59,7 @@ class ChatCubit extends Cubit<ChatState> {
          ),
        ) {
     _subscribe();
+    _mirrorMemoryProgress();
     if (autoStart) unawaited(_doStart());
   }
 
@@ -64,7 +72,7 @@ class ChatCubit extends Cubit<ChatState> {
   final AdventureCubit? _adventureCubit;
   final Uuid _uuid;
   StreamSubscription? _sub;
-  bool _hasNewUserActivity = false;
+  StreamSubscription? _memorySub;
 
   /// Guards the "quick introspection" default task so it's marked done at most
   /// once per chat session (the completion itself is also idempotent per day).
@@ -85,13 +93,10 @@ class ChatCubit extends Cubit<ChatState> {
   /// Guards against overlapping insight generations.
   bool _insightInFlight = false;
 
-  /// Guards against overlapping progress assessments.
-  bool _progressInFlight = false;
-
-  /// Fill of the insight ring in [0,1] — the model's latest readiness estimate.
+  /// Fill of the insight ring in [0,1] — the memory builder's latest estimate.
   double get insightProgress => state.insightProgress;
 
-  /// Whether the user may reveal an insight now: the model judged it ready and
+  /// Whether the user may reveal an insight now: the builder judged it ready and
   /// the conversation has enough substance since the last insight.
   bool get isInsightReady =>
       state.insightProgress >= 1.0 &&
@@ -103,9 +108,6 @@ class ChatCubit extends Cubit<ChatState> {
         .watchMessages(state.conversationId)
         .listen(
           (messages) {
-            // The ring reads its fill from the stored progress on the latest
-            // message, so an opened conversation reflects readiness immediately
-            // without a fresh assessment.
             emit(state.copyWith(messages: messages, isLoading: false));
           },
           onError: (e) {
@@ -115,7 +117,32 @@ class ChatCubit extends Cubit<ChatState> {
         );
   }
 
-  /// Sends [text] as a user message, then asks Gemini for a reply.
+  /// Mirrors the memory builder's insight progress/boundary into chat state so
+  /// the ring reads it without recomputing.
+  void _mirrorMemoryProgress() {
+    final mem = _memoryCubit;
+    if (mem == null) return;
+    emit(
+      state.copyWith(
+        insightProgress: mem.state.insightProgress,
+        insightBoundaryMs: mem.state.insightBoundaryMs,
+      ),
+    );
+    _memorySub = mem.stream.listen((MemoryState ms) {
+      if (isClosed) return;
+      if (ms.insightProgress != state.insightProgress ||
+          ms.insightBoundaryMs != state.insightBoundaryMs) {
+        emit(
+          state.copyWith(
+            insightProgress: ms.insightProgress,
+            insightBoundaryMs: ms.insightBoundaryMs,
+          ),
+        );
+      }
+    });
+  }
+
+  /// Sends [text] as a user message, then asks the Answerer for a reply.
   /// Optimistically inserts the user message before persisting.
   Future<void> sendText(String text) async {
     final trimmed = text.trim();
@@ -130,8 +157,13 @@ class ChatCubit extends Cubit<ChatState> {
       createdAt: now,
     );
 
+    // Clear stale rapid answers as soon as the user sends.
     emit(
-      state.copyWith(messages: [...state.messages, userMsg], isSending: true),
+      state.copyWith(
+        messages: [...state.messages, userMsg],
+        isSending: true,
+        proposedAnswers: const [],
+      ),
     );
 
     try {
@@ -152,16 +184,7 @@ class ChatCubit extends Cubit<ChatState> {
     if (isFirstUserMessage) {
       unawaited(_titleConversation(trimmed));
     }
-    // Bump lastMessageAt and unflag memoryExtracted so this conversation is
-    // picked up for re-extraction on the next quit / app start.
-    _hasNewUserActivity = true;
-    unawaited(
-      _repo.updateConversation(
-        state.conversationId,
-        lastMessageAt: now,
-        memoryExtracted: false,
-      ),
-    );
+    unawaited(_repo.updateConversation(state.conversationId, lastMessageAt: now));
 
     AnalyticsService.capture(AnalyticsService.chatMessageSent);
 
@@ -190,7 +213,6 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   /// Sends the AI's opening greeting without a user message.
-  /// Normally invoked automatically via [autoStart]; exposed for external callers.
   Future<void> startSession() async {
     if (state.messages.isNotEmpty || state.isSending) return;
     emit(state.copyWith(isSending: true));
@@ -201,11 +223,7 @@ class ChatCubit extends Cubit<ChatState> {
   /// from the constructor when [autoStart] pre-sets [isSending] to true.
   Future<void> _doStart() async {
     try {
-      final reply = await _gemini.send(
-        history: const [],
-        userText: '.',
-        memoryContext: _buildContext(),
-      );
+      final reply = await _callAnswer(const []);
       await _commitModelReply(reply);
     } catch (e) {
       debugPrint('[ChatCubit] startSession failed: $e');
@@ -214,24 +232,29 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  /// Hidden instruction behind the "Ask me an insightful question" starter:
-  /// Appy replies with one warm opening question, without a visible user turn.
+  /// Hidden instruction behind the "Ask me an insightful question" starter.
   static const _openingQuestionPrompt =
       'Ask me one warm, open-ended, insightful question to help me start '
       'opening up. Reply with just the question.';
 
   /// Asks Appy for an insightful opening question without persisting a user
-  /// message. No [_hasNewUserActivity] flip — there is no user content to
-  /// extract if the user leaves right after tapping the starter.
+  /// message. The instruction is passed as a transient (unsaved) window turn.
   Future<void> promptOpeningQuestion() async {
     if (state.isSending) return;
     emit(state.copyWith(isSending: true));
     try {
-      final reply = await _gemini.send(
-        history: state.messages.toList(),
-        userText: _openingQuestionPrompt,
-        memoryContext: _buildContext(),
+      final transient = ChatMessage(
+        id: _uuid.v4(),
+        conversationId: state.conversationId,
+        role: ChatRole.user,
+        text: _openingQuestionPrompt,
+        createdAt: DateTime.now(),
       );
+      final window = [
+        ...GeminiService.lastActiveDaysWindow(state.messages),
+        transient,
+      ];
+      final reply = await _callAnswer(window);
       await _commitModelReply(reply);
     } catch (e) {
       debugPrint('[ChatCubit] promptOpeningQuestion failed: $e');
@@ -243,10 +266,8 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> _generateModelReply() async {
     ChatMessage? modelMsg;
     try {
-      final reply = await _gemini.send(
-        history: state.messages.toList(),
-        userText: state.messages.last.text,
-        memoryContext: _buildContext(),
+      final reply = await _callAnswer(
+        GeminiService.lastActiveDaysWindow(state.messages),
       );
       modelMsg = await _commitModelReply(reply);
     } catch (e) {
@@ -255,45 +276,37 @@ class ChatCubit extends Cubit<ChatState> {
     } finally {
       emit(state.copyWith(isSending: false));
     }
-    // After the reply lands, score how ready the conversation is to yield an
-    // insight and store it on that message, then auto-generate one if the user
-    // has gone long enough without tapping. Both are best-effort — they never
-    // block or disrupt the chat.
+    // After the reply lands, run the background memory builder (which also
+    // updates insight progress), then auto-generate an insight if the user has
+    // gone long enough without tapping. Best-effort — never blocks the chat.
     if (modelMsg != null) {
-      final msg = modelMsg;
       unawaited(
-        _assessAndStoreProgress(msg).then((_) => _maybeAutoGenerateInsight()),
+        (_memoryCubit?.analyze(state.conversationId) ?? Future.value())
+            .then((_) => _maybeAutoGenerateInsight()),
       );
     }
   }
 
-  /// Asks the model to score how close the conversation is to an insight and
-  /// persists it on [msg] so the ring reads it back without recomputing.
-  /// Best-effort: keeps the previous value on failure, and no-ops while another
-  /// assessment or a generation is running.
-  Future<void> _assessAndStoreProgress(ChatMessage msg) async {
-    if (_progressInFlight || _insightInFlight) return;
-    // Score the exchange since the last insight, including the reply just
-    // committed (the stream may not have delivered it into state yet).
-    final since = state.messagesSinceLastInsight;
-    final history = (since.isNotEmpty && since.last.id == msg.id)
-        ? since
-        : [...since, msg];
-    if (history.isEmpty) return;
-    _progressInFlight = true;
-    try {
-      final progress = await _gemini.assessInsightProgress(history: history);
-      if (progress == null || isClosed) return;
-      await _repo.updateMessageInsightProgress(
-        state.conversationId,
-        msg.id,
-        progress,
-      );
-    } catch (e) {
-      debugPrint('[ChatCubit] _assessAndStoreProgress failed: $e');
-    } finally {
-      _progressInFlight = false;
-    }
+  /// Assembles the full memory context and calls the Answerer for [window].
+  Future<AnswerResult> _callAnswer(List<ChatMessage> window) {
+    final mem = _memoryCubit?.state;
+    final today = _moodCubit?.state.weekMoods[DateTime.now().weekday % 7];
+    final insights = <ChatInsight>[
+      for (final m in state.messages)
+        if (m.insight != null) m.insight!,
+    ];
+    final recentInsights = insights.length > 20
+        ? insights.sublist(insights.length - 20)
+        : insights;
+    return _gemini.answer(
+      windowMessages: window,
+      recentSummaries: mem?.summaries ?? const [],
+      recentInsights: recentInsights,
+      facts: mem?.profile.facts ?? const {},
+      events: mem?.events ?? const [],
+      lifeRating: mem?.lifeRating ?? LifeRating.empty(),
+      todayMood: today,
+    );
   }
 
   /// Auto path: fire when the conversation has run long enough without an
@@ -305,7 +318,7 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   /// Manual path: called from the "insights forming" sheet once the ring is
-  /// full. No-op until the model judges an insight ready.
+  /// full. No-op until the builder judges an insight ready.
   Future<void> generateInsightNow() async {
     if (_insightInFlight) return;
     if (!isInsightReady) return;
@@ -313,7 +326,7 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   /// Generates an insight from the conversation so far and, if one is produced,
-  /// saves it as an inline model message (which resets the progress ring).
+  /// saves it as an inline model message and resets the progress boundary.
   Future<void> _generateInsight() async {
     _insightInFlight = true;
     emit(state.copyWith(isGeneratingInsight: true));
@@ -336,10 +349,10 @@ class ChatCubit extends Cubit<ChatState> {
       );
       await _repo.saveMessage(msg);
       await _repo.updateConversation(state.conversationId, lastMessageAt: now);
+      // Reset the progress boundary centrally so the ring restarts from empty.
+      await _memoryCubit?.markInsight(now.millisecondsSinceEpoch);
       AnalyticsService.capture(AnalyticsService.chatInsightGenerated);
       debugPrint('[ChatCubit] saved insight "${insight.title}"');
-      // The ring resets on its own once the insight message lands: it becomes
-      // the new reset boundary, so no later message carries a stored progress.
     } catch (e) {
       debugPrint('[ChatCubit] _generateInsight failed: $e');
     } finally {
@@ -349,16 +362,13 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   /// Marks an insight message as opened and grants the one-time reward (coins +
-  /// strikes). Returns true only on the first open, so the caller can show the
-  /// win page then. No-op (returns false) for unknown, non-insight, or already
-  /// opened messages.
+  /// strikes). Returns true only on the first open.
   Future<bool> revealInsightReward(String messageId) async {
     final idx = state.messages.indexWhere((m) => m.id == messageId);
     if (idx == -1) return false;
     final msg = state.messages[idx];
     if (msg.insight == null || msg.insightOpened) return false;
 
-    // Optimistically flip the flag so a second tap can't double-reward.
     final updated = List<ChatMessage>.from(state.messages)
       ..[idx] = msg.copyWith(insightOpened: true);
     emit(state.copyWith(messages: updated));
@@ -374,48 +384,46 @@ class ChatCubit extends Cubit<ChatState> {
     return true;
   }
 
-  /// Builds the full context string injected into Gemini's system prompt:
-  /// memory facts + conversation summaries + this week's mood check-ins.
-  String? _buildContext() {
-    final memory = _memoryCubit?.buildMemoryContext(
-      excludeConversationId: state.conversationId,
-    );
-    final weekMoods = _moodCubit?.state.weekMoods;
-    if (weekMoods == null || weekMoods.isEmpty) return memory;
-
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    final todayIndex = DateTime.now().weekday % 7;
-    final moodLines =
-        (weekMoods.entries.toList()..sort((a, b) => a.key.compareTo(b.key)))
-            .map((e) {
-              final tag = e.key == todayIndex ? ' (today)' : '';
-              return '- ${dayNames[e.key]}: ${e.value.name} ${e.value.emoji}$tag';
-            })
-            .join('\n');
-    final moodSection = "This week's mood check-ins:\n$moodLines";
-
-    if (memory == null || memory.isEmpty) return moodSection;
-    return '$memory\n\n$moodSection';
-  }
-
-  /// Persists a Gemini reply as a model [ChatMessage] and updates the
-  /// conversation's lastMessageAt. Shared by [startSession] and
-  /// [_generateModelReply]. Returns the saved message (or null when the reply
-  /// was empty and dropped) so callers can attach insight progress to it.
-  Future<ChatMessage?> _commitModelReply(GeminiReply reply) async {
+  /// Persists an [AnswerResult] as a model [ChatMessage], applies any routine
+  /// op, and stores the proposed rapid answers. Returns the saved message (or
+  /// null when the reply was empty and dropped).
+  Future<ChatMessage?> _commitModelReply(AnswerResult reply) async {
     ChatRoutineMutation? mutation;
-    String replyText = reply.text ?? '';
-    if (reply.routineToolCall != null) {
-      mutation = await _applyRoutineToolCall(reply.routineToolCall!);
-      replyText = '';
+    var replyText = reply.text;
+    if (reply.routineOp != null) {
+      mutation = await _applyRoutineOp(reply.routineOp!);
+      replyText = replyText.isEmpty ? '' : replyText;
     }
 
-    // Never persist an empty bubble: if the model returned no text and no
-    // interactive payload (e.g. a malformed tool call), drop it rather than
-    // showing a blank message.
-    final hasPayload = reply.form != null ||
-        reply.missionSuggestion != null ||
-        reply.moodCheckIn != null ||
+    final card = reply.card;
+    ChatForm? form;
+    ChatMoodCheckIn? moodCheckIn;
+    ChatMissionSuggestion? missionSuggestion;
+    if (card != null) {
+      switch (card.type) {
+        case AnswerCardType.choices:
+          if (card.options.isNotEmpty) {
+            form = ChatForm(question: card.question, options: card.options);
+          }
+        case AnswerCardType.mood:
+          moodCheckIn = ChatMoodCheckIn(question: card.question);
+        case AnswerCardType.mission:
+          if (card.missionKey.isNotEmpty) {
+            missionSuggestion = ChatMissionSuggestion(
+              toolKey: card.missionKey,
+              reason: card.reason,
+            );
+          }
+      }
+    }
+
+    // Store the rapid answers regardless of whether a bubble is persisted.
+    emit(state.copyWith(proposedAnswers: reply.proposedAnswers));
+
+    // Never persist an empty bubble: no text and no interactive payload.
+    final hasPayload = form != null ||
+        missionSuggestion != null ||
+        moodCheckIn != null ||
         mutation != null;
     if (replyText.isEmpty && !hasPayload) {
       debugPrint('[ChatCubit] dropping empty model reply (no text/payload)');
@@ -427,9 +435,9 @@ class ChatCubit extends Cubit<ChatState> {
       conversationId: state.conversationId,
       role: ChatRole.model,
       text: replyText,
-      form: reply.form,
-      missionSuggestion: reply.missionSuggestion,
-      moodCheckIn: reply.moodCheckIn,
+      form: form,
+      missionSuggestion: missionSuggestion,
+      moodCheckIn: moodCheckIn,
       routineMutation: mutation,
       createdAt: DateTime.now(),
     );
@@ -440,24 +448,22 @@ class ChatCubit extends Cubit<ChatState> {
       lastMessageAt: modelMsg.createdAt,
     );
     debugPrint(
-      '[ChatCubit] saved model reply '
-      '(form=${reply.isForm}, mission=${reply.isMissionSuggestion}, '
-      'mood=${reply.isMoodCheckIn}, routine=${mutation != null})',
+      '[ChatCubit] saved model reply (form=${form != null}, '
+      'mission=${missionSuggestion != null}, mood=${moodCheckIn != null}, '
+      'routine=${mutation != null}, proposed=${reply.proposedAnswers.length})',
     );
     return modelMsg;
   }
 
-  /// Applies a Gemini-driven routine mutation against [RoutineCubit] and
-  /// returns the receipt to attach to the chat message.
-  Future<ChatRoutineMutation?> _applyRoutineToolCall(
-    RoutineToolCall call,
-  ) async {
+  /// Applies an Answerer-driven routine op and returns the receipt to attach to
+  /// the chat message. [op] carries the op name plus routine fields.
+  Future<ChatRoutineMutation?> _applyRoutineOp(Map<String, dynamic> op) async {
     final routineCubit = _routineCubit;
     if (routineCubit == null) return null;
     try {
-      switch (call.tool) {
-        case 'create_routine':
-          final draft = _routineFromArgs(call.args, existing: null);
+      switch (op['op']) {
+        case 'create':
+          final draft = _routineFromArgs(op, existing: null);
           if (draft == null) return null;
           final saved = await routineCubit.addRoutine(draft);
           return ChatRoutineMutation(
@@ -469,13 +475,13 @@ class ChatCubit extends Cubit<ChatState> {
             colorKey: saved.colorKey,
             scheduledDate: saved.scheduledDate,
           );
-        case 'update_routine':
-          final id = call.args['routine_id']?.toString() ?? '';
+        case 'update':
+          final id = op['routine_id']?.toString() ?? '';
           final existing = routineCubit.state.routines
               .where((r) => r.id == id)
               .toList();
           if (existing.isEmpty) return null;
-          final draft = _routineFromArgs(call.args, existing: existing.first);
+          final draft = _routineFromArgs(op, existing: existing.first);
           if (draft == null) return null;
           await routineCubit.editRoutine(draft);
           return ChatRoutineMutation(
@@ -486,8 +492,8 @@ class ChatCubit extends Cubit<ChatState> {
             emoji: draft.emoji,
             colorKey: draft.colorKey,
           );
-        case 'delete_routine':
-          final id = call.args['routine_id']?.toString() ?? '';
+        case 'delete':
+          final id = op['routine_id']?.toString() ?? '';
           final match = routineCubit.state.routines
               .where((r) => r.id == id)
               .toList();
@@ -504,7 +510,7 @@ class ChatCubit extends Cubit<ChatState> {
           );
       }
     } catch (e) {
-      debugPrint('[ChatCubit] applyRoutineToolCall failed: $e');
+      debugPrint('[ChatCubit] applyRoutineOp failed: $e');
     }
     return null;
   }
@@ -518,7 +524,6 @@ class ChatCubit extends Cubit<ChatState> {
         (existing?.type == RoutineType.habit ? 'habit' : 'action');
     final type = typeStr == 'habit' ? RoutineType.habit : RoutineType.action;
     final rawName = args['name']?.toString().trim();
-    // Titles are capped at 3 words (safety net for the model).
     final name = (rawName == null || rawName.isEmpty)
         ? rawName
         : rawName.split(RegExp(r'\s+')).take(3).join(' ');
@@ -592,7 +597,7 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   /// Records the user's choice from a form message and treats it as the next
-  /// user turn (sends the chosen label as a new user message to Gemini).
+  /// user turn (sends the chosen label as a new user message).
   Future<void> answerForm(String messageId, int optionIndex) async {
     final idx = state.messages.indexWhere((m) => m.id == messageId);
     if (idx == -1) return;
@@ -685,7 +690,6 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   /// Records the user's mood selection from an inline check-in card.
-  /// Saves to Firestore, updates the message, then sends the mood as a user turn.
   Future<void> selectMood(String messageId, MoodValue mood) async {
     final idx = state.messages.indexWhere((m) => m.id == messageId);
     if (idx == -1) return;
@@ -749,16 +753,7 @@ class ChatCubit extends Cubit<ChatState> {
   @override
   Future<void> close() {
     _sub?.cancel();
-    // Fire-and-forget memory extraction if the user sent at least one message
-    // in this session. The extractor itself is best-effort and silent on
-    // failure.
-    if (_hasNewUserActivity) {
-      final cubit = _memoryCubit;
-      final cid = state.conversationId;
-      if (cubit != null) {
-        unawaited(cubit.extractNow(cid));
-      }
-    }
+    _memorySub?.cancel();
     return super.close();
   }
 }

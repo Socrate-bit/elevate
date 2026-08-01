@@ -2642,6 +2642,12 @@ abstract class AppLocalizations {
   /// **'Your message'**
   String get chatPageComposerHint;
 
+  /// No description provided for @chatProposedAnswersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick replies'**
+  String get chatProposedAnswersTitle;
+
   /// No description provided for @chatInsightsFormingTitle.
   ///
   /// In en, this message translates to:

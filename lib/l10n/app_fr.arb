@@ -506,6 +506,7 @@
   "chatStarterKnow": "Je sais déjà de quoi je veux parler",
   "chatStarterOff": "Je ne me sens pas bien",
   "chatPageComposerHint": "Votre message",
+  "chatProposedAnswersTitle": "Réponses rapides",
 
   "chatInsightsFormingTitle": "Vos insights se dessinent",
   "chatInsightsFormingBody": "Ash a besoin d'un peu plus de contexte dans cette conversation avant de pouvoir vous refléter un insight.",

@@ -26,11 +26,6 @@ class ChatMessage extends Equatable {
   /// True once the user has opened this insight for the first time (only ever
   /// set on insight messages). Gates the one-time open reward + win page.
   final bool insightOpened;
-
-  /// Model-assessed insight readiness (0..1) captured when this model reply
-  /// landed. Only set on model-reply turns; null on user turns and legacy
-  /// messages. The ring reads the latest one instead of recomputing.
-  final double? insightProgress;
   final DateTime createdAt;
 
   const ChatMessage({
@@ -45,7 +40,6 @@ class ChatMessage extends Equatable {
     this.routineMutation,
     this.insight,
     this.insightOpened = false,
-    this.insightProgress,
   });
 
   ChatMessage copyWith({
@@ -59,7 +53,6 @@ class ChatMessage extends Equatable {
     ChatRoutineMutation? routineMutation,
     ChatInsight? insight,
     bool? insightOpened,
-    double? insightProgress,
     DateTime? createdAt,
   }) => ChatMessage(
     id: id ?? this.id,
@@ -72,7 +65,6 @@ class ChatMessage extends Equatable {
     routineMutation: routineMutation ?? this.routineMutation,
     insight: insight ?? this.insight,
     insightOpened: insightOpened ?? this.insightOpened,
-    insightProgress: insightProgress ?? this.insightProgress,
     createdAt: createdAt ?? this.createdAt,
   );
 
@@ -85,7 +77,6 @@ class ChatMessage extends Equatable {
     'routineMutation': routineMutation?.toMap(),
     'insight': insight?.toMap(),
     'insightOpened': insightOpened,
-    'insightProgress': insightProgress,
     'createdAtMs': createdAt.millisecondsSinceEpoch,
   };
 
@@ -115,7 +106,6 @@ class ChatMessage extends Equatable {
           : ChatRoutineMutation.fromMap(routineMap),
       insight: insightMap == null ? null : ChatInsight.fromMap(insightMap),
       insightOpened: m['insightOpened'] as bool? ?? false,
-      insightProgress: (m['insightProgress'] as num?)?.toDouble(),
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         m['createdAtMs'] as int? ?? 0,
       ),
@@ -134,7 +124,6 @@ class ChatMessage extends Equatable {
     routineMutation,
     insight,
     insightOpened,
-    insightProgress,
     createdAt,
   ];
 }

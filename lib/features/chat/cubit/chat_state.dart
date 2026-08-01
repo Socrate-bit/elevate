@@ -2,8 +2,10 @@ import 'package:equatable/equatable.dart';
 
 import '../services/chat_message.dart';
 
-/// State for an active conversation. Mirrors the Firestore message stream
-/// and tracks transient UI flags for the composer (sending, listening).
+/// State for an active conversation. Mirrors the Firestore message stream and
+/// tracks transient UI flags for the composer (sending, listening). Insight
+/// progress + boundary are mirrored from [MemoryCubit] (the background builder
+/// owns them now).
 class ChatState extends Equatable {
   final String conversationId;
   final List<ChatMessage> messages;
@@ -15,6 +17,18 @@ class ChatState extends Equatable {
   /// True while an insight is being generated (drives the forming animation).
   final bool isGeneratingInsight;
 
+  /// AI-suggested rapid replies for the latest assistant turn (0–4). Surfaced
+  /// by the composer's rapid-answer button; cleared when the user sends.
+  final List<String> proposedAnswers;
+
+  /// Model-assessed readiness of the conversation to yield an insight, [0,1].
+  /// Mirrored from the memory builder's state.
+  final double insightProgress;
+
+  /// createdAtMs of the last generated insight; progress + turn counting reset
+  /// for messages newer than this.
+  final int insightBoundaryMs;
+
   const ChatState({
     required this.conversationId,
     this.messages = const [],
@@ -23,6 +37,9 @@ class ChatState extends Equatable {
     this.isListening = false,
     this.voicePartial = '',
     this.isGeneratingInsight = false,
+    this.proposedAnswers = const [],
+    this.insightProgress = 0.0,
+    this.insightBoundaryMs = 0,
   });
 
   ChatState copyWith({
@@ -33,6 +50,9 @@ class ChatState extends Equatable {
     bool? isListening,
     String? voicePartial,
     bool? isGeneratingInsight,
+    List<String>? proposedAnswers,
+    double? insightProgress,
+    int? insightBoundaryMs,
   }) => ChatState(
     conversationId: conversationId ?? this.conversationId,
     messages: messages ?? this.messages,
@@ -41,42 +61,26 @@ class ChatState extends Equatable {
     isListening: isListening ?? this.isListening,
     voicePartial: voicePartial ?? this.voicePartial,
     isGeneratingInsight: isGeneratingInsight ?? this.isGeneratingInsight,
+    proposedAnswers: proposedAnswers ?? this.proposedAnswers,
+    insightProgress: insightProgress ?? this.insightProgress,
+    insightBoundaryMs: insightBoundaryMs ?? this.insightBoundaryMs,
   );
 
-  /// Model-assessed readiness of the current conversation to yield an insight,
-  /// in [0,1] — the stored progress of the latest model turn since the last
-  /// insight, falling back to 0.0. Reaches 1.0 when the model judges an insight
-  /// can be generated. Drives the ring; read from messages, never recomputed.
-  double get insightProgress {
-    for (final m in messages.reversed) {
-      if (m.insight != null) break; // reset boundary
-      if (m.insightProgress != null) return m.insightProgress!;
-    }
-    return 0.0;
-  }
-
-  /// Number of user turns since the most recent insight message (all user
-  /// turns if there is no insight yet). Drives the progress ring + triggers.
+  /// Number of user turns since the most recent insight (by the memory
+  /// builder's boundary). Drives the auto-generate trigger.
   int get userTurnsSinceLastInsight {
     var count = 0;
-    for (final m in messages.reversed) {
-      if (m.insight != null) break;
-      if (m.role == ChatRole.user) count++;
+    for (final m in messages) {
+      if (m.role != ChatRole.user) continue;
+      if (m.createdAt.millisecondsSinceEpoch > insightBoundaryMs) count++;
     }
     return count;
   }
 
-  /// Messages accumulated since the most recent insight (all of them if there
-  /// is none yet), in chronological order. Feeds the model-driven progress
-  /// assessment so readiness resets after each insight.
-  List<ChatMessage> get messagesSinceLastInsight {
-    final out = <ChatMessage>[];
-    for (final m in messages.reversed) {
-      if (m.insight != null) break;
-      out.add(m);
-    }
-    return out.reversed.toList();
-  }
+  /// Messages accumulated since the most recent insight, chronological.
+  List<ChatMessage> get messagesSinceLastInsight => messages
+      .where((m) => m.createdAt.millisecondsSinceEpoch > insightBoundaryMs)
+      .toList();
 
   @override
   List<Object?> get props => [
@@ -87,5 +91,8 @@ class ChatState extends Equatable {
     isListening,
     voicePartial,
     isGeneratingInsight,
+    proposedAnswers,
+    insightProgress,
+    insightBoundaryMs,
   ];
 }

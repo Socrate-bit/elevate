@@ -16,9 +16,6 @@ abstract interface class ChatRepository {
     String id, {
     String? title,
     DateTime? lastMessageAt,
-    String? summary,
-    DateTime? summaryAt,
-    bool? memoryExtracted,
   });
   Future<void> deleteConversation(String id);
   Future<void> saveMessage(ChatMessage m);
@@ -42,14 +39,6 @@ abstract interface class ChatRepository {
 
   /// Flags an insight message as opened (first-open reward bookkeeping).
   Future<void> markInsightOpened(String conversationId, String messageId);
-
-  /// Stores the model-assessed insight-readiness (0..1) on a model message so
-  /// the ring reads it back instead of recomputing.
-  Future<void> updateMessageInsightProgress(
-    String conversationId,
-    String messageId,
-    double progress,
-  );
 }
 
 /// Firestore-backed [ChatRepository].
@@ -110,20 +99,12 @@ class ChatFirestoreService implements ChatRepository {
     String id, {
     String? title,
     DateTime? lastMessageAt,
-    String? summary,
-    DateTime? summaryAt,
-    bool? memoryExtracted,
   }) {
     final patch = <String, dynamic>{};
     if (title != null) patch['title'] = title;
     if (lastMessageAt != null) {
       patch['lastMessageAtMs'] = lastMessageAt.millisecondsSinceEpoch;
     }
-    if (summary != null) patch['summary'] = summary;
-    if (summaryAt != null) {
-      patch['summaryAtMs'] = summaryAt.millisecondsSinceEpoch;
-    }
-    if (memoryExtracted != null) patch['memoryExtracted'] = memoryExtracted;
     if (patch.isEmpty) return Future.value();
     return _conversations().doc(id).update(patch);
   }
@@ -173,13 +154,4 @@ class ChatFirestoreService implements ChatRepository {
       _messages(
         conversationId,
       ).doc(messageId).update({'insightOpened': true});
-
-  @override
-  Future<void> updateMessageInsightProgress(
-    String conversationId,
-    String messageId,
-    double progress,
-  ) => _messages(
-    conversationId,
-  ).doc(messageId).update({'insightProgress': progress});
 }
