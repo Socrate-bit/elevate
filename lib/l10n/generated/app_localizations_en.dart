@@ -1477,15 +1477,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopCtaColor => 'Change color';
 
   @override
-  String get onboardingAppyStartBadge => 'YOUR AI GROWTH COACH';
+  String get onboardingAppyStartBadge => 'PRIVATE & JUDGMENT-FREE';
 
   @override
-  String get onboardingAppyStartTitle =>
-      'Welcome to Appy,\nyour self-growth coach';
+  String get onboardingAppyStartTitle => 'Build the life you deserve';
 
   @override
   String get onboardingAppyStartSubtitle =>
-      'Understand yourself, heal old patterns, and take aligned action. A gamified AI coach to grow into the life you want.';
+      'Appy helps you understand yourself, break your limiting patterns, and create a more aligned life.';
 
   @override
   String get onboardingAppyStartJoin => 'Thousands growing with Appy every day';
@@ -1636,24 +1635,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingAppyProblemBody =>
-      'Everyone has blind spots — patterns, beliefs, and old stories that quietly shape our decisions. Not because something\'s wrong with us. It\'s simply human. But what we can\'t see, we can\'t change.';
+      'Everyone has blind spots that quietly shape our lives and prevent us from getting what we really want. Not because something\'s wrong with us. It\'s simply human. But what we can\'t see, we can\'t change.';
 
   @override
   String get onboardingAppyProblemCta => 'So how do we see it?';
 
   @override
   String get onboardingAppySolutionTitle =>
-      'You just need someone to think out loud with';
+      'You need someone to help you understand your mind';
 
   @override
   String get onboardingAppySolutionBody =>
-      'Talking to someone who listens without judging is how blind spots come into view. Appy is there whenever you need it — at 2am, mid-spiral, or on a good day. It remembers what matters to you, asks the questions that bring clarity, and helps you take the next step.';
+      'Talking to someone who listens without judging is how blind spots come into view. Your companion is there whenever you need it — at 2am, mid-spiral, or on a good day. It remembers what matters to you, asks the questions that bring clarity, and helps you take the next step.';
 
   @override
-  String get onboardingAppySolutionCta => 'Meet Appy';
+  String get onboardingAppySolutionCta => 'Meet your companion';
 
   @override
-  String get onboardingAppyPresentTitle => 'Hi, I\'m Appy';
+  String get onboardingAppyPresentTitle => 'Here is your new companion';
 
   @override
   String get onboardingAppyPresentBody =>
@@ -1662,6 +1661,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get onboardingAppyPresentFootnote =>
       'Everything you share stays between us';
+
+  @override
+  String get onboardingAppyPetNameQuestion =>
+      'What do you want to name your new companion?';
+
+  @override
+  String get onboardingAppyPetNameSubtitle => 'You can change this later.';
+
+  @override
+  String get onboardingAppyPetNameHint => 'Type a name';
+
+  @override
+  String get onboardingAppyPetNameShuffle => 'Shuffle';
 
   @override
   String get onboardingAppyNameQuestion => 'What\'s your name?';

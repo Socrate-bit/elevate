@@ -2795,19 +2795,19 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingAppyStartBadge.
   ///
   /// In en, this message translates to:
-  /// **'YOUR AI GROWTH COACH'**
+  /// **'PRIVATE & JUDGMENT-FREE'**
   String get onboardingAppyStartBadge;
 
   /// No description provided for @onboardingAppyStartTitle.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Appy,\nyour self-growth coach'**
+  /// **'Build the life you deserve'**
   String get onboardingAppyStartTitle;
 
   /// No description provided for @onboardingAppyStartSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Understand yourself, heal old patterns, and take aligned action. A gamified AI coach to grow into the life you want.'**
+  /// **'Appy helps you understand yourself, break your limiting patterns, and create a more aligned life.'**
   String get onboardingAppyStartSubtitle;
 
   /// No description provided for @onboardingAppyStartJoin.
@@ -3095,7 +3095,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingAppyProblemBody.
   ///
   /// In en, this message translates to:
-  /// **'Everyone has blind spots — patterns, beliefs, and old stories that quietly shape our decisions. Not because something\'s wrong with us. It\'s simply human. But what we can\'t see, we can\'t change.'**
+  /// **'Everyone has blind spots that quietly shape our lives and prevent us from getting what we really want. Not because something\'s wrong with us. It\'s simply human. But what we can\'t see, we can\'t change.'**
   String get onboardingAppyProblemBody;
 
   /// No description provided for @onboardingAppyProblemCta.
@@ -3107,25 +3107,25 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingAppySolutionTitle.
   ///
   /// In en, this message translates to:
-  /// **'You just need someone to think out loud with'**
+  /// **'You need someone to help you understand your mind'**
   String get onboardingAppySolutionTitle;
 
   /// No description provided for @onboardingAppySolutionBody.
   ///
   /// In en, this message translates to:
-  /// **'Talking to someone who listens without judging is how blind spots come into view. Appy is there whenever you need it — at 2am, mid-spiral, or on a good day. It remembers what matters to you, asks the questions that bring clarity, and helps you take the next step.'**
+  /// **'Talking to someone who listens without judging is how blind spots come into view. Your companion is there whenever you need it — at 2am, mid-spiral, or on a good day. It remembers what matters to you, asks the questions that bring clarity, and helps you take the next step.'**
   String get onboardingAppySolutionBody;
 
   /// No description provided for @onboardingAppySolutionCta.
   ///
   /// In en, this message translates to:
-  /// **'Meet Appy'**
+  /// **'Meet your companion'**
   String get onboardingAppySolutionCta;
 
   /// No description provided for @onboardingAppyPresentTitle.
   ///
   /// In en, this message translates to:
-  /// **'Hi, I\'m Appy'**
+  /// **'Here is your new companion'**
   String get onboardingAppyPresentTitle;
 
   /// No description provided for @onboardingAppyPresentBody.
@@ -3139,6 +3139,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Everything you share stays between us'**
   String get onboardingAppyPresentFootnote;
+
+  /// No description provided for @onboardingAppyPetNameQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to name your new companion?'**
+  String get onboardingAppyPetNameQuestion;
+
+  /// No description provided for @onboardingAppyPetNameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change this later.'**
+  String get onboardingAppyPetNameSubtitle;
+
+  /// No description provided for @onboardingAppyPetNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a name'**
+  String get onboardingAppyPetNameHint;
+
+  /// No description provided for @onboardingAppyPetNameShuffle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shuffle'**
+  String get onboardingAppyPetNameShuffle;
 
   /// No description provided for @onboardingAppyNameQuestion.
   ///

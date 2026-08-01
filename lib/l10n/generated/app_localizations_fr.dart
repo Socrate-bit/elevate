@@ -1489,15 +1489,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get shopCtaColor => 'Changer la couleur';
 
   @override
-  String get onboardingAppyStartBadge => 'TON COACH DE CROISSANCE IA';
+  String get onboardingAppyStartBadge => 'PRIVÉ & SANS JUGEMENT';
 
   @override
-  String get onboardingAppyStartTitle =>
-      'Bienvenue sur Appy,\nton coach de développement personnel';
+  String get onboardingAppyStartTitle => 'Construis la vie que tu mérites';
 
   @override
   String get onboardingAppyStartSubtitle =>
-      'Comprends-toi, guéris tes vieux schémas et passe à l\'action alignée. Un coach IA gamifié pour bâtir la vie que tu veux.';
+      'Appy t\'aide à te comprendre, à briser tes schémas limitants et à créer une vie plus alignée.';
 
   @override
   String get onboardingAppyStartJoin =>
@@ -1655,24 +1654,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get onboardingAppyProblemBody =>
-      'Chacun a des angles morts — des schémas, des croyances et de vieilles histoires qui façonnent discrètement nos décisions. Non pas parce que quelque chose ne va pas chez nous. C\'est simplement humain. Mais ce qu\'on ne voit pas, on ne peut pas le changer.';
+      'Chacun a des angles morts qui façonnent discrètement nos vies et nous empêchent d\'obtenir ce que nous voulons vraiment. Non pas parce que quelque chose ne va pas chez nous. C\'est simplement humain. Mais ce qu\'on ne voit pas, on ne peut pas le changer.';
 
   @override
   String get onboardingAppyProblemCta => 'Alors, comment le voir ?';
 
   @override
   String get onboardingAppySolutionTitle =>
-      'Tu as juste besoin de quelqu\'un avec qui réfléchir à voix haute';
+      'Tu as besoin de quelqu\'un pour t\'aider à comprendre ton esprit';
 
   @override
   String get onboardingAppySolutionBody =>
-      'Parler à quelqu\'un qui écoute sans juger, c\'est ainsi que les angles morts apparaissent. Appy est là dès que tu en as besoin — à 2h du matin, en pleine spirale, ou un bon jour. Il retient ce qui compte pour toi, pose les questions qui apportent de la clarté et t\'aide à faire le prochain pas.';
+      'Parler à quelqu\'un qui écoute sans juger, c\'est ainsi que les angles morts apparaissent. Ton compagnon est là dès que tu en as besoin — à 2h du matin, en pleine spirale, ou un bon jour. Il retient ce qui compte pour toi, pose les questions qui apportent de la clarté et t\'aide à faire le prochain pas.';
 
   @override
-  String get onboardingAppySolutionCta => 'Rencontrer Appy';
+  String get onboardingAppySolutionCta => 'Rencontrer ton compagnon';
 
   @override
-  String get onboardingAppyPresentTitle => 'Salut, je suis Appy';
+  String get onboardingAppyPresentTitle => 'Voici ton nouveau compagnon';
 
   @override
   String get onboardingAppyPresentBody =>
@@ -1681,6 +1680,20 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get onboardingAppyPresentFootnote =>
       'Tout ce que tu partages reste entre nous';
+
+  @override
+  String get onboardingAppyPetNameQuestion =>
+      'Comment veux-tu appeler ton nouveau compagnon ?';
+
+  @override
+  String get onboardingAppyPetNameSubtitle =>
+      'Tu pourras le changer plus tard.';
+
+  @override
+  String get onboardingAppyPetNameHint => 'Écris un nom';
+
+  @override
+  String get onboardingAppyPetNameShuffle => 'Au hasard';
 
   @override
   String get onboardingAppyNameQuestion => 'Comment t\'appelles-tu ?';

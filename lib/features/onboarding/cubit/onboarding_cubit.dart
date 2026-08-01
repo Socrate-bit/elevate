@@ -81,6 +81,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void setName(String value) => emit(state.copyWith(name: value));
 
+  void setPetName(String value) {
+    emit(state.copyWith(petName: value));
+    _captureAnswer('pet_name', value);
+  }
+
   void setTone(String value) {
     emit(state.copyWith(tone: value));
     _captureAnswer('tone', value);
@@ -155,6 +160,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
           if (state.lifeRatings.isNotEmpty) 'lifeRatings': state.lifeRatings,
           if (state.name != null && state.name!.trim().isNotEmpty)
             'name': state.name!.trim(),
+          if (state.petName != null && state.petName!.trim().isNotEmpty)
+            'petName': state.petName!.trim(),
           if (state.tone != null) 'tone': state.tone,
           'onboardingComplete': true,
           'completedAt': FieldValue.serverTimestamp(),

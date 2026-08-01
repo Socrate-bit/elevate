@@ -14,6 +14,7 @@ import '../widgets/life_rating_step.dart';
 import '../widgets/multi_select_step.dart';
 import '../widgets/name_input_step.dart';
 import '../widgets/onboarding_auth_step.dart';
+import '../widgets/pet_name_step.dart';
 import '../widgets/survey_step.dart';
 
 /// Redesigned Appy onboarding funnel. Portrays the user's situation, educates,
@@ -32,9 +33,10 @@ import '../widgets/survey_step.dart';
 ///  5  Problem (education)
 ///  6  Solution (education)
 ///  7  Present Appy (education)
-///  8  Name
-///  9  How should Appy talk to you (tone)
-/// 10  Sign up → complete                — owns nav
+///  8  Name your companion (+ shuffle)
+///  9  Name
+/// 10  How should Appy talk to you (tone)
+/// 11  Sign up → complete                — owns nav
 class OnboardingScreenV2 extends StatefulWidget {
   const OnboardingScreenV2({super.key});
 
@@ -43,7 +45,7 @@ class OnboardingScreenV2 extends StatefulWidget {
 }
 
 class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
-  static const _totalPages = 11;
+  static const _totalPages = 12;
 
   final _pageController = PageController();
   int _currentPage = 0;
@@ -78,7 +80,7 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
   }
 
   // Pages that render their own primary action (no shared Continue button).
-  bool _ownsNav(int page) => page == 10;
+  bool _ownsNav(int page) => page == 11;
 
   bool _canContinue(OnboardingState s) {
     switch (_currentPage) {
@@ -91,8 +93,10 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
       case 4:
         return s.lifeRatings.length >= _lifeDimensions(context).length;
       case 8:
-        return (s.name ?? '').trim().isNotEmpty;
+        return (s.petName ?? '').trim().isNotEmpty;
       case 9:
+        return (s.name ?? '').trim().isNotEmpty;
+      case 10:
         return s.tone != null;
       default:
         return true;
@@ -240,14 +244,14 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
       ),
       // 6: solution (education)
       EducationStep(
-        emoji: '💬',
+        emoji: '🌌',
         title: l10n.onboardingAppySolutionTitle,
         body: l10n.onboardingAppySolutionBody,
       ),
       // 7: present Appy (education) — the mascot waves hello.
       EducationStep(
         illustration: Image.asset(
-          'assets/onboarding/pet_hello.jpg',
+          'assets/onboarding/pet_hello.gif',
           height: 180.h,
           fit: BoxFit.contain,
         ),
@@ -255,14 +259,23 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
         body: l10n.onboardingAppyPresentBody,
         footnote: l10n.onboardingAppyPresentFootnote,
       ),
-      // 8: name
+      // 8: name your companion (with shuffle suggestions)
+      PetNameStep(
+        title: l10n.onboardingAppyPetNameQuestion,
+        subtitle: l10n.onboardingAppyPetNameSubtitle,
+        hint: l10n.onboardingAppyPetNameHint,
+        shuffleLabel: l10n.onboardingAppyPetNameShuffle,
+        initialValue: state.petName,
+        onChanged: cubit.setPetName,
+      ),
+      // 9: name
       NameInputStep(
         title: l10n.onboardingAppyNameQuestion,
         hint: l10n.onboardingAppyNameHint,
         initialValue: state.name,
         onChanged: cubit.setName,
       ),
-      // 9: tone
+      // 10: tone
       SurveyStep(
         question: l10n.onboardingAppyToneQuestion,
         options: [
@@ -274,7 +287,7 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
         selectedOption: state.tone,
         onSelected: cubit.setTone,
       ),
-      // 10: sign up → complete
+      // 11: sign up → complete
       OnboardingAuthStep(
         mode: OnboardingAuthMode.signUp,
         title: l10n.onboardingAppySignUpTitle,

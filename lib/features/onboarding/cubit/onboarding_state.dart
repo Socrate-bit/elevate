@@ -16,6 +16,7 @@ class OnboardingState extends Equatable {
   final Set<String> feelings;
   final Map<String, int> lifeRatings;
   final String? name;
+  final String? petName;
   final String? tone;
 
   const OnboardingState({
@@ -30,6 +31,7 @@ class OnboardingState extends Equatable {
     this.feelings = const {},
     this.lifeRatings = const {},
     this.name,
+    this.petName,
     this.tone,
   });
 
@@ -45,6 +47,7 @@ class OnboardingState extends Equatable {
     Set<String>? feelings,
     Map<String, int>? lifeRatings,
     String? name,
+    String? petName,
     String? tone,
   }) =>
       OnboardingState(
@@ -59,6 +62,7 @@ class OnboardingState extends Equatable {
         feelings: feelings ?? this.feelings,
         lifeRatings: lifeRatings ?? this.lifeRatings,
         name: name ?? this.name,
+        petName: petName ?? this.petName,
         tone: tone ?? this.tone,
       );
 
@@ -75,6 +79,7 @@ class OnboardingState extends Equatable {
         feelings,
         lifeRatings,
         name,
+        petName,
         tone,
       ];
 }
