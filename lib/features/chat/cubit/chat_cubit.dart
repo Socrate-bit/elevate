@@ -88,9 +88,6 @@ class ChatCubit extends Cubit<ChatState> {
   /// Guards against overlapping progress assessments.
   bool _progressInFlight = false;
 
-  /// Ensures the ring is assessed once when an existing conversation loads.
-  bool _initialProgressAssessed = false;
-
   /// Fill of the insight ring in [0,1] — the model's latest readiness estimate.
   double get insightProgress => state.insightProgress;
 
@@ -106,13 +103,10 @@ class ChatCubit extends Cubit<ChatState> {
         .watchMessages(state.conversationId)
         .listen(
           (messages) {
+            // The ring reads its fill from the stored progress on the latest
+            // message, so an opened conversation reflects readiness immediately
+            // without a fresh assessment.
             emit(state.copyWith(messages: messages, isLoading: false));
-            // Assess the ring once for a conversation opened with existing
-            // history so it reflects readiness without waiting for a new turn.
-            if (!_initialProgressAssessed && messages.isNotEmpty) {
-              _initialProgressAssessed = true;
-              unawaited(_assessInsightProgress());
-            }
           },
           onError: (e) {
             debugPrint('[ChatCubit] watchMessages error: $e');
@@ -247,39 +241,56 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> _generateModelReply() async {
+    ChatMessage? modelMsg;
     try {
       final reply = await _gemini.send(
         history: state.messages.toList(),
         userText: state.messages.last.text,
         memoryContext: _buildContext(),
       );
-      await _commitModelReply(reply);
+      modelMsg = await _commitModelReply(reply);
     } catch (e) {
       debugPrint('[ChatCubit] _generateModelReply failed: $e');
       rethrow;
     } finally {
       emit(state.copyWith(isSending: false));
     }
-    // After the reply lands, re-assess how ready the conversation is to yield an
-    // insight, then auto-generate one if the user has gone long enough without
-    // tapping. Both are best-effort — they never block or disrupt the chat.
-    unawaited(_assessInsightProgress().then((_) => _maybeAutoGenerateInsight()));
+    // After the reply lands, score how ready the conversation is to yield an
+    // insight and store it on that message, then auto-generate one if the user
+    // has gone long enough without tapping. Both are best-effort — they never
+    // block or disrupt the chat.
+    if (modelMsg != null) {
+      final msg = modelMsg;
+      unawaited(
+        _assessAndStoreProgress(msg).then((_) => _maybeAutoGenerateInsight()),
+      );
+    }
   }
 
   /// Asks the model to score how close the conversation is to an insight and
-  /// stores it as the ring's fill. Best-effort: keeps the previous value on
-  /// failure, and no-ops while another assessment or a generation is running.
-  Future<void> _assessInsightProgress() async {
+  /// persists it on [msg] so the ring reads it back without recomputing.
+  /// Best-effort: keeps the previous value on failure, and no-ops while another
+  /// assessment or a generation is running.
+  Future<void> _assessAndStoreProgress(ChatMessage msg) async {
     if (_progressInFlight || _insightInFlight) return;
+    // Score the exchange since the last insight, including the reply just
+    // committed (the stream may not have delivered it into state yet).
     final since = state.messagesSinceLastInsight;
-    if (since.isEmpty) return;
+    final history = (since.isNotEmpty && since.last.id == msg.id)
+        ? since
+        : [...since, msg];
+    if (history.isEmpty) return;
     _progressInFlight = true;
     try {
-      final progress = await _gemini.assessInsightProgress(history: since);
+      final progress = await _gemini.assessInsightProgress(history: history);
       if (progress == null || isClosed) return;
-      emit(state.copyWith(insightProgress: progress));
+      await _repo.updateMessageInsightProgress(
+        state.conversationId,
+        msg.id,
+        progress,
+      );
     } catch (e) {
-      debugPrint('[ChatCubit] _assessInsightProgress failed: $e');
+      debugPrint('[ChatCubit] _assessAndStoreProgress failed: $e');
     } finally {
       _progressInFlight = false;
     }
@@ -327,8 +338,8 @@ class ChatCubit extends Cubit<ChatState> {
       await _repo.updateConversation(state.conversationId, lastMessageAt: now);
       AnalyticsService.capture(AnalyticsService.chatInsightGenerated);
       debugPrint('[ChatCubit] saved insight "${insight.title}"');
-      // The ring resets once an insight lands — the next one starts from zero.
-      emit(state.copyWith(insightProgress: 0.0));
+      // The ring resets on its own once the insight message lands: it becomes
+      // the new reset boundary, so no later message carries a stored progress.
     } catch (e) {
       debugPrint('[ChatCubit] _generateInsight failed: $e');
     } finally {
@@ -388,8 +399,10 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   /// Persists a Gemini reply as a model [ChatMessage] and updates the
-  /// conversation's lastMessageAt. Shared by [startSession] and [_generateModelReply].
-  Future<void> _commitModelReply(GeminiReply reply) async {
+  /// conversation's lastMessageAt. Shared by [startSession] and
+  /// [_generateModelReply]. Returns the saved message (or null when the reply
+  /// was empty and dropped) so callers can attach insight progress to it.
+  Future<ChatMessage?> _commitModelReply(GeminiReply reply) async {
     ChatRoutineMutation? mutation;
     String replyText = reply.text ?? '';
     if (reply.routineToolCall != null) {
@@ -406,7 +419,7 @@ class ChatCubit extends Cubit<ChatState> {
         mutation != null;
     if (replyText.isEmpty && !hasPayload) {
       debugPrint('[ChatCubit] dropping empty model reply (no text/payload)');
-      return;
+      return null;
     }
 
     final modelMsg = ChatMessage(
@@ -431,6 +444,7 @@ class ChatCubit extends Cubit<ChatState> {
       '(form=${reply.isForm}, mission=${reply.isMissionSuggestion}, '
       'mood=${reply.isMoodCheckIn}, routine=${mutation != null})',
     );
+    return modelMsg;
   }
 
   /// Applies a Gemini-driven routine mutation against [RoutineCubit] and

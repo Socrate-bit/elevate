@@ -42,6 +42,14 @@ abstract interface class ChatRepository {
 
   /// Flags an insight message as opened (first-open reward bookkeeping).
   Future<void> markInsightOpened(String conversationId, String messageId);
+
+  /// Stores the model-assessed insight-readiness (0..1) on a model message so
+  /// the ring reads it back instead of recomputing.
+  Future<void> updateMessageInsightProgress(
+    String conversationId,
+    String messageId,
+    double progress,
+  );
 }
 
 /// Firestore-backed [ChatRepository].
@@ -165,4 +173,13 @@ class ChatFirestoreService implements ChatRepository {
       _messages(
         conversationId,
       ).doc(messageId).update({'insightOpened': true});
+
+  @override
+  Future<void> updateMessageInsightProgress(
+    String conversationId,
+    String messageId,
+    double progress,
+  ) => _messages(
+    conversationId,
+  ).doc(messageId).update({'insightProgress': progress});
 }

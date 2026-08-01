@@ -15,11 +15,6 @@ class ChatState extends Equatable {
   /// True while an insight is being generated (drives the forming animation).
   final bool isGeneratingInsight;
 
-  /// Model-assessed readiness of the current conversation to yield an insight,
-  /// in [0,1]. Reaches 1.0 when the model judges an insight can be generated
-  /// (deep enough exploration over more than five messages). Drives the ring.
-  final double insightProgress;
-
   const ChatState({
     required this.conversationId,
     this.messages = const [],
@@ -28,7 +23,6 @@ class ChatState extends Equatable {
     this.isListening = false,
     this.voicePartial = '',
     this.isGeneratingInsight = false,
-    this.insightProgress = 0.0,
   });
 
   ChatState copyWith({
@@ -39,7 +33,6 @@ class ChatState extends Equatable {
     bool? isListening,
     String? voicePartial,
     bool? isGeneratingInsight,
-    double? insightProgress,
   }) => ChatState(
     conversationId: conversationId ?? this.conversationId,
     messages: messages ?? this.messages,
@@ -48,8 +41,19 @@ class ChatState extends Equatable {
     isListening: isListening ?? this.isListening,
     voicePartial: voicePartial ?? this.voicePartial,
     isGeneratingInsight: isGeneratingInsight ?? this.isGeneratingInsight,
-    insightProgress: insightProgress ?? this.insightProgress,
   );
+
+  /// Model-assessed readiness of the current conversation to yield an insight,
+  /// in [0,1] — the stored progress of the latest model turn since the last
+  /// insight, falling back to 0.0. Reaches 1.0 when the model judges an insight
+  /// can be generated. Drives the ring; read from messages, never recomputed.
+  double get insightProgress {
+    for (final m in messages.reversed) {
+      if (m.insight != null) break; // reset boundary
+      if (m.insightProgress != null) return m.insightProgress!;
+    }
+    return 0.0;
+  }
 
   /// Number of user turns since the most recent insight message (all user
   /// turns if there is no insight yet). Drives the progress ring + triggers.
@@ -83,6 +87,5 @@ class ChatState extends Equatable {
     isListening,
     voicePartial,
     isGeneratingInsight,
-    insightProgress,
   ];
 }

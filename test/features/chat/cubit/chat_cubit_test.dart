@@ -72,6 +72,7 @@ ChatMessage _msg(
   String text = '',
   ChatRole role = ChatRole.user,
   ChatForm? form,
+  double? insightProgress,
   int createdAtMs = 0,
 }) =>
     ChatMessage(
@@ -80,6 +81,7 @@ ChatMessage _msg(
       role: role,
       text: text,
       form: form,
+      insightProgress: insightProgress,
       createdAt: DateTime.fromMillisecondsSinceEpoch(createdAtMs),
     );
 
@@ -111,6 +113,10 @@ void main() {
         )).thenAnswer((_) async {});
     when(() => repo.updateMessageForm(any(), any(), any()))
         .thenAnswer((_) async {});
+    when(() => repo.updateMessageInsightProgress(any(), any(), any()))
+        .thenAnswer((_) async {});
+    when(() => gemini.assessInsightProgress(history: any(named: 'history')))
+        .thenAnswer((_) async => 0.4);
     when(() => gemini.generateTitle(any()))
         .thenAnswer((_) async => 'A title');
     when(() => gemini.send(
@@ -229,6 +235,38 @@ void main() {
       expect(modelMsg.role, ChatRole.model);
       expect(modelMsg.form, isNotNull);
       expect(modelMsg.form!.options, ['A', 'B']);
+    });
+  });
+
+  group('insight progress', () {
+    test('stores the assessed progress on the model reply message', () async {
+      final cubit = buildCubit(ids: ['user-id', 'model-id']);
+      await cubit.sendText('hello');
+      // _assessAndStoreProgress runs unawaited; give it a tick.
+      await Future<void>.delayed(Duration.zero);
+
+      verify(() => gemini.assessInsightProgress(history: any(named: 'history')))
+          .called(1);
+      verify(() =>
+              repo.updateMessageInsightProgress('c1', 'model-id', 0.4))
+          .called(1);
+    });
+
+    test('ring reads stored progress from the latest message, no recompute',
+        () async {
+      final cubit = buildCubit();
+      await Future<void>.delayed(Duration.zero);
+      messages.add([
+        _msg('u', text: 'hi', role: ChatRole.user),
+        _msg('m', text: 'hey', role: ChatRole.model, insightProgress: 0.7),
+      ]);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(cubit.state.insightProgress, 0.7);
+      // Opening/loading an existing conversation never re-assesses.
+      verifyNever(
+        () => gemini.assessInsightProgress(history: any(named: 'history')),
+      );
     });
   });
 
