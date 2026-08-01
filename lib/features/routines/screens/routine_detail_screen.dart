@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:elevate/l10n/generated/app_localizations.dart';
@@ -6,16 +7,28 @@ import 'package:elevate/l10n/l10n_helpers.dart';
 
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
+import '../../adventure/cubit/adventure_cubit.dart';
+import '../../tools/models/tools_mock_data.dart';
+import '../../tools/tools_launcher.dart';
+import '../cubit/routine_cubit.dart';
 import '../models/routine.dart';
 import '../models/routine_palette.dart';
 
 /// Read-only detail view for a single [Routine], opened when a task is tapped
 /// from the plan. Shows, top to bottom: the emoji, the title, the recurrence
-/// detail, the description, and the reward. Theme-adaptive.
+/// detail, the description, and the reward. Theme-adaptive. Activities that
+/// aren't validated yet also get a "Start now" button that runs their session.
 class RoutineDetailScreen extends StatelessWidget {
   final Routine routine;
 
-  const RoutineDetailScreen({super.key, required this.routine});
+  /// Whether the routine is already validated for today (hides "Start now").
+  final bool done;
+
+  const RoutineDetailScreen({
+    super.key,
+    required this.routine,
+    this.done = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +36,10 @@ class RoutineDetailScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final tint = routineColor(routine.colorKey);
     final description = routine.description?.trim();
+    // Activity/tool task with a guided session that hasn't been done yet.
+    final tool =
+        routine.toolKey == null ? null : ToolsMockData.byKey(routine.toolKey!);
+    final canStart = tool != null && tool.hasSession && !done;
 
     return Scaffold(
       backgroundColor: c.background,
@@ -107,6 +124,15 @@ class RoutineDetailScreen extends StatelessWidget {
                             ],
                           ),
                         ),
+                        // Activities: start the guided session straight away.
+                        if (canStart) ...[
+                          SizedBox(height: 24.h),
+                          _StartNowButton(
+                            color: tint,
+                            label: l10n.routineDetailStartNow,
+                            onTap: () => _startNow(context, tool),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -117,6 +143,21 @@ class RoutineDetailScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Runs the activity's guided session; validates + rewards the routine and
+  /// returns to the plan once the session runs to completion.
+  Future<void> _startNow(BuildContext context, ToolItem tool) async {
+    // Capture what we need before the await so we don't touch a stale context.
+    final routineCubit = context.read<RoutineCubit>();
+    final adventure = context.read<AdventureCubit>();
+    final navigator = Navigator.of(context);
+    final completed = await openToolSession(context, tool);
+    if (!completed) return;
+    await routineCubit.validate(routine.id);
+    // Award coins (== the task's XP) + a strike; fires confetti on home.
+    await adventure.awardForCompletion(routine.xp);
+    navigator.pop();
   }
 
   /// Human-readable recurrence: the habit's weekdays or the action's date,
@@ -214,6 +255,49 @@ class _DetailCard extends StatelessWidget {
           SizedBox(height: 8.h),
           child,
         ],
+      ),
+    );
+  }
+}
+
+/// Full-width tinted call-to-action that starts an activity's session.
+class _StartNowButton extends StatelessWidget {
+  final Color color;
+  final String label;
+  final VoidCallback onTap;
+
+  const _StartNowButton({
+    required this.color,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: withMediumHaptic(onTap),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 16.h),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22.sp),
+            SizedBox(width: 6.w),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

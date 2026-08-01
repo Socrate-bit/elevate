@@ -1219,6 +1219,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get routineDetailStartNow => 'Commencer';
+
+  @override
   String chatRoutineCreated(String name) {
     return 'Créé \'$name\'';
   }

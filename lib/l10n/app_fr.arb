@@ -437,6 +437,7 @@
   "routineDetailAnytime": "À tout moment",
   "routineDetailPoints": "{xp} pts",
   "@routineDetailPoints": { "placeholders": { "xp": { "type": "int" } } },
+  "routineDetailStartNow": "Commencer",
 
   "chatRoutineCreated": "Créé '{name}'",
   "@chatRoutineCreated": { "placeholders": { "name": { "type": "String" } } },

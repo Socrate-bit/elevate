@@ -109,7 +109,8 @@ class TodaysPlanCard extends StatelessWidget {
               routine: r,
               done: completedIds.contains(r.id),
               onToggle: () => _toggle(context, r, completedIds.contains(r.id)),
-              onOpen: () => _openDetail(context, r),
+              onStartSession: () => _startSession(context, r),
+              onOpen: () => _openDetail(context, r, completedIds.contains(r.id)),
             ),
           ),
         ),
@@ -132,13 +133,29 @@ class TodaysPlanCard extends StatelessWidget {
   }
 
   /// Opens the read-only task detail page.
-  void _openDetail(BuildContext context, Routine r) {
+  void _openDetail(BuildContext context, Routine r, bool done) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => RoutineDetailScreen(routine: r),
+        builder: (_) => RoutineDetailScreen(routine: r, done: done),
       ),
     );
+  }
+
+  /// Runs an activity's guided session straight away; validates + rewards the
+  /// routine once the session runs to completion.
+  Future<void> _startSession(BuildContext context, Routine r) async {
+    final tool =
+        r.toolKey == null ? null : ToolsMockData.byKey(r.toolKey!);
+    if (tool == null || !tool.hasSession) return;
+    // Capture cubits before the await so we don't touch a stale context after.
+    final cubit = context.read<RoutineCubit>();
+    final adventure = context.read<AdventureCubit>();
+    final completed = await openToolSession(context, tool);
+    if (!completed) return;
+    await cubit.validate(r.id);
+    // Award coins (== the task's XP) + a strike; fires confetti on home.
+    await adventure.awardForCompletion(r.xp);
   }
 
   /// Runs a default task's underlying feature; each marks itself done on
@@ -407,12 +424,14 @@ class _TaskCard extends StatelessWidget {
   final Routine routine;
   final bool done;
   final VoidCallback onToggle;
+  final VoidCallback onStartSession;
   final VoidCallback onOpen;
 
   const _TaskCard({
     required this.routine,
     required this.done,
     required this.onToggle,
+    required this.onStartSession,
     required this.onOpen,
   });
 
@@ -420,17 +439,16 @@ class _TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final tile = routineColor(routine.colorKey);
-    // Activity/tool task: resolve its tool so we can show its asset icon and
-    // open its guided session on tap (falling back to edit when there's none).
+    // Activity/tool task: resolve its tool so we can show its asset icon and,
+    // when not yet done, offer a "play" affordance that starts its session.
     final tool =
         routine.toolKey == null ? null : ToolsMockData.byKey(routine.toolKey!);
     final opensSession = tool != null && tool.hasSession;
+    // An undone activity starts its session straight from the trailing button.
+    final startable = opensSession && !done;
     return GestureDetector(
-      onTap: withHaptic(
-        opensSession ? () => openToolSession(context, tool) : onOpen,
-      ),
-      // Tool tasks open their session on tap; long-press shows their details.
-      onLongPress: opensSession ? withHaptic(onOpen) : null,
+      // Tapping the card always opens the read-only detail page.
+      onTap: withHaptic(onOpen),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
         decoration: BoxDecoration(
@@ -503,7 +521,10 @@ class _TaskCard extends StatelessWidget {
             _CheckButton(
               done: done,
               hasObjectCheck: routine.objectCheck != null,
-              onTap: onToggle,
+              // Undone activities play straight into their session; everything
+              // else toggles its validated state.
+              showPlay: startable,
+              onTap: startable ? onStartSession : onToggle,
             ),
           ],
         ),
@@ -555,15 +576,18 @@ class _TaskCard extends StatelessWidget {
   }
 }
 
-/// Tappable check button: grey rounded square; green check when done.
+/// Tappable trailing button: grey rounded square; green check when done, or a
+/// "play" arrow when it starts an activity's session ([showPlay]).
 class _CheckButton extends StatelessWidget {
   final bool done;
   final bool hasObjectCheck;
+  final bool showPlay;
   final VoidCallback onTap;
 
   const _CheckButton({
     required this.done,
     required this.hasObjectCheck,
+    this.showPlay = false,
     required this.onTap,
   });
 
@@ -586,9 +610,11 @@ class _CheckButton extends StatelessWidget {
         child: Icon(
           done
               ? Icons.check_rounded
-              : (hasObjectCheck
-                    ? Icons.camera_alt_rounded
-                    : Icons.check_rounded),
+              : (showPlay
+                    ? Icons.play_arrow_rounded
+                    : (hasObjectCheck
+                          ? Icons.camera_alt_rounded
+                          : Icons.check_rounded)),
           size: 28.sp,
           color: done ? Colors.white : HomePalette.checkButtonBorder,
         ),
