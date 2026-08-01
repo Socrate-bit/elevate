@@ -1,31 +1,31 @@
 import 'package:equatable/equatable.dart';
 
-/// A single life event mentioned by the user in chat, extracted into its own
-/// document. One conversation may produce many events.
+/// A single life event the user mentioned in chat, extracted into its own
+/// document. The memory builder can create, update, or delete these over time.
 class LifeEvent extends Equatable {
   final String id;
   final String title;
   final String description;
   final DateTime? occurredAt;
-  final String sourceConversationId;
   final DateTime createdAt;
+  final DateTime updatedAt;
 
   const LifeEvent({
     required this.id,
     required this.title,
     required this.description,
-    required this.sourceConversationId,
     required this.createdAt,
+    required this.updatedAt,
     this.occurredAt,
   });
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'description': description,
-        'occurredAtMs': occurredAt?.millisecondsSinceEpoch,
-        'sourceConversationId': sourceConversationId,
-        'createdAtMs': createdAt.millisecondsSinceEpoch,
-      };
+    'title': title,
+    'description': description,
+    'occurredAtMs': occurredAt?.millisecondsSinceEpoch,
+    'createdAtMs': createdAt.millisecondsSinceEpoch,
+    'updatedAtMs': updatedAt.millisecondsSinceEpoch,
+  };
 
   static LifeEvent fromMap(String id, Map<String, dynamic> m) {
     final occMs = m['occurredAtMs'];
@@ -33,22 +33,21 @@ class LifeEvent extends Equatable {
       id: id,
       title: m['title'] as String? ?? '',
       description: m['description'] as String? ?? '',
-      occurredAt:
-          occMs is int ? DateTime.fromMillisecondsSinceEpoch(occMs) : null,
-      sourceConversationId: m['sourceConversationId'] as String? ?? '',
-      createdAt: DateTime.fromMillisecondsSinceEpoch(
-        m['createdAtMs'] as int? ?? 0,
+      occurredAt: occMs is int ? DateTime.fromMillisecondsSinceEpoch(occMs) : null,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(m['createdAtMs'] as int? ?? 0),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(
+        m['updatedAtMs'] as int? ?? m['createdAtMs'] as int? ?? 0,
       ),
     );
   }
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        occurredAt,
-        sourceConversationId,
-        createdAt,
-      ];
+    id,
+    title,
+    description,
+    occurredAt,
+    createdAt,
+    updatedAt,
+  ];
 }

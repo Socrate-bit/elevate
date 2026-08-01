@@ -91,6 +91,7 @@ class AnalyticsService {
   static const chatConversationCreated = 'chat_conversation_created';
   static const chatConversationDeleted = 'chat_conversation_deleted';
   static const chatMessageSent = 'chat_message_sent';
+  static const chatProposedAnswerTapped = 'chat_proposed_answer_tapped';
   static const chatVoiceUsed = 'chat_voice_used';
   static const chatFormAnswered = 'chat_form_answered';
   static const chatMissionAccepted = 'chat_mission_accepted';

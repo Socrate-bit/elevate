@@ -1406,6 +1406,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chatPageComposerHint => 'Votre message';
 
   @override
+  String get chatProposedAnswersTitle => 'Réponses rapides';
+
+  @override
   String get chatInsightsFormingTitle => 'Vos insights se dessinent';
 
   @override

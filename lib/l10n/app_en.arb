@@ -506,6 +506,7 @@
   "chatStarterKnow": "I know already what I wanna talk about",
   "chatStarterOff": "I just feel not right",
   "chatPageComposerHint": "Your message",
+  "chatProposedAnswersTitle": "Quick replies",
 
   "chatInsightsFormingTitle": "Your insights are forming",
   "chatInsightsFormingBody": "Ash just needs a little more context from this conversation before it can reflect an insight back to you.",

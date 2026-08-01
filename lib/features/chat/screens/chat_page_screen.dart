@@ -13,6 +13,7 @@ import '../../navigation/appy_nav_bar.dart';
 import '../../memory/cubit/memory_cubit.dart';
 import '../../mood/cubit/mood_cubit.dart';
 import '../../routines/cubit/routine_cubit.dart';
+import '../../subscription/services/analytics_service.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_list_cubit.dart';
 import '../cubit/chat_list_state.dart';
@@ -157,12 +158,6 @@ class _ChatConversationGateState extends State<_ChatConversationGate> {
         _resolvedId = conv.id;
         _autoStart = false; // resume — no fresh greeting
       });
-      // On enter: if the previous session's messages were never scanned for
-      // memory (e.g. app-killed before leave-extraction ran), scan them now.
-      if (!conv.memoryExtracted) {
-        debugPrint('[ChatPage] resumed unscanned conversation → extracting');
-        context.read<MemoryCubit>().extractNow(conv.id);
-      }
       return;
     }
 
@@ -382,7 +377,9 @@ class _ChatViewState extends State<_ChatView> with WidgetsBindingObserver {
             (24.h - MediaQuery.viewInsetsOf(context).bottom).clamp(8.h, 96.h),
           ),
           child: BlocBuilder<ChatCubit, ChatState>(
-            buildWhen: (a, b) => a.isListening != b.isListening,
+            buildWhen: (a, b) =>
+                a.isListening != b.isListening ||
+                a.proposedAnswers != b.proposedAnswers,
             builder: (context, state) => ChatComposerBar(
               controller: _composer,
               focusNode: _composerFocus,
@@ -392,6 +389,13 @@ class _ChatViewState extends State<_ChatView> with WidgetsBindingObserver {
               isListening: state.isListening,
               onSend: () => _send(context, _composer.text),
               onMic: () => _toggleMic(context),
+              proposedAnswers: state.proposedAnswers,
+              onProposedTap: (text) {
+                AnalyticsService.capture(
+                  AnalyticsService.chatProposedAnswerTapped,
+                );
+                _send(context, text);
+              },
             ),
           ),
         ),

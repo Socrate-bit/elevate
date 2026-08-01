@@ -3,83 +3,123 @@ import 'dart:convert';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/foundation.dart';
 
-import 'chat_form.dart';
+import '../../memory/models/life_event.dart';
+import '../../memory/models/life_rating.dart';
+import '../../memory/models/memory_summary.dart';
+import '../../mood/models/mood_entry.dart';
 import 'chat_insight.dart';
 import 'chat_message.dart';
-import 'chat_mission_suggestion.dart';
-import 'chat_mood_check_in.dart';
 
-/// Tool call returned by Gemini that mutates the user's routines. The chat
-/// layer applies it and produces a `ChatRoutineMutation` confirmation card.
-class RoutineToolCall {
-  final String tool; // 'create_routine' | 'update_routine' | 'delete_routine'
-  final Map<String, dynamic> args;
-  const RoutineToolCall({required this.tool, required this.args});
+/// One interactive card the Answerer can attach to a reply.
+enum AnswerCardType { choices, mood, mission }
+
+/// The optional inline card carried by an [AnswerResult].
+class AnswerCard {
+  final AnswerCardType type;
+  final String question; // choices / mood
+  final List<String> options; // choices
+  final String missionKey; // mission
+  final String reason; // mission
+  const AnswerCard({
+    required this.type,
+    this.question = '',
+    this.options = const [],
+    this.missionKey = '',
+    this.reason = '',
+  });
 }
 
-/// Either a text reply, a structured multiple-choice form, an activity
-/// suggestion, a mood check-in, or a routine tool call from the model.
-class GeminiReply {
-  final String? text;
-  final ChatForm? form;
-  final ChatMissionSuggestion? missionSuggestion;
-  final ChatMoodCheckIn? moodCheckIn;
-  final RoutineToolCall? routineToolCall;
+/// One structured turn from the Answerer: the assistant's reply, an optional
+/// card, an optional routine mutation, and the tappable "rapid answers".
+class AnswerResult {
+  final String text;
+  final AnswerCard? card;
 
-  const GeminiReply._({
-    this.text,
-    this.form,
-    this.missionSuggestion,
-    this.moodCheckIn,
-    this.routineToolCall,
+  /// `{op: create|update|delete, ...routine fields}` — consumed by ChatCubit's
+  /// routine apply path. Null when the turn touches no routine.
+  final Map<String, dynamic>? routineOp;
+
+  /// 0–4 short first-person replies the user could tap to respond.
+  final List<String> proposedAnswers;
+
+  const AnswerResult({
+    required this.text,
+    this.card,
+    this.routineOp,
+    this.proposedAnswers = const [],
   });
 
-  factory GeminiReply.text(String text) => GeminiReply._(text: text);
-  factory GeminiReply.form(ChatForm form) => GeminiReply._(form: form);
-  factory GeminiReply.missionSuggestion(ChatMissionSuggestion s) =>
-      GeminiReply._(missionSuggestion: s);
-  factory GeminiReply.moodCheckIn(ChatMoodCheckIn c) =>
-      GeminiReply._(moodCheckIn: c);
-  factory GeminiReply.routineToolCall(RoutineToolCall t) =>
-      GeminiReply._(routineToolCall: t);
-
-  bool get isForm => form != null;
-  bool get isMissionSuggestion => missionSuggestion != null;
-  bool get isMoodCheckIn => moodCheckIn != null;
-  bool get isRoutineToolCall => routineToolCall != null;
+  factory AnswerResult.empty() => const AnswerResult(text: '');
 }
 
-/// Plain DTO produced by [GeminiClient.extractMemory]. The memory feature
-/// converts these into Firestore documents (profile + life events + summary).
-class ExtractedLifeEvent {
+/// A create/update/delete on a life event, produced by the memory builder.
+class EventOp {
+  final String op; // create | update | delete
+  final String? id; // required for update/delete
   final String title;
   final String description;
   final DateTime? occurredAt;
-
-  const ExtractedLifeEvent({
-    required this.title,
-    required this.description,
+  const EventOp({
+    required this.op,
+    this.id,
+    this.title = '',
+    this.description = '',
     this.occurredAt,
   });
 }
 
-class MemoryExtraction {
-  /// Sparse map of profile-fact keys → new/updated values.
-  final Map<String, String> factUpdates;
-  final List<ExtractedLifeEvent> newEvents;
-  final String summary;
+/// A create/update on a rolling conversation summary.
+class SummaryOp {
+  final String op; // create | update
+  final String? id; // required for update
+  final String text;
+  final String topic;
+  const SummaryOp({
+    required this.op,
+    this.id,
+    this.text = '',
+    this.topic = '',
+  });
+}
 
-  const MemoryExtraction({
-    required this.factUpdates,
-    required this.newEvents,
-    required this.summary,
+/// The result of one background memory-builder pass.
+class MemoryAnalysis {
+  final Map<String, String> factUpserts;
+  final List<String> factDeletes;
+  final List<EventOp> eventOps;
+
+  /// Sparse dimension→score(1-5) map, or null when the rating didn't change.
+  final Map<String, int>? lifeRatingUpdate;
+  final List<SummaryOp> summaryOps;
+
+  /// Insight readiness [0,1], or null when the pass produced no assessment
+  /// (so callers keep the previous value).
+  final double? insightProgress;
+
+  const MemoryAnalysis({
+    required this.factUpserts,
+    required this.factDeletes,
+    required this.eventOps,
+    required this.lifeRatingUpdate,
+    required this.summaryOps,
+    required this.insightProgress,
   });
 
-  static const empty = MemoryExtraction(
-    factUpdates: {},
-    newEvents: [],
-    summary: '',
+  static const empty = MemoryAnalysis(
+    factUpserts: {},
+    factDeletes: [],
+    eventOps: [],
+    lifeRatingUpdate: null,
+    summaryOps: [],
+    insightProgress: null,
   );
+
+  bool get isEmpty =>
+      factUpserts.isEmpty &&
+      factDeletes.isEmpty &&
+      eventOps.isEmpty &&
+      lifeRatingUpdate == null &&
+      summaryOps.isEmpty;
 }
 
 /// Plain DTO produced by [GeminiClient.generateCitation]: a real citation from
@@ -106,32 +146,34 @@ class GeneratedCitation {
 /// LLM surface the chat depends on. Implementations: [GeminiService] for
 /// production (Firebase + Gemini), or a fake for tests.
 abstract interface class GeminiClient {
-  Future<GeminiReply> send({
-    required List<ChatMessage> history,
-    required String userText,
-    String? memoryContext,
+  /// The hot-path chat call: produces the assistant reply + rapid answers from
+  /// the recent conversation window and the full memory context.
+  Future<AnswerResult> answer({
+    required List<ChatMessage> windowMessages,
+    required List<MemorySummary> recentSummaries,
+    required List<ChatInsight> recentInsights,
+    required Map<String, String> facts,
+    required List<LifeEvent> events,
+    required LifeRating lifeRating,
+    MoodValue? todayMood,
+  });
+
+  /// The background builder call: reviews the recent window against current
+  /// memory and returns fact/event/summary/life-rating ops + insight progress.
+  Future<MemoryAnalysis> analyze({
+    required List<ChatMessage> windowMessages,
+    required Map<String, String> facts,
+    required List<LifeEvent> events,
+    required LifeRating lifeRating,
+    required List<MemorySummary> recentSummaries,
   });
 
   Future<String> generateTitle(String firstUserMessage);
-
-  /// Extracts structured memory from a finished conversation. Returns sparse
-  /// updates only; callers merge into existing storage.
-  Future<MemoryExtraction> extractMemory({
-    required List<ChatMessage> history,
-    required Map<String, String> existingFacts,
-    required List<String> existingEventTitles,
-  });
 
   /// Distills the conversation so far into a single useful insight (title, a key
   /// citation from the chat, and a short paragraph). Returns null when there
   /// isn't enough material to say something meaningful.
   Future<ChatInsight?> generateInsight({required List<ChatMessage> history});
-
-  /// Assesses how ready the conversation is to yield a meaningful insight, as a
-  /// value in [0,1]. 1.0 means an insight can now be generated (deep enough
-  /// exploration/resolution over more than five messages). Returns null when the
-  /// assessment fails so callers can keep the previous value.
-  Future<double?> assessInsightProgress({required List<ChatMessage> history});
 
   /// Produces a real, verbatim citation from a well-known figure or book,
   /// thematically tied to [context] (a general one if it's empty), that is not
@@ -145,11 +187,8 @@ abstract interface class GeminiClient {
   });
 }
 
-/// Firebase Gemini implementation with function tools:
-/// - `present_choices`: renders interactive multiple-choice cards inline in chat
-/// - `suggest_mission`: proposes a guided-activity card when context calls for it
-/// - `create_routine` / `update_routine` / `delete_routine`: mutate the user's
-///   action/habit tracker
+/// Firebase Gemini implementation. The chat turn ([answer]) and the memory
+/// builder ([analyze]) both use structured-JSON `responseSchema` calls.
 class GeminiService implements GeminiClient {
   GeminiService();
 
@@ -157,14 +196,21 @@ class GeminiService implements GeminiClient {
   static final GeminiClient instance = GeminiService();
 
   static const _modelName = 'gemini-2.5-flash';
-  static const _toolChoices = 'present_choices';
-  static const _toolMission = 'suggest_mission';
-  static const _toolMood = 'ask_mood';
-  static const _toolCreateRoutine = 'create_routine';
-  static const _toolUpdateRoutine = 'update_routine';
-  static const _toolDeleteRoutine = 'delete_routine';
 
-  static const _systemInstruction = '''
+  /// Messages from the last [days] *calendar days that had activity* (not the
+  /// last N hours) — quiet days don't consume the window. Returned ascending.
+  static List<ChatMessage> lastActiveDaysWindow(
+    List<ChatMessage> messages, {
+    int days = 3,
+  }) {
+    if (messages.isEmpty) return const [];
+    int dayKey(DateTime d) => d.year * 10000 + d.month * 100 + d.day;
+    final keys = <int>{for (final m in messages) dayKey(m.createdAt)};
+    final keep = (keys.toList()..sort((a, b) => b.compareTo(a))).take(days).toSet();
+    return messages.where((m) => keep.contains(dayKey(m.createdAt))).toList();
+  }
+
+  static const _answerPersona = '''
 ## Who you are
 You are a personal growth coach inside a mobile chat app. Your one job is to help
 the user grow in their life. You do that three ways, in whatever order the moment
@@ -181,29 +227,31 @@ calls for:
 - Honest over flattering. You can name patterns and gently challenge.
 - You don't diagnose, give medical advice, or moralize.
 
-## Memory
-When provided, use what you know about the user (profile, recent life events,
-session summaries, active commitments) to feel like you remember them — reference
-it naturally, never recite it or name the source. Don't raise sensitive past
-content on your own initiative.
+## How you respond
+Every turn you return ONE structured object:
+- `reply_text`: your message to the user, in warm plain prose. Keep it brief.
+- `card_type` + fields: optionally attach ONE interactive card (else "none"):
+  - "choices" — a multiple-choice question. Set `card_question` and 2–6
+    `card_options`. Use it instead of listing options as plain text.
+  - "mood" — a mood check-in. Set `card_question` (e.g. "How are you feeling
+    right now?"). Use when their emotional state is relevant.
+  - "mission" — suggest one of the guided activities below. Set `mission_key`
+    and a one-sentence `mission_reason`.
+  `reply_text` may still introduce the card.
+- `routine_op` (+ `routine_*`): manage the user's action/habit tracker. ALWAYS
+  propose a routine in `reply_text` first (its short name, whether it's an
+  "action" or a "habit", and when it happens) and only set `routine_op` to
+  create/update/delete AFTER the user explicitly agrees; otherwise "none". An
+  action is a one-shot that disappears once done; a habit recurs on chosen
+  weekdays. `routine_name` ≤ 3 words; pick a fitting `routine_emoji`,
+  `routine_color_key` (orange/blue/green/purple/red/pink/yellow/teal) and
+  `routine_xp` (small ~10, up to 50). For update/delete set `routine_id`.
+- `proposed_answers`: 3–4 SHORT first-person replies the user could tap to answer
+  you (write them as if the user is speaking, e.g. "Yeah, that's it", "Not
+  really", "Tell me more"). Leave empty only when a card already lists the
+  options or no reply makes sense.
 
-## Your tools
-Prefer these interactive tools over plain text when they fit:
-- `present_choices` — a multiple-choice question (2–6 options) whenever you'd ask
-  the user to pick from a small set. Use it instead of listing options as text.
-- `ask_mood` — check in on how the user is feeling when their emotional state is
-  relevant.
-- `suggest_mission` — offer one of the ready-made guided activities below when it
-  fits what the user needs right now.
-- `create_routine` / `update_routine` / `delete_routine` — manage the user's
-  action/habit tracker. Always propose a routine in plain prose first (its short
-  name, whether it's a one-shot `action` or a recurring `habit`, and when it
-  happens) and only call the tool AFTER the user confirms. An action disappears
-  once done; a habit recurs on chosen weekdays. Keep `name` at most 3 words; pick a
-  fitting `emoji`, `color_key`, and `xp` (small ~10, bigger up to 50).
-
-## Guided missions you can suggest
-Pass the key to `suggest_mission`:
+## Guided missions (mission_key values)
 - `breathing` — a guided breathing exercise to calm down.
 - `wimHof` — a Wim Hof power-breathing session.
 - `meditation` — a guided meditation.
@@ -216,22 +264,38 @@ Pass the key to `suggest_mission`:
 - `selfLove` — a chat-based self-compassion reflection.
 - `mindfulness` — a chat-based reflection to come back to the present.
 
-Use plain prose for everything else.
-''';
+## Memory
+Use what you know about the user (below) to feel like you remember them —
+reference it naturally, never recite it or name the source. Don't raise
+sensitive past content on your own initiative.''';
 
-  static const _extractorSystemInstruction =
-      'You analyze a finished chat conversation and extract structured memory '
-      'about the user. Return JSON matching the schema. '
-      '`profile_facts` are durable semantic facts about the person (age, gender, job, '
-      'city, marital_status, purpose, what_tried, what_works, etc.) — include only NEW '
-      'or UPDATED facts not already present in the existing list. Keys are short '
-      'snake_case strings; values are concise strings. '
-      '`new_life_events` are notable events that happened in the user\'s life that they '
-      'mentioned (a job change, a breakup, a loss, a trip, a milestone). Skip anything '
-      'whose title closely matches an already-extracted event. Leave `occurred_at_iso` '
-      'empty if unknown. '
-      '`summary` is a 1–3 sentence neutral recap of what was discussed in this '
-      'conversation.';
+  static const _analyzerSystemInstruction = '''
+You maintain a user's long-term memory from an ongoing coaching conversation.
+Review the recent messages against the current memory and return JSON per the
+schema. Only propose changes that are clearly warranted; return empty lists when
+nothing changed.
+
+- `fact_upserts`: durable semantic facts about the person (age, gender, job,
+  city, marital_status, purpose, preferences, key past events…). snake_case
+  keys, concise values. Include a key only to ADD or CORRECT it.
+- `fact_deletes`: keys whose fact is no longer true and should be removed.
+- `event_ops`: notable life events the user mentioned (a job change, a breakup,
+  a loss, a trip, a milestone). op "create" for a new one; "update" (with the
+  existing id) to refine wording/date; "delete" (with id) if retracted. Skip
+  events already captured. Leave `occurred_at_iso` empty if unknown.
+- `life_rating_updates`: only when the conversation reveals a real shift in how
+  a life dimension is going. dimension is one of health, support, safety,
+  environment, selfCare, enjoyment, job, meaning; value is 1 (low) to 5 (great).
+  Empty when nothing changed.
+- `summary_ops`: keep a rolling set of short conversation summaries. If the
+  latest recent messages continue the SAME topic as the most recent existing
+  summary, "update" that summary (pass its id) with the enriched recap; if the
+  conversation has moved to a new topic/session, "create" a new one. `topic` is
+  a short label. Do not create duplicates.
+- `insight_progress`: 0.0–1.0 readiness for ONE genuinely useful insight to
+  reflect back. Weigh depth (has something been meaningfully explored/resolved?)
+  and length (a real insight needs more than five substantive messages). Never
+  1.0 with five or fewer messages of substance.''';
 
   static const _insightSystemInstruction =
       'You read a chat between a user and their supportive coach, and surface ONE '
@@ -247,20 +311,6 @@ Use plain prose for everything else.
       'was said, encouraging, and non-generic.\n'
       'If the conversation is too short or thin to say anything meaningful, return '
       'empty strings for all three fields.';
-
-  static const _insightProgressSystemInstruction =
-      'You track how close a coaching conversation is to yielding ONE genuinely '
-      'useful insight to reflect back to the user. Weigh two things: depth '
-      '(has the user explored something meaningfully, reached some clarity, a '
-      'reframe, or a resolution?) and length (a real insight needs more than '
-      'five messages of substance). Return JSON matching the schema with a single '
-      '`progress` field, a number from 0.0 to 1.0:\n'
-      '- 1.0 means an insight can be generated right now: the exchange has more '
-      'than five messages AND the exploration or resolution is satisfying.\n'
-      '- Values in between reflect partial progress as the conversation deepens.\n'
-      '- Near 0.0 for a thin or just-started exchange.\n'
-      'Never return 1.0 when there are five or fewer messages, or when nothing '
-      'meaningful has been explored yet.';
 
   static const _citationSystemInstruction =
       'You award a "wisdom trophy": ONE real, verbatim quotation from a well-known '
@@ -283,126 +333,555 @@ Use plain prose for everything else.
       '- `color_key`: exactly one key from the allowed color list that best fits '
       'the citation\'s mood.';
 
-  GenerativeModel _buildChatModel(String? memoryContext) {
-    final instruction = (memoryContext == null || memoryContext.isEmpty)
-        ? _systemInstruction
-        : '$_systemInstruction\n\n'
-              '--- What you already know about this user ---\n'
-              '$memoryContext';
+  // ---------------------------------------------------------------------------
+  // Answerer
+  // ---------------------------------------------------------------------------
+
+  @override
+  Future<AnswerResult> answer({
+    required List<ChatMessage> windowMessages,
+    required List<MemorySummary> recentSummaries,
+    required List<ChatInsight> recentInsights,
+    required Map<String, String> facts,
+    required List<LifeEvent> events,
+    required LifeRating lifeRating,
+    MoodValue? todayMood,
+  }) async {
+    try {
+      final memoryBlock = _renderMemoryBlock(
+        facts: facts,
+        events: events,
+        summaries: recentSummaries,
+        insights: recentInsights,
+        lifeRating: lifeRating,
+        todayMood: todayMood,
+      );
+      final response = await _buildAnswerModel(memoryBlock)
+          .generateContent(_buildAnswerContents(windowMessages))
+          .timeout(const Duration(seconds: 45));
+      final text = response.text?.trim() ?? '';
+      if (text.isEmpty) {
+        debugPrint('[GeminiService] empty answer response');
+        return AnswerResult.empty();
+      }
+      return _parseAnswer(text);
+    } catch (e, st) {
+      debugPrint('[GeminiService] answer failed: $e\n$st');
+      rethrow;
+    }
+  }
+
+  GenerativeModel _buildAnswerModel(String memoryBlock) {
+    final instruction = memoryBlock.isEmpty
+        ? _answerPersona
+        : '$_answerPersona\n\n--- What you already know about this user ---\n$memoryBlock';
     return FirebaseAI.googleAI().generativeModel(
       model: _modelName,
       systemInstruction: Content.system(instruction),
-      tools: [
-        Tool.functionDeclarations([
-          FunctionDeclaration(
-            _toolChoices,
-            'Render a multiple-choice question for the user.',
-            parameters: {
-              'question': Schema.string(
-                description: 'Short prompt shown above the options.',
-              ),
-              'options': Schema.array(
-                items: Schema.string(),
-                description: 'Two to six concise answer labels.',
-              ),
-            },
-          ),
-          FunctionDeclaration(
-            _toolMission,
-            "Open one of the app's ready-made guided activities for the user "
-            '(breathing, meditation, a reflection, a workout, …).',
-            parameters: {
-              'tool_key': Schema.string(
-                description:
-                    'One of: breathing, wimHof, meditation, stretching, walking, '
-                    'sport, running, otherSport, gratitude, selfLove, mindfulness.',
-              ),
-              'reason': Schema.string(
-                description:
-                    'One short sentence explaining why this activity fits right now.',
-              ),
-            },
-          ),
-          FunctionDeclaration(
-            _toolMood,
-            'Check in on how the user is feeling when their emotional state is relevant.',
-            parameters: {
-              'question': Schema.string(
-                description:
-                    'Short contextual question to display, e.g. "How are you feeling right now?"',
-              ),
-            },
-          ),
-          FunctionDeclaration(
-            _toolCreateRoutine,
-            'Create a new routine (action or habit) for the user.',
-            parameters: _routineSchema(includeId: false),
-          ),
-          FunctionDeclaration(
-            _toolUpdateRoutine,
-            "Update an existing routine. Pass `routine_id` plus the fields to change.",
-            parameters: _routineSchema(includeId: true),
-          ),
-          FunctionDeclaration(
-            _toolDeleteRoutine,
-            'Delete a routine by id.',
-            parameters: {
-              'routine_id': Schema.string(
-                description: 'Id of the routine to delete.',
-              ),
-            },
-          ),
-        ]),
-      ],
-    );
-  }
-
-  GenerativeModel _buildExtractorModel() {
-    return FirebaseAI.googleAI().generativeModel(
-      model: _modelName,
-      systemInstruction: Content.system(_extractorSystemInstruction),
       generationConfig: GenerationConfig(
         responseMimeType: 'application/json',
         responseSchema: Schema.object(
           properties: {
-            'profile_facts': Schema.array(
+            'reply_text': Schema.string(
+              description: 'Your warm, brief message to the user.',
+            ),
+            'card_type': Schema.enumString(
+              enumValues: ['none', 'choices', 'mood', 'mission'],
+              description: 'Which inline card to attach, or "none".',
+            ),
+            'card_question': Schema.string(
+              description: 'Question for a choices/mood card.',
+            ),
+            'card_options': Schema.array(
+              items: Schema.string(),
+              description: 'Two to six labels for a choices card.',
+            ),
+            'mission_key': Schema.string(
+              description: 'Guided-activity key for a mission card.',
+            ),
+            'mission_reason': Schema.string(
+              description: 'One sentence on why the mission fits now.',
+            ),
+            'routine_op': Schema.enumString(
+              enumValues: ['none', 'create', 'update', 'delete'],
+              description: 'Routine mutation to apply after user consent.',
+            ),
+            'routine_id': Schema.string(
+              description: 'Id of the routine to update/delete.',
+            ),
+            'routine_type': Schema.string(
+              description: '"action" (one-shot) or "habit" (recurring).',
+            ),
+            'routine_name': Schema.string(
+              description: 'Short title, at most 3 words.',
+            ),
+            'routine_description': Schema.string(),
+            'routine_emoji': Schema.string(
+              description: 'A single emoji for the routine tile.',
+            ),
+            'routine_color_key': Schema.string(
+              description:
+                  'One of: orange, blue, green, purple, red, pink, yellow, teal.',
+            ),
+            'routine_xp': Schema.integer(
+              description: 'Points for completing it (5–50).',
+            ),
+            'routine_object_check': Schema.string(
+              description: 'Object name for photo validation, or empty.',
+            ),
+            'routine_scheduled_date': Schema.string(
+              description: 'Action-only ISO date (YYYY-MM-DD), or empty.',
+            ),
+            'routine_scheduled_days': Schema.array(
+              items: Schema.boolean(),
+              description: 'Habit-only 7-element array, index 0 = Sunday.',
+            ),
+            'routine_scheduled_minute': Schema.integer(
+              description: 'Minutes since midnight (0-1439), or -1 for none.',
+            ),
+            'routine_has_alarm': Schema.boolean(),
+            'proposed_answers': Schema.array(
+              items: Schema.string(),
+              description:
+                  '3–4 short first-person replies the user could tap; [] if none fit.',
+            ),
+          },
+          optionalProperties: const [
+            'card_question',
+            'card_options',
+            'mission_key',
+            'mission_reason',
+            'routine_id',
+            'routine_type',
+            'routine_name',
+            'routine_description',
+            'routine_emoji',
+            'routine_color_key',
+            'routine_xp',
+            'routine_object_check',
+            'routine_scheduled_date',
+            'routine_scheduled_days',
+            'routine_scheduled_minute',
+            'routine_has_alarm',
+          ],
+        ),
+      ),
+    );
+  }
+
+  static List<Content> _buildAnswerContents(List<ChatMessage> windowMessages) {
+    final out = <Content>[];
+    for (final m in windowMessages) {
+      if (m.role == ChatRole.user) {
+        if (m.text.isNotEmpty) out.add(Content.text(m.text));
+      } else {
+        final prose = _modelTurnProse(m);
+        if (prose.isNotEmpty) out.add(Content.model([TextPart(prose)]));
+      }
+    }
+    // Opening turn: no history yet — nudge a warm greeting.
+    if (out.isEmpty) {
+      out.add(
+        Content.text(
+          '(The user just opened the chat. Greet them warmly and briefly, and '
+          'invite them to share what is on their mind.)',
+        ),
+      );
+    }
+    return out;
+  }
+
+  /// Renders a stored model message back into prose so the model retains
+  /// context for its cards/mutations.
+  static String _modelTurnProse(ChatMessage m) {
+    if (m.text.isNotEmpty) return m.text;
+    final form = m.form;
+    final mood = m.moodCheckIn;
+    final mission = m.missionSuggestion;
+    final mutation = m.routineMutation;
+    if (form != null) {
+      return 'I offered these choices for "${form.question}": '
+          '${form.options.join(", ")}.';
+    }
+    if (mood != null) {
+      final status = mood.selectedMood != null
+          ? 'User selected: ${mood.selectedMood!.name}.'
+          : 'Awaiting response.';
+      return 'I asked "${mood.question}". $status';
+    }
+    if (mission != null) {
+      final status = mission.accepted == null
+          ? 'Awaiting response.'
+          : mission.accepted!
+          ? 'User started it.'
+          : 'User declined.';
+      return 'I suggested the ${mission.toolKey} activity. $status';
+    }
+    if (mutation != null) {
+      return 'I ${mutation.kind.name} the ${mutation.routineType.name} '
+          '"${mutation.routineName}".';
+    }
+    return '';
+  }
+
+  static AnswerResult _parseAnswer(String jsonText) {
+    final dynamic decoded;
+    try {
+      decoded = jsonDecode(jsonText);
+    } catch (e) {
+      debugPrint('[GeminiService] answer invalid JSON: $e');
+      return AnswerResult.empty();
+    }
+    if (decoded is! Map) return AnswerResult.empty();
+
+    final text = decoded['reply_text']?.toString().trim() ?? '';
+
+    // Card.
+    AnswerCard? card;
+    final cardType = decoded['card_type']?.toString() ?? 'none';
+    if (cardType == 'choices') {
+      final options = _stringList(decoded['card_options']);
+      if (options.isNotEmpty) {
+        card = AnswerCard(
+          type: AnswerCardType.choices,
+          question: decoded['card_question']?.toString() ?? '',
+          options: options,
+        );
+      }
+    } else if (cardType == 'mood') {
+      card = AnswerCard(
+        type: AnswerCardType.mood,
+        question: decoded['card_question']?.toString().trim().isNotEmpty == true
+            ? decoded['card_question'].toString()
+            : 'How are you feeling right now?',
+      );
+    } else if (cardType == 'mission') {
+      final key = decoded['mission_key']?.toString().trim() ?? '';
+      if (key.isNotEmpty) {
+        card = AnswerCard(
+          type: AnswerCardType.mission,
+          missionKey: key,
+          reason: decoded['mission_reason']?.toString() ?? '',
+        );
+      }
+    }
+
+    // Routine op.
+    Map<String, dynamic>? routineOp;
+    final op = decoded['routine_op']?.toString() ?? 'none';
+    if (op == 'create' || op == 'update' || op == 'delete') {
+      routineOp = {
+        'op': op,
+        'routine_id': decoded['routine_id']?.toString() ?? '',
+        'type': decoded['routine_type']?.toString() ?? '',
+        'name': decoded['routine_name']?.toString() ?? '',
+        'description': decoded['routine_description']?.toString() ?? '',
+        'emoji': decoded['routine_emoji']?.toString() ?? '',
+        'color_key': decoded['routine_color_key']?.toString() ?? '',
+        'xp': decoded['routine_xp'],
+        'object_check': decoded['routine_object_check']?.toString() ?? '',
+        'scheduled_date': decoded['routine_scheduled_date']?.toString() ?? '',
+        'scheduled_days': decoded['routine_scheduled_days'],
+        'scheduled_minute': decoded['routine_scheduled_minute'],
+        'has_alarm': decoded['routine_has_alarm'],
+      };
+    }
+
+    final proposed = _stringList(
+      decoded['proposed_answers'],
+    ).take(4).toList(growable: false);
+
+    return AnswerResult(
+      text: text,
+      card: card,
+      routineOp: routineOp,
+      proposedAnswers: proposed,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Memory / analysis builder
+  // ---------------------------------------------------------------------------
+
+  @override
+  Future<MemoryAnalysis> analyze({
+    required List<ChatMessage> windowMessages,
+    required Map<String, String> facts,
+    required List<LifeEvent> events,
+    required LifeRating lifeRating,
+    required List<MemorySummary> recentSummaries,
+  }) async {
+    try {
+      if (!windowMessages.any((m) => m.role == ChatRole.user)) {
+        return MemoryAnalysis.empty;
+      }
+      final transcript = _renderTranscript(windowMessages);
+      final factsBlock = facts.isEmpty
+          ? '(none)'
+          : (facts.keys.toList()..sort())
+                .map((k) => '- $k: ${facts[k]}')
+                .join('\n');
+      final eventsBlock = events.isEmpty
+          ? '(none)'
+          : events
+                .map((e) => '- [${e.id}] ${e.title}: ${e.description}')
+                .join('\n');
+      final ratingBlock = lifeRating.ratings.isEmpty
+          ? '(none)'
+          : (lifeRating.ratings.keys.toList()..sort())
+                .map((k) => '- $k: ${lifeRating.ratings[k]}/5')
+                .join('\n');
+      final summariesBlock = recentSummaries.isEmpty
+          ? '(none)'
+          : recentSummaries
+                .map((s) => '- [${s.id}] (${s.topic}) ${s.text}')
+                .join('\n');
+
+      final prompt =
+          'Recent conversation (last active days):\n$transcript\n\n'
+          'Current facts:\n$factsBlock\n\n'
+          'Current life events:\n$eventsBlock\n\n'
+          'Current life rating:\n$ratingBlock\n\n'
+          'Recent summaries (most recent first):\n$summariesBlock\n\n'
+          'Return JSON per the schema.';
+
+      final response = await _buildAnalyzerModel()
+          .generateContent([Content.text(prompt)])
+          .timeout(const Duration(seconds: 30));
+      final text = response.text?.trim() ?? '';
+      if (text.isEmpty) return MemoryAnalysis.empty;
+      return _parseAnalysis(text);
+    } catch (e, st) {
+      debugPrint('[GeminiService] analyze failed: $e\n$st');
+      return MemoryAnalysis.empty;
+    }
+  }
+
+  GenerativeModel _buildAnalyzerModel() {
+    return FirebaseAI.googleAI().generativeModel(
+      model: _modelName,
+      systemInstruction: Content.system(_analyzerSystemInstruction),
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: Schema.object(
+          properties: {
+            'fact_upserts': Schema.array(
               items: Schema.object(
                 properties: {
-                  'key': Schema.string(
-                    description:
-                        'snake_case fact key, e.g. "job", "city", "purpose".',
-                  ),
-                  'value': Schema.string(
-                    description: 'Short value for the fact.',
-                  ),
+                  'key': Schema.string(),
+                  'value': Schema.string(),
                 },
               ),
-              description:
-                  'New or updated profile facts. Skip facts already present unchanged.',
+              description: 'Facts to add or correct.',
             ),
-            'new_life_events': Schema.array(
+            'fact_deletes': Schema.array(
+              items: Schema.string(),
+              description: 'Fact keys to remove.',
+            ),
+            'event_ops': Schema.array(
               items: Schema.object(
                 properties: {
-                  'title': Schema.string(description: 'Short event title.'),
-                  'description': Schema.string(
-                    description: 'One sentence describing what happened.',
+                  'op': Schema.enumString(
+                    enumValues: ['create', 'update', 'delete'],
                   ),
+                  'id': Schema.string(
+                    description: 'Existing event id for update/delete.',
+                  ),
+                  'title': Schema.string(),
+                  'description': Schema.string(),
                   'occurred_at_iso': Schema.string(
-                    description:
-                        'ISO 8601 date (YYYY-MM-DD) if known, else empty string.',
+                    description: 'YYYY-MM-DD if known, else empty.',
                   ),
                 },
+                optionalProperties: const [
+                  'id',
+                  'title',
+                  'description',
+                  'occurred_at_iso',
+                ],
               ),
-              description:
-                  'Notable events mentioned by the user. Skip duplicates of existing events.',
+              description: 'Life-event mutations.',
             ),
-            'summary': Schema.string(
-              description: '1–3 sentence neutral recap of what was discussed.',
+            'life_rating_updates': Schema.array(
+              items: Schema.object(
+                properties: {
+                  'dimension': Schema.string(),
+                  'value': Schema.integer(),
+                },
+              ),
+              description: 'Changed life dimensions (1–5). Empty if unchanged.',
+            ),
+            'summary_ops': Schema.array(
+              items: Schema.object(
+                properties: {
+                  'op': Schema.enumString(enumValues: ['create', 'update']),
+                  'id': Schema.string(
+                    description: 'Existing summary id for update.',
+                  ),
+                  'text': Schema.string(),
+                  'topic': Schema.string(),
+                },
+                optionalProperties: const ['id'],
+              ),
+              description: 'Rolling summary mutations.',
+            ),
+            'insight_progress': Schema.number(
+              description: 'Insight readiness, 0.0 (thin) to 1.0 (ready now).',
             ),
           },
         ),
       ),
     );
+  }
+
+  static MemoryAnalysis _parseAnalysis(String jsonText) {
+    final dynamic decoded;
+    try {
+      decoded = jsonDecode(jsonText);
+    } catch (e) {
+      debugPrint('[GeminiService] analyze invalid JSON: $e');
+      return MemoryAnalysis.empty;
+    }
+    if (decoded is! Map) return MemoryAnalysis.empty;
+
+    final factUpserts = <String, String>{};
+    final rawFacts = decoded['fact_upserts'];
+    if (rawFacts is List) {
+      for (final f in rawFacts) {
+        if (f is Map) {
+          final key = f['key']?.toString().trim() ?? '';
+          final value = f['value']?.toString().trim() ?? '';
+          if (key.isNotEmpty && value.isNotEmpty) factUpserts[key] = value;
+        }
+      }
+    }
+
+    final factDeletes = _stringList(decoded['fact_deletes']);
+
+    final eventOps = <EventOp>[];
+    final rawEvents = decoded['event_ops'];
+    if (rawEvents is List) {
+      for (final e in rawEvents) {
+        if (e is! Map) continue;
+        final op = e['op']?.toString().trim() ?? '';
+        if (op != 'create' && op != 'update' && op != 'delete') continue;
+        final id = e['id']?.toString().trim();
+        if ((op == 'update' || op == 'delete') && (id == null || id.isEmpty)) {
+          continue;
+        }
+        final iso = e['occurred_at_iso']?.toString().trim() ?? '';
+        eventOps.add(
+          EventOp(
+            op: op,
+            id: id,
+            title: e['title']?.toString().trim() ?? '',
+            description: e['description']?.toString().trim() ?? '',
+            occurredAt: iso.isEmpty ? null : DateTime.tryParse(iso),
+          ),
+        );
+      }
+    }
+
+    Map<String, int>? lifeRatingUpdate;
+    final rawRating = decoded['life_rating_updates'];
+    if (rawRating is List && rawRating.isNotEmpty) {
+      final map = <String, int>{};
+      for (final r in rawRating) {
+        if (r is! Map) continue;
+        final dim = r['dimension']?.toString().trim() ?? '';
+        final v = r['value'];
+        if (dim.isEmpty || !LifeRating.dimensions.contains(dim)) continue;
+        final value = v is num ? v.toInt() : int.tryParse('$v');
+        if (value == null) continue;
+        map[dim] = value.clamp(1, 5);
+      }
+      if (map.isNotEmpty) lifeRatingUpdate = map;
+    }
+
+    final summaryOps = <SummaryOp>[];
+    final rawSummaries = decoded['summary_ops'];
+    if (rawSummaries is List) {
+      for (final s in rawSummaries) {
+        if (s is! Map) continue;
+        final op = s['op']?.toString().trim() ?? '';
+        if (op != 'create' && op != 'update') continue;
+        final text = s['text']?.toString().trim() ?? '';
+        if (text.isEmpty) continue;
+        final id = s['id']?.toString().trim();
+        if (op == 'update' && (id == null || id.isEmpty)) continue;
+        summaryOps.add(
+          SummaryOp(
+            op: op,
+            id: id,
+            text: text,
+            topic: s['topic']?.toString().trim() ?? '',
+          ),
+        );
+      }
+    }
+
+    double? insightProgress;
+    final rawProgress = decoded['insight_progress'];
+    if (rawProgress is num) {
+      insightProgress = rawProgress.toDouble().clamp(0.0, 1.0);
+    } else if (rawProgress != null) {
+      insightProgress = double.tryParse('$rawProgress')?.clamp(0.0, 1.0);
+    }
+
+    return MemoryAnalysis(
+      factUpserts: factUpserts,
+      factDeletes: factDeletes,
+      eventOps: eventOps,
+      lifeRatingUpdate: lifeRatingUpdate,
+      summaryOps: summaryOps,
+      insightProgress: insightProgress,
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Title / insight / citation (unchanged surface)
+  // ---------------------------------------------------------------------------
+
+  @override
+  Future<String> generateTitle(String firstUserMessage) async {
+    try {
+      final prompt =
+          'Write a 3 to 6 word title for a chat that starts with this user message. '
+          'Reply with just the title — no quotes, no punctuation at the end.\n\n'
+          'Message: $firstUserMessage';
+      final response = await FirebaseAI.googleAI()
+          .generativeModel(model: _modelName)
+          .generateContent([Content.text(prompt)]);
+      final text = response.text?.trim() ?? '';
+      if (text.isEmpty) return _fallbackTitle(firstUserMessage);
+      return text.replaceAll('"', '').replaceAll("'", '').trim();
+    } catch (e) {
+      debugPrint('[GeminiService] generateTitle failed: $e');
+      return _fallbackTitle(firstUserMessage);
+    }
+  }
+
+  @override
+  Future<ChatInsight?> generateInsight({
+    required List<ChatMessage> history,
+  }) async {
+    try {
+      final transcript = _renderTranscript(history);
+      if (transcript.trim().isEmpty) return null;
+      final prompt =
+          'Conversation transcript:\n$transcript\n\n'
+          'Return JSON per the schema with one useful insight.';
+
+      final response = await _buildInsightModel()
+          .generateContent([Content.text(prompt)])
+          .timeout(const Duration(seconds: 45));
+      final text = response.text?.trim() ?? '';
+      if (text.isEmpty) return null;
+      return _parseInsight(text);
+    } catch (e, st) {
+      debugPrint('[GeminiService] generateInsight failed: $e\n$st');
+      return null;
+    }
   }
 
   GenerativeModel _buildInsightModel() {
@@ -429,313 +908,6 @@ Use plain prose for everything else.
     );
   }
 
-  GenerativeModel _buildInsightProgressModel() {
-    return FirebaseAI.googleAI().generativeModel(
-      model: _modelName,
-      systemInstruction: Content.system(_insightProgressSystemInstruction),
-      generationConfig: GenerationConfig(
-        responseMimeType: 'application/json',
-        responseSchema: Schema.object(
-          properties: {
-            'progress': Schema.number(
-              description:
-                  'Readiness for an insight, 0.0 (thin) to 1.0 (ready now).',
-            ),
-          },
-        ),
-      ),
-    );
-  }
-
-  GenerativeModel _buildCitationModel() {
-    return FirebaseAI.googleAI().generativeModel(
-      model: _modelName,
-      systemInstruction: Content.system(_citationSystemInstruction),
-      generationConfig: GenerationConfig(
-        responseMimeType: 'application/json',
-        responseSchema: Schema.object(
-          properties: {
-            'title': Schema.string(
-              description: 'Single evocative word naming the wisdom.',
-            ),
-            'quote': Schema.string(
-              description: 'Verbatim citation, no surrounding quotation marks.',
-            ),
-            'author': Schema.string(
-              description: 'Figure or book author the quote is attributed to.',
-            ),
-            'source': Schema.string(
-              description: 'Book/work title, or empty string.',
-            ),
-            'icon_key': Schema.string(
-              description: 'One key from the allowed icon list.',
-            ),
-            'color_key': Schema.string(
-              description: 'One key from the allowed color list.',
-            ),
-          },
-        ),
-      ),
-    );
-  }
-
-  static Map<String, Schema> _routineSchema({required bool includeId}) {
-    return {
-      if (includeId)
-        'routine_id': Schema.string(
-          description: 'Id of the routine to update.',
-        ),
-      'type': Schema.string(
-        description: '"action" (one-shot) or "habit" (recurring).',
-      ),
-      'name': Schema.string(
-        description: 'Short human-readable title, at most 3 words.',
-      ),
-      'description': Schema.string(
-        description: 'Optional longer description, may be empty.',
-      ),
-      'emoji': Schema.string(
-        description:
-            'A single emoji shown on the routine tile, e.g. 🧘 for meditation, '
-            '💧 for hydration, 🏃 for a run.',
-      ),
-      'color_key': Schema.string(
-        description:
-            'One of: orange, blue, green, purple, red, pink, yellow, teal.',
-      ),
-      'xp': Schema.integer(
-        description: 'Points awarded for completing it (5–50). Default 10.',
-      ),
-      'object_check': Schema.string(
-        description:
-            'Free-text object name for photo validation, or empty for none. '
-            'Example: "toothbrush", "book", "water bottle".',
-      ),
-      'scheduled_date': Schema.string(
-        description:
-            'Action-only ISO 8601 date (YYYY-MM-DD), or empty for no date.',
-      ),
-      'scheduled_days': Schema.array(
-        items: Schema.boolean(),
-        description:
-            'Habit-only: 7-element array, index 0 = Sunday … 6 = Saturday.',
-      ),
-      'scheduled_minute': Schema.integer(
-        description: 'Minutes since midnight (0-1439). Use -1 for no time set.',
-      ),
-      'has_alarm': Schema.boolean(
-        description: 'True to ring an alarm at the scheduled time.',
-      ),
-    };
-  }
-
-  @override
-  Future<GeminiReply> send({
-    required List<ChatMessage> history,
-    required String userText,
-    String? memoryContext,
-  }) async {
-    try {
-      final contents = _buildContents(history, userText);
-      // Bound the request so a stalled network call surfaces as an error
-      // (graceful empty state / snackbar) instead of an endless typing state.
-      final response = await _buildChatModel(memoryContext)
-          .generateContent(contents)
-          .timeout(const Duration(seconds: 45));
-
-      final calls = response.functionCalls.toList();
-      if (calls.isNotEmpty) {
-        debugPrint(
-          '[GeminiService] function calls: '
-          '${calls.map((c) => "${c.name}(${c.args})").join(" | ")}',
-        );
-        final call = calls.first;
-        if (call.name == _toolChoices) {
-          final args = call.args;
-          final question = args['question']?.toString() ?? '';
-          final rawOptions = args['options'];
-          final options = rawOptions is List
-              ? rawOptions.map((e) => e.toString()).toList()
-              : <String>[];
-          if (options.isNotEmpty) {
-            return GeminiReply.form(
-              ChatForm(question: question, options: options),
-            );
-          }
-        }
-        if (call.name == _toolMission) {
-          final args = call.args;
-          // The model sometimes passes the key under `mission_type` or nests it;
-          // accept the common aliases so a suggestion never collapses to blank.
-          final toolKey = (args['tool_key'] ?? args['mission_type'] ?? args['tool'])
-                  ?.toString() ??
-              '';
-          final reason = args['reason']?.toString() ?? '';
-          if (toolKey.isNotEmpty) {
-            return GeminiReply.missionSuggestion(
-              ChatMissionSuggestion(toolKey: toolKey, reason: reason),
-            );
-          }
-          debugPrint('[GeminiService] suggest_mission called without a key: $args');
-        }
-        if (call.name == _toolMood) {
-          final args = call.args;
-          final question =
-              args['question']?.toString() ?? 'How are you feeling right now?';
-          return GeminiReply.moodCheckIn(ChatMoodCheckIn(question: question));
-        }
-        if (call.name == _toolCreateRoutine ||
-            call.name == _toolUpdateRoutine ||
-            call.name == _toolDeleteRoutine) {
-          return GeminiReply.routineToolCall(
-            RoutineToolCall(tool: call.name, args: Map.from(call.args)),
-          );
-        }
-      }
-
-      final text = response.text?.trim() ?? '';
-      if (text.isEmpty) {
-        debugPrint(
-          '[GeminiService] empty text reply '
-          '(calls=${calls.map((c) => c.name).toList()})',
-        );
-      }
-      return GeminiReply.text(text);
-    } catch (e, st) {
-      debugPrint('[GeminiService] send failed: $e\n$st');
-      rethrow;
-    }
-  }
-
-  @override
-  Future<String> generateTitle(String firstUserMessage) async {
-    try {
-      final prompt =
-          'Write a 3 to 6 word title for a chat that starts with this user message. '
-          'Reply with just the title — no quotes, no punctuation at the end.\n\n'
-          'Message: $firstUserMessage';
-      final response = await _buildChatModel(
-        null,
-      ).generateContent([Content.text(prompt)]);
-      final text = response.text?.trim() ?? '';
-      if (text.isEmpty) return _fallbackTitle(firstUserMessage);
-      return text.replaceAll('"', '').replaceAll("'", '').trim();
-    } catch (e) {
-      debugPrint('[GeminiService] generateTitle failed: $e');
-      return _fallbackTitle(firstUserMessage);
-    }
-  }
-
-  @override
-  Future<MemoryExtraction> extractMemory({
-    required List<ChatMessage> history,
-    required Map<String, String> existingFacts,
-    required List<String> existingEventTitles,
-  }) async {
-    try {
-      final transcript = _renderTranscript(history);
-      final factsBlock = existingFacts.isEmpty
-          ? '(none)'
-          : existingFacts.entries
-                .map((e) => '- ${e.key}: ${e.value}')
-                .join('\n');
-      final eventsBlock = existingEventTitles.isEmpty
-          ? '(none)'
-          : existingEventTitles.map((t) => '- $t').join('\n');
-
-      final prompt =
-          'Conversation transcript:\n$transcript\n\n'
-          'Existing profile facts (do not repeat unchanged):\n$factsBlock\n\n'
-          'Already-extracted life events (do not duplicate):\n$eventsBlock\n\n'
-          'Return JSON per the schema.';
-
-      final response = await _buildExtractorModel().generateContent([
-        Content.text(prompt),
-      ]);
-      final text = response.text?.trim() ?? '';
-      if (text.isEmpty) return MemoryExtraction.empty;
-      return _parseExtraction(text);
-    } catch (e, st) {
-      debugPrint('[GeminiService] extractMemory failed: $e\n$st');
-      return MemoryExtraction.empty;
-    }
-  }
-
-  static MemoryExtraction _parseExtraction(String jsonText) {
-    final dynamic decoded;
-    try {
-      decoded = jsonDecode(jsonText);
-    } catch (e) {
-      debugPrint('[GeminiService] extractMemory invalid JSON: $e');
-      return MemoryExtraction.empty;
-    }
-    if (decoded is! Map) return MemoryExtraction.empty;
-
-    final facts = <String, String>{};
-    final rawFacts = decoded['profile_facts'];
-    if (rawFacts is List) {
-      for (final f in rawFacts) {
-        if (f is Map) {
-          final key = f['key']?.toString().trim() ?? '';
-          final value = f['value']?.toString().trim() ?? '';
-          if (key.isNotEmpty && value.isNotEmpty) facts[key] = value;
-        }
-      }
-    }
-
-    final events = <ExtractedLifeEvent>[];
-    final rawEvents = decoded['new_life_events'];
-    if (rawEvents is List) {
-      for (final e in rawEvents) {
-        if (e is Map) {
-          final title = e['title']?.toString().trim() ?? '';
-          if (title.isEmpty) continue;
-          final desc = e['description']?.toString().trim() ?? '';
-          final iso = e['occurred_at_iso']?.toString().trim() ?? '';
-          DateTime? occurred;
-          if (iso.isNotEmpty) occurred = DateTime.tryParse(iso);
-          events.add(
-            ExtractedLifeEvent(
-              title: title,
-              description: desc,
-              occurredAt: occurred,
-            ),
-          );
-        }
-      }
-    }
-
-    final summary = decoded['summary']?.toString().trim() ?? '';
-    return MemoryExtraction(
-      factUpdates: facts,
-      newEvents: events,
-      summary: summary,
-    );
-  }
-
-  @override
-  Future<ChatInsight?> generateInsight({
-    required List<ChatMessage> history,
-  }) async {
-    try {
-      final transcript = _renderTranscript(history);
-      if (transcript.trim().isEmpty) return null;
-      final prompt =
-          'Conversation transcript:\n$transcript\n\n'
-          'Return JSON per the schema with one useful insight.';
-
-      final response = await _buildInsightModel()
-          .generateContent([Content.text(prompt)])
-          .timeout(const Duration(seconds: 45));
-      final text = response.text?.trim() ?? '';
-      if (text.isEmpty) return null;
-      return _parseInsight(text);
-    } catch (e, st) {
-      debugPrint('[GeminiService] generateInsight failed: $e\n$st');
-      return null;
-    }
-  }
-
   static ChatInsight? _parseInsight(String jsonText) {
     final dynamic decoded;
     try {
@@ -748,47 +920,8 @@ Use plain prose for everything else.
     final title = decoded['title']?.toString().trim() ?? '';
     final quote = decoded['quote']?.toString().trim() ?? '';
     final body = decoded['body']?.toString().trim() ?? '';
-    // The model returns empty fields when there isn't enough to say.
     if (title.isEmpty || body.isEmpty) return null;
     return ChatInsight(title: title, quote: quote, body: body);
-  }
-
-  @override
-  Future<double?> assessInsightProgress({
-    required List<ChatMessage> history,
-  }) async {
-    try {
-      final transcript = _renderTranscript(history);
-      if (transcript.trim().isEmpty) return 0.0;
-      final prompt =
-          'Conversation transcript (since the last insight):\n$transcript\n\n'
-          'Return JSON per the schema with the insight-readiness progress.';
-
-      final response = await _buildInsightProgressModel()
-          .generateContent([Content.text(prompt)])
-          .timeout(const Duration(seconds: 20));
-      final text = response.text?.trim() ?? '';
-      if (text.isEmpty) return null;
-      return _parseProgress(text);
-    } catch (e, st) {
-      debugPrint('[GeminiService] assessInsightProgress failed: $e\n$st');
-      return null;
-    }
-  }
-
-  static double? _parseProgress(String jsonText) {
-    final dynamic decoded;
-    try {
-      decoded = jsonDecode(jsonText);
-    } catch (e) {
-      debugPrint('[GeminiService] assessInsightProgress invalid JSON: $e');
-      return null;
-    }
-    if (decoded is! Map) return null;
-    final raw = decoded['progress'];
-    final value = raw is num ? raw.toDouble() : double.tryParse('$raw');
-    if (value == null) return null;
-    return value.clamp(0.0, 1.0);
   }
 
   @override
@@ -824,6 +957,38 @@ Use plain prose for everything else.
     }
   }
 
+  GenerativeModel _buildCitationModel() {
+    return FirebaseAI.googleAI().generativeModel(
+      model: _modelName,
+      systemInstruction: Content.system(_citationSystemInstruction),
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: Schema.object(
+          properties: {
+            'title': Schema.string(
+              description: 'Single evocative word naming the wisdom.',
+            ),
+            'quote': Schema.string(
+              description: 'Verbatim citation, no surrounding quotation marks.',
+            ),
+            'author': Schema.string(
+              description: 'Figure or book author the quote is attributed to.',
+            ),
+            'source': Schema.string(
+              description: 'Book/work title, or empty string.',
+            ),
+            'icon_key': Schema.string(
+              description: 'One key from the allowed icon list.',
+            ),
+            'color_key': Schema.string(
+              description: 'One key from the allowed color list.',
+            ),
+          },
+        ),
+      ),
+    );
+  }
+
   static GeneratedCitation? _parseCitation(String jsonText) {
     final dynamic decoded;
     try {
@@ -836,7 +1001,6 @@ Use plain prose for everything else.
     final quote = decoded['quote']?.toString().trim() ?? '';
     final author = decoded['author']?.toString().trim() ?? '';
     if (quote.isEmpty || author.isEmpty) return null;
-    // Keep the title to a single word, stripping any stray punctuation.
     final rawTitle = decoded['title']?.toString().trim() ?? '';
     final title = rawTitle.split(RegExp(r'\s+')).first.replaceAll(
       RegExp(r'[^A-Za-zÀ-ÿ-]'),
@@ -850,6 +1014,76 @@ Use plain prose for everything else.
       iconKey: decoded['icon_key']?.toString().trim() ?? '',
       colorKey: decoded['color_key']?.toString().trim() ?? '',
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Shared helpers
+  // ---------------------------------------------------------------------------
+
+  /// Formats the full memory context appended to the Answerer's system prompt.
+  static String _renderMemoryBlock({
+    required Map<String, String> facts,
+    required List<LifeEvent> events,
+    required List<MemorySummary> summaries,
+    required List<ChatInsight> insights,
+    required LifeRating lifeRating,
+    required MoodValue? todayMood,
+  }) {
+    final b = StringBuffer();
+
+    if (facts.isNotEmpty) {
+      b.writeln('Profile facts:');
+      for (final k in facts.keys.toList()..sort()) {
+        b.writeln('- $k: ${facts[k]}');
+      }
+    }
+
+    if (lifeRating.ratings.isNotEmpty) {
+      if (b.isNotEmpty) b.writeln();
+      b.writeln('Life rating (1 low – 5 great):');
+      for (final k in lifeRating.ratings.keys.toList()..sort()) {
+        b.writeln('- $k: ${lifeRating.ratings[k]}/5');
+      }
+    }
+
+    if (events.isNotEmpty) {
+      if (b.isNotEmpty) b.writeln();
+      b.writeln('Life events:');
+      for (final e in events.take(20)) {
+        b.writeln('- ${e.title}: ${e.description}');
+      }
+    }
+
+    if (summaries.isNotEmpty) {
+      if (b.isNotEmpty) b.writeln();
+      b.writeln('Recent conversation summaries (most recent first):');
+      for (final s in summaries.take(20)) {
+        b.writeln('- ${s.text}');
+      }
+    }
+
+    if (insights.isNotEmpty) {
+      if (b.isNotEmpty) b.writeln();
+      b.writeln('Insights already reflected back:');
+      for (final i in insights.take(20)) {
+        b.writeln('- ${i.title}: ${i.body}');
+      }
+    }
+
+    if (todayMood != null) {
+      if (b.isNotEmpty) b.writeln();
+      b.writeln("Today's mood: ${todayMood.name} ${todayMood.emoji}");
+    }
+
+    return b.toString().trim();
+  }
+
+  static List<String> _stringList(dynamic raw) {
+    if (raw is! List) return const [];
+    return raw
+        .map((e) => e.toString().trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
   }
 
   static String _renderTranscript(List<ChatMessage> history) {
@@ -890,59 +1124,5 @@ Use plain prose for everything else.
     final trimmed = text.trim();
     if (trimmed.length <= 40) return trimmed;
     return '${trimmed.substring(0, 40)}…';
-  }
-
-  /// Converts our local history into Firebase AI [Content] entries.
-  /// Form, mood check-in, and routine-mutation messages are serialized
-  /// as model prose so Gemini retains context.
-  static List<Content> _buildContents(
-    List<ChatMessage> history,
-    String userText,
-  ) {
-    final out = <Content>[];
-    for (final m in history) {
-      if (m.role == ChatRole.user) {
-        out.add(Content.text(m.text));
-      } else {
-        final form = m.form;
-        final mutation = m.routineMutation;
-        if (form != null) {
-          final summary =
-              'I offered these choices for "${form.question}": ${form.options.join(", ")}.';
-          out.add(Content.model([TextPart(summary)]));
-        } else if (m.moodCheckIn != null) {
-          final checkIn = m.moodCheckIn!;
-          final status = checkIn.selectedMood != null
-              ? 'User selected: ${checkIn.selectedMood!.name}.'
-              : 'Awaiting response.';
-          out.add(
-            Content.model([TextPart('I asked "${checkIn.question}". $status')]),
-          );
-        } else if (mutation != null) {
-          out.add(
-            Content.model([
-              TextPart(
-                'I ${mutation.kind.name} the ${mutation.routineType.name} '
-                '"${mutation.routineName}" (id ${mutation.routineId}).',
-              ),
-            ]),
-          );
-        } else if (m.missionSuggestion != null) {
-          final s = m.missionSuggestion!;
-          final status = s.accepted == null
-              ? 'Awaiting response.'
-              : s.accepted!
-                  ? 'User started it.'
-                  : 'User declined.';
-          out.add(Content.model([
-            TextPart('I suggested the ${s.toolKey} activity. $status'),
-          ]));
-        } else if (m.text.isNotEmpty) {
-          out.add(Content.model([TextPart(m.text)]));
-        }
-      }
-    }
-    out.add(Content.text(userText));
-    return out;
   }
 }

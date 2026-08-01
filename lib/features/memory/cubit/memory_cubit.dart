@@ -3,152 +3,126 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../chat/services/chat_conversation.dart';
-import '../../chat/services/chat_firestore_service.dart';
-import '../services/memory_extractor_service.dart';
+import '../services/memory_builder_service.dart';
 import '../services/memory_firestore_service.dart';
 import 'memory_state.dart';
 
-/// Owns the user's reactive memory: profile facts and a derived list of
-/// recent conversation summaries. Also exposes triggers for extraction
-/// (one-off via [extractNow], catch-up via [processPendingExtractions]).
+/// Owns the user's reactive memory (facts, life events, rolling summaries, life
+/// rating, and insight progress) and exposes the per-exchange memory builder.
 class MemoryCubit extends Cubit<MemoryState> {
-  MemoryCubit({
-    MemoryRepository? memoryRepo,
-    ChatRepository? chatRepo,
-    MemoryExtractorService? extractor,
-  })  : _memoryRepo = memoryRepo ?? MemoryFirestoreService.instance,
-        _chatRepo = chatRepo ?? ChatFirestoreService.instance,
-        _extractor = extractor ?? MemoryExtractorService.instance,
-        super(MemoryState.initial());
+  MemoryCubit({MemoryRepository? memoryRepo, MemoryBuilderService? builder})
+    : _memoryRepo = memoryRepo ?? MemoryFirestoreService.instance,
+      _builder = builder ?? MemoryBuilderService.instance,
+      super(MemoryState.initial());
 
   final MemoryRepository _memoryRepo;
-  final ChatRepository _chatRepo;
-  final MemoryExtractorService _extractor;
+  final MemoryBuilderService _builder;
 
-  StreamSubscription? _profileSub;
-  StreamSubscription? _convSub;
-  bool _didCatchUp = false;
+  final List<StreamSubscription> _subs = [];
 
-  /// Subscribes to memory streams. Call when auth flips to signed-in.
+  /// Guards the one-time onboarding → life-rating seed so it runs at most once
+  /// per session even as the rating stream re-emits.
+  bool _seedAttempted = false;
+
+  /// Subscribes to all memory streams. Call when auth flips to signed-in.
   void start() {
-    _profileSub?.cancel();
-    _convSub?.cancel();
-    _didCatchUp = false;
+    _cancelSubs();
+    _seedAttempted = false;
     emit(state.copyWith(isLoading: true));
 
-    _profileSub = _memoryRepo.watchProfile().listen(
-      (profile) {
-        emit(state.copyWith(profile: profile, isLoading: false));
-      },
-      onError: (e) {
-        debugPrint('[MemoryCubit] watchProfile error: $e');
-        emit(state.copyWith(isLoading: false));
-      },
+    _subs.add(
+      _memoryRepo.watchProfile().listen(
+        (profile) => emit(state.copyWith(profile: profile, isLoading: false)),
+        onError: (e) {
+          debugPrint('[MemoryCubit] watchProfile error: $e');
+          emit(state.copyWith(isLoading: false));
+        },
+      ),
     );
 
-    _convSub = _chatRepo.watchConversations().listen(
-      (conversations) {
-        final summaries = conversations
-            .where((c) => c.summary.isNotEmpty)
-            .map((c) => ConversationSummary(
-                  conversationId: c.id,
-                  summary: c.summary,
-                  lastMessageAt: c.lastMessageAt,
-                ))
-            .toList();
-        emit(state.copyWith(recentSummaries: summaries));
+    _subs.add(
+      _memoryRepo.watchEvents().listen(
+        (events) => emit(state.copyWith(events: events)),
+        onError: (e) => debugPrint('[MemoryCubit] watchEvents error: $e'),
+      ),
+    );
 
-        // One-shot catch-up on first conversations snapshot after sign-in.
-        if (!_didCatchUp) {
-          _didCatchUp = true;
-          unawaited(_processPending(conversations));
-        }
-      },
-      onError: (e) {
-        debugPrint('[MemoryCubit] watchConversations error: $e');
-      },
+    _subs.add(
+      _memoryRepo.watchSummaries(limit: 20).listen(
+        (summaries) => emit(state.copyWith(summaries: summaries)),
+        onError: (e) => debugPrint('[MemoryCubit] watchSummaries error: $e'),
+      ),
+    );
+
+    _subs.add(
+      _memoryRepo.watchLifeRating().listen(
+        (rating) {
+          emit(state.copyWith(lifeRating: rating));
+          if (!rating.seeded && !_seedAttempted) {
+            _seedAttempted = true;
+            unawaited(_seedLifeRatingFromOnboarding());
+          }
+        },
+        onError: (e) => debugPrint('[MemoryCubit] watchLifeRating error: $e'),
+      ),
+    );
+
+    _subs.add(
+      _memoryRepo.watchBuilderState().listen(
+        (bs) => emit(
+          state.copyWith(
+            insightProgress: bs.insightProgress,
+            insightBoundaryMs: bs.insightBoundaryMs,
+          ),
+        ),
+        onError: (e) => debugPrint('[MemoryCubit] watchBuilderState error: $e'),
+      ),
     );
   }
 
   /// Cancels subscriptions and resets to empty state. Call on sign-out.
   void clear() {
-    _profileSub?.cancel();
-    _convSub?.cancel();
-    _profileSub = null;
-    _convSub = null;
-    _didCatchUp = false;
+    _cancelSubs();
+    _seedAttempted = false;
     emit(MemoryState.initial());
   }
 
-  /// Manually re-runs catch-up scan against the current conversation list.
-  Future<void> processPendingExtractions() async {
-    await _processPending(null);
-  }
-
-  /// Internal: scan [conversations] (or fetch fresh) and extract any flagged
-  /// `memoryExtracted == false`.
-  Future<void> _processPending(List<ChatConversation>? conversations) async {
+  /// Copies the onboarding wheel-of-life ratings into memory the first time we
+  /// see an unseeded rating doc. Idempotent — `seedLifeRating` sets `seeded`.
+  Future<void> _seedLifeRatingFromOnboarding() async {
     try {
-      // We don't have a one-shot getConversations on the repo, so if the
-      // caller didn't pass a list, just no-op — the conversations stream is
-      // expected to be live by the time this is called.
-      if (conversations == null) return;
-      final pending =
-          conversations.where((c) => !c.memoryExtracted).toList();
-      if (pending.isEmpty) return;
-      debugPrint(
-        '[MemoryCubit] catch-up extraction for ${pending.length} conversation(s)',
-      );
-      for (final c in pending) {
-        await _extractor.extractFromConversation(c.id);
+      final ratings = await _memoryRepo.getOnboardingLifeRatings();
+      if (ratings.isEmpty) {
+        debugPrint('[MemoryCubit] no onboarding ratings to seed');
+        return;
       }
+      await _memoryRepo.seedLifeRating(ratings);
+      debugPrint('[MemoryCubit] seeded life rating from onboarding');
     } catch (e) {
-      debugPrint('[MemoryCubit] processPending failed: $e');
+      debugPrint('[MemoryCubit] life-rating seed failed: $e');
     }
   }
 
-  /// Fire-and-forget extraction for one conversation. Used when the user
-  /// leaves the chat screen.
-  Future<void> extractNow(String conversationId) async {
-    await _extractor.extractFromConversation(conversationId);
-  }
+  /// Runs one background memory-builder pass for [conversationId]. Called by
+  /// ChatCubit after each assistant reply.
+  Future<void> analyze(String conversationId) =>
+      _builder.analyzeExchange(conversationId);
 
-  /// Builds the memory-context string injected into Gemini's system prompt.
-  /// Includes profile facts + up to 10 most recent conversation summaries,
-  /// excluding the currently-active conversation.
-  String buildMemoryContext({String? excludeConversationId, int summaryLimit = 10}) {
-    final buffer = StringBuffer();
+  /// Records that an insight was generated at [boundaryMs], resetting the
+  /// insight progress so the ring restarts from empty.
+  Future<void> markInsight(int boundaryMs) =>
+      _memoryRepo.writeInsightBoundary(boundaryMs);
 
-    final facts = state.profile.facts;
-    if (facts.isNotEmpty) {
-      buffer.writeln('Profile facts about the user:');
-      final keys = facts.keys.toList()..sort();
-      for (final k in keys) {
-        buffer.writeln('- $k: ${facts[k]}');
-      }
+  void _cancelSubs() {
+    for (final s in _subs) {
+      s.cancel();
     }
-
-    final filtered = state.recentSummaries
-        .where((s) => s.conversationId != excludeConversationId)
-        .toList()
-      ..sort((a, b) => b.lastMessageAt.compareTo(a.lastMessageAt));
-    final top = filtered.take(summaryLimit).toList();
-    if (top.isNotEmpty) {
-      if (buffer.isNotEmpty) buffer.writeln();
-      buffer.writeln('Recent past conversations (most recent first):');
-      for (final s in top) {
-        buffer.writeln('- ${s.summary}');
-      }
-    }
-
-    return buffer.toString().trim();
+    _subs.clear();
   }
 
   @override
   Future<void> close() {
-    _profileSub?.cancel();
-    _convSub?.cancel();
+    _cancelSubs();
     return super.close();
   }
 }

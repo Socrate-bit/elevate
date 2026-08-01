@@ -3,12 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
+import 'chat_proposed_answers_sheet.dart';
 
 /// Minimalist composer: a white pill (matching the page background) holding the
 /// text field and a trailing action. The trailing icon is a mic while the field
 /// is empty (tap → [onMic]) and a send arrow once there is text (tap → [onSend]).
-/// The field grows from one to three lines. Controlled by the parent, which owns
-/// [controller].
+/// When the AI attaches rapid replies, a sparkle button appears that unfolds
+/// them ([proposedAnswers] / [onProposedTap]). The field grows from one to three
+/// lines. Controlled by the parent, which owns [controller].
 class ChatComposerBar extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
@@ -16,6 +18,12 @@ class ChatComposerBar extends StatelessWidget {
   final bool isListening;
   final VoidCallback onSend;
   final VoidCallback onMic;
+
+  /// AI-suggested rapid replies; the sparkle button is hidden when empty.
+  final List<String> proposedAnswers;
+
+  /// Called with the tapped rapid reply (which the parent sends instantly).
+  final ValueChanged<String> onProposedTap;
 
   const ChatComposerBar({
     super.key,
@@ -25,6 +33,8 @@ class ChatComposerBar extends StatelessWidget {
     required this.isListening,
     required this.onSend,
     required this.onMic,
+    this.proposedAnswers = const [],
+    required this.onProposedTap,
   });
 
   @override
@@ -75,6 +85,26 @@ class ChatComposerBar extends StatelessWidget {
                   ),
                 ),
               ),
+              // Sparkle button unfolding the AI's rapid replies (only when the
+              // field is empty and suggestions exist).
+              if (!hasText && proposedAnswers.isNotEmpty)
+                GestureDetector(
+                  onTap: withHaptic(
+                    () => showProposedAnswersSheet(
+                      context,
+                      proposedAnswers,
+                      onProposedTap,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(6.w),
+                    child: Icon(
+                      Icons.auto_awesome_rounded,
+                      color: ChatPalette.accent,
+                      size: 26.sp,
+                    ),
+                  ),
+                ),
               SizedBox(width: 6.w),
               GestureDetector(
                 onTap: withHaptic(hasText ? onSend : onMic),

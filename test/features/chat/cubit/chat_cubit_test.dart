@@ -5,9 +5,13 @@ import 'package:elevate/features/chat/cubit/chat_cubit.dart';
 import 'package:elevate/features/chat/cubit/chat_state.dart';
 import 'package:elevate/features/chat/services/chat_firestore_service.dart';
 import 'package:elevate/features/chat/services/chat_form.dart';
+import 'package:elevate/features/chat/services/chat_insight.dart';
 import 'package:elevate/features/chat/services/chat_message.dart';
 import 'package:elevate/features/chat/services/gemini_service.dart';
 import 'package:elevate/features/chat/services/voice_service.dart';
+import 'package:elevate/features/memory/models/life_event.dart';
+import 'package:elevate/features/memory/models/life_rating.dart';
+import 'package:elevate/features/memory/models/memory_summary.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid/data.dart';
@@ -72,18 +76,30 @@ ChatMessage _msg(
   String text = '',
   ChatRole role = ChatRole.user,
   ChatForm? form,
-  double? insightProgress,
   int createdAtMs = 0,
-}) =>
-    ChatMessage(
-      id: id,
-      conversationId: 'c1',
-      role: role,
-      text: text,
-      form: form,
-      insightProgress: insightProgress,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(createdAtMs),
-    );
+}) => ChatMessage(
+  id: id,
+  conversationId: 'c1',
+  role: role,
+  text: text,
+  form: form,
+  createdAt: DateTime.fromMillisecondsSinceEpoch(createdAtMs),
+);
+
+/// Stubs `gemini.answer(...)` with all-any matchers, returning [result].
+void _stubAnswer(_MockGemini gemini, AnswerResult result) {
+  when(
+    () => gemini.answer(
+      windowMessages: any(named: 'windowMessages'),
+      recentSummaries: any(named: 'recentSummaries'),
+      recentInsights: any(named: 'recentInsights'),
+      facts: any(named: 'facts'),
+      events: any(named: 'events'),
+      lifeRating: any(named: 'lifeRating'),
+      todayMood: any(named: 'todayMood'),
+    ),
+  ).thenAnswer((_) async => result);
+}
 
 void main() {
   late _MockRepo repo;
@@ -93,6 +109,12 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(_msg('fallback'));
+    registerFallbackValue(<ChatMessage>[]);
+    registerFallbackValue(<MemorySummary>[]);
+    registerFallbackValue(<ChatInsight>[]);
+    registerFallbackValue(<LifeEvent>[]);
+    registerFallbackValue(<String, String>{});
+    registerFallbackValue(LifeRating.empty());
   });
 
   setUp(() {
@@ -103,27 +125,18 @@ void main() {
 
     when(() => repo.watchMessages(any())).thenAnswer((_) => messages.stream);
     when(() => repo.saveMessage(any())).thenAnswer((_) async {});
-    when(() => repo.updateConversation(
-          any(),
-          title: any(named: 'title'),
-          lastMessageAt: any(named: 'lastMessageAt'),
-          summary: any(named: 'summary'),
-          summaryAt: any(named: 'summaryAt'),
-          memoryExtracted: any(named: 'memoryExtracted'),
-        )).thenAnswer((_) async {});
-    when(() => repo.updateMessageForm(any(), any(), any()))
-        .thenAnswer((_) async {});
-    when(() => repo.updateMessageInsightProgress(any(), any(), any()))
-        .thenAnswer((_) async {});
-    when(() => gemini.assessInsightProgress(history: any(named: 'history')))
-        .thenAnswer((_) async => 0.4);
-    when(() => gemini.generateTitle(any()))
-        .thenAnswer((_) async => 'A title');
-    when(() => gemini.send(
-          history: any(named: 'history'),
-          userText: any(named: 'userText'),
-          memoryContext: any(named: 'memoryContext'),
-        )).thenAnswer((_) async => GeminiReply.text('hello back'));
+    when(
+      () => repo.updateConversation(
+        any(),
+        title: any(named: 'title'),
+        lastMessageAt: any(named: 'lastMessageAt'),
+      ),
+    ).thenAnswer((_) async {});
+    when(
+      () => repo.updateMessageForm(any(), any(), any()),
+    ).thenAnswer((_) async {});
+    when(() => gemini.generateTitle(any())).thenAnswer((_) async => 'A title');
+    _stubAnswer(gemini, const AnswerResult(text: 'hello back'));
   });
 
   tearDown(() async {
@@ -158,12 +171,10 @@ void main() {
 
   group('sendText', () {
     test('optimistically inserts user message, persists both turns, '
-        'calls Gemini', () async {
+        'calls the Answerer', () async {
       final cubit = buildCubit(ids: ['user-id', 'model-id']);
       await cubit.sendText('hello');
 
-      // Local state shows the optimistic user bubble; the model bubble lives
-      // in Firestore and would arrive via the watchMessages stream in prod.
       expect(cubit.state.messages.single.role, ChatRole.user);
       expect(cubit.state.messages.single.text, 'hello');
       expect(cubit.state.isSending, false);
@@ -175,10 +186,40 @@ void main() {
       expect((saved[1] as ChatMessage).role, ChatRole.model);
       expect((saved[1] as ChatMessage).text, 'hello back');
 
-      verify(() => gemini.send(
-            history: any(named: 'history'),
-            userText: 'hello',
-          )).called(1);
+      // The Answerer saw the user's message at the tail of its window.
+      final window = verify(
+        () => gemini.answer(
+          windowMessages: captureAny(named: 'windowMessages'),
+          recentSummaries: any(named: 'recentSummaries'),
+          recentInsights: any(named: 'recentInsights'),
+          facts: any(named: 'facts'),
+          events: any(named: 'events'),
+          lifeRating: any(named: 'lifeRating'),
+          todayMood: any(named: 'todayMood'),
+        ),
+      ).captured.single as List<ChatMessage>;
+      expect(window.last.text, 'hello');
+    });
+
+    test('surfaces proposed answers from the reply into state', () async {
+      _stubAnswer(
+        gemini,
+        const AnswerResult(
+          text: 'ok',
+          proposedAnswers: ['Yeah', 'Not really', 'Tell me more'],
+        ),
+      );
+      final cubit = buildCubit();
+      await cubit.sendText('hello');
+      expect(cubit.state.proposedAnswers, ['Yeah', 'Not really', 'Tell me more']);
+    });
+
+    test('clears proposed answers when the next message is sent', () async {
+      final cubit = buildCubit(ids: ['u1', 'm1', 'u2', 'm2']);
+      cubit.emit(cubit.state.copyWith(proposedAnswers: const ['stale']));
+      await cubit.sendText('hello');
+      // The stub returns no proposed answers, so they end up empty.
+      expect(cubit.state.proposedAnswers, isEmpty);
     });
 
     test('ignores empty or whitespace text', () async {
@@ -199,7 +240,6 @@ void main() {
     test('first user message triggers title generation', () async {
       final cubit = buildCubit();
       await cubit.sendText('first');
-      // generateTitle runs unawaited; give it a tick.
       await Future<void>.delayed(Duration.zero);
       verify(() => gemini.generateTitle('first')).called(1);
       verify(() => repo.updateConversation('c1', title: 'A title')).called(1);
@@ -210,23 +250,24 @@ void main() {
       await cubit.sendText('first');
       await Future<void>.delayed(Duration.zero);
       clearInteractions(gemini);
-      when(() => gemini.send(
-            history: any(named: 'history'),
-            userText: any(named: 'userText'),
-            memoryContext: any(named: 'memoryContext'),
-          )).thenAnswer((_) async => GeminiReply.text('hello back 2'));
+      _stubAnswer(gemini, const AnswerResult(text: 'hello back 2'));
 
       await cubit.sendText('second');
       verifyNever(() => gemini.generateTitle(any()));
     });
 
-    test('persists a form when Gemini returns a structured reply', () async {
-      when(() => gemini.send(
-            history: any(named: 'history'),
-            userText: any(named: 'userText'),
-          )).thenAnswer((_) async => GeminiReply.form(
-            const ChatForm(question: 'Pick', options: ['A', 'B']),
-          ));
+    test('persists a form when the reply carries a choices card', () async {
+      _stubAnswer(
+        gemini,
+        const AnswerResult(
+          text: '',
+          card: AnswerCard(
+            type: AnswerCardType.choices,
+            question: 'Pick',
+            options: ['A', 'B'],
+          ),
+        ),
+      );
       final cubit = buildCubit();
       await cubit.sendText('hello');
 
@@ -238,41 +279,8 @@ void main() {
     });
   });
 
-  group('insight progress', () {
-    test('stores the assessed progress on the model reply message', () async {
-      final cubit = buildCubit(ids: ['user-id', 'model-id']);
-      await cubit.sendText('hello');
-      // _assessAndStoreProgress runs unawaited; give it a tick.
-      await Future<void>.delayed(Duration.zero);
-
-      verify(() => gemini.assessInsightProgress(history: any(named: 'history')))
-          .called(1);
-      verify(() =>
-              repo.updateMessageInsightProgress('c1', 'model-id', 0.4))
-          .called(1);
-    });
-
-    test('ring reads stored progress from the latest message, no recompute',
-        () async {
-      final cubit = buildCubit();
-      await Future<void>.delayed(Duration.zero);
-      messages.add([
-        _msg('u', text: 'hi', role: ChatRole.user),
-        _msg('m', text: 'hey', role: ChatRole.model, insightProgress: 0.7),
-      ]);
-      await Future<void>.delayed(Duration.zero);
-
-      expect(cubit.state.insightProgress, 0.7);
-      // Opening/loading an existing conversation never re-assesses.
-      verifyNever(
-        () => gemini.assessInsightProgress(history: any(named: 'history')),
-      );
-    });
-  });
-
   group('answerForm', () {
-    test('records selection and sends chosen option as next user turn',
-        () async {
+    test('records selection and sends chosen option as next user turn', () async {
       final formMsg = _msg(
         'form-msg',
         role: ChatRole.model,
@@ -283,17 +291,13 @@ void main() {
 
       await cubit.answerForm('form-msg', 1);
 
-      // Form message updated optimistically.
-      final updated =
-          cubit.state.messages.firstWhere((m) => m.id == 'form-msg');
+      final updated = cubit.state.messages.firstWhere((m) => m.id == 'form-msg');
       expect(updated.form?.selectedIndex, 1);
       verify(() => repo.updateMessageForm('c1', 'form-msg', 1)).called(1);
 
-      // Sent the chosen label.
-      verify(() => gemini.send(
-            history: any(named: 'history'),
-            userText: 'B',
-          )).called(1);
+      // The chosen label was sent as the next user turn.
+      final saved = verify(() => repo.saveMessage(captureAny())).captured;
+      expect(saved.whereType<ChatMessage>().any((m) => m.text == 'B'), isTrue);
     });
 
     test('ignores invalid messageId, missing form, out-of-range index, '
@@ -317,16 +321,12 @@ void main() {
       await cubit.answerForm('answered', -1);
 
       verifyNever(() => repo.updateMessageForm(any(), any(), any()));
-      verifyNever(() => gemini.send(
-            history: any(named: 'history'),
-            userText: any(named: 'userText'),
-          ));
+      verifyNever(() => repo.saveMessage(any()));
     });
   });
 
   group('voice', () {
-    test('startListening flips flag and routes partials into state',
-        () async {
+    test('startListening flips flag and routes partials into state', () async {
       final cubit = buildCubit();
       await cubit.startListening();
       expect(cubit.state.isListening, true);

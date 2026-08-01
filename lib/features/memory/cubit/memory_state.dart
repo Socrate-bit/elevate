@@ -1,53 +1,68 @@
 import 'package:equatable/equatable.dart';
 
+import '../models/life_event.dart';
+import '../models/life_rating.dart';
 import '../models/memory_profile.dart';
+import '../models/memory_summary.dart';
 
-/// Lightweight (conversationId, summary, lastMessageAt) record maintained by
-/// [MemoryCubit] so [MemoryCubit.buildMemoryContext] can format a top-N list
-/// quickly.
-class ConversationSummary extends Equatable {
-  final String conversationId;
-  final String summary;
-  final DateTime lastMessageAt;
-
-  const ConversationSummary({
-    required this.conversationId,
-    required this.summary,
-    required this.lastMessageAt,
-  });
-
-  @override
-  List<Object?> get props => [conversationId, summary, lastMessageAt];
-}
-
+/// The user's reactive memory: durable facts, life events, rolling
+/// conversation summaries, the life rating, and the insight progress/boundary
+/// maintained by the background builder. Fed to the Answerer on every turn.
 class MemoryState extends Equatable {
   final MemoryProfile profile;
-  final List<ConversationSummary> recentSummaries;
+  final List<LifeEvent> events;
+  final List<MemorySummary> summaries;
+  final LifeRating lifeRating;
+  final double insightProgress;
+  final int insightBoundaryMs;
   final bool isLoading;
 
   const MemoryState({
     required this.profile,
-    required this.recentSummaries,
+    required this.events,
+    required this.summaries,
+    required this.lifeRating,
+    required this.insightProgress,
+    required this.insightBoundaryMs,
     required this.isLoading,
   });
 
   factory MemoryState.initial() => MemoryState(
-        profile: MemoryProfile.empty(),
-        recentSummaries: const [],
-        isLoading: true,
-      );
+    profile: MemoryProfile.empty(),
+    events: const [],
+    summaries: const [],
+    lifeRating: LifeRating.empty(),
+    insightProgress: 0.0,
+    insightBoundaryMs: 0,
+    isLoading: true,
+  );
 
   MemoryState copyWith({
     MemoryProfile? profile,
-    List<ConversationSummary>? recentSummaries,
+    List<LifeEvent>? events,
+    List<MemorySummary>? summaries,
+    LifeRating? lifeRating,
+    double? insightProgress,
+    int? insightBoundaryMs,
     bool? isLoading,
-  }) =>
-      MemoryState(
-        profile: profile ?? this.profile,
-        recentSummaries: recentSummaries ?? this.recentSummaries,
-        isLoading: isLoading ?? this.isLoading,
-      );
+  }) => MemoryState(
+    profile: profile ?? this.profile,
+    events: events ?? this.events,
+    summaries: summaries ?? this.summaries,
+    lifeRating: lifeRating ?? this.lifeRating,
+    insightProgress: insightProgress ?? this.insightProgress,
+    insightBoundaryMs: insightBoundaryMs ?? this.insightBoundaryMs,
+    isLoading: isLoading ?? this.isLoading,
+  );
 
   @override
-  List<Object?> get props => [profile, recentSummaries, isLoading];
+  List<Object?> get props => [
+    profile,
+    events,
+    summaries,
+    lifeRating,
+    insightProgress,
+    insightBoundaryMs,
+    isLoading,
+  ];
 }
