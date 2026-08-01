@@ -2312,6 +2312,12 @@ abstract class AppLocalizations {
   /// **'{xp} pts'**
   String routineDetailPoints(int xp);
 
+  /// No description provided for @routineDetailStartNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Start now'**
+  String get routineDetailStartNow;
+
   /// No description provided for @chatRoutineCreated.
   ///
   /// In en, this message translates to:
