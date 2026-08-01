@@ -153,6 +153,7 @@
 
   "onboardingContinue": "Continuer",
   "onboardingGetStarted": "Commencer",
+  "languageSelectTitle": "Choisissez votre langue",
   "onboardingWelcomeTitle": "Bienvenue dans Skeleton",
   "onboardingWelcomeSubtitle": "Remplacez ce texte par un message de bienvenue.",
 
@@ -536,6 +537,12 @@
   "shopCtaScarf": "Acheter une écharpe",
   "shopCtaColor": "Changer la couleur",
 
+  "onboardingAppyStartBadge": "PRIVÉ & SANS JUGEMENT",
+  "onboardingAppyStartTitle": "Voici Appy,\nton compagnon de poche",
+  "onboardingAppyStartSubtitle": "Un espace bienveillant pour penser à voix haute, démêler tes pensées et te sentir un peu plus léger.",
+  "onboardingAppyStartJoin": "Adopté par des milliers de personnes en quête de clarté",
+  "onboardingAppyAlreadyAccount": "Tu as déjà un compte ? ",
+  "onboardingSignIn": "Se connecter",
   "onboardingAppyPrivacyTitle": "Ta santé mentale est personnelle et privée",
   "onboardingAppyPrivacyFootnote": "Données chiffrées — toi seul peux les voir",
   "onboardingAppySignInTitle": "Bienvenue",

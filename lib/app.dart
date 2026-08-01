@@ -55,7 +55,7 @@ class AppyApp extends StatelessWidget {
             themeMode: settings.themeMode,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: DevicePreview.locale(context),
+            locale: settings.locale ?? DevicePreview.locale(context),
             navigatorKey: navigatorKey,
             navigatorObservers: [PosthogObserver()],
             builder: (context, child) => DevicePreview.appBuilder(

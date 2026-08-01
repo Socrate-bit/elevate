@@ -436,6 +436,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get onboardingGetStarted => 'Commencer';
 
   @override
+  String get languageSelectTitle => 'Choisissez votre langue';
+
+  @override
   String get onboardingWelcomeTitle => 'Bienvenue dans Skeleton';
 
   @override
@@ -1484,6 +1487,26 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get shopCtaColor => 'Changer la couleur';
+
+  @override
+  String get onboardingAppyStartBadge => 'PRIVÉ & SANS JUGEMENT';
+
+  @override
+  String get onboardingAppyStartTitle => 'Voici Appy,\nton compagnon de poche';
+
+  @override
+  String get onboardingAppyStartSubtitle =>
+      'Un espace bienveillant pour penser à voix haute, démêler tes pensées et te sentir un peu plus léger.';
+
+  @override
+  String get onboardingAppyStartJoin =>
+      'Adopté par des milliers de personnes en quête de clarté';
+
+  @override
+  String get onboardingAppyAlreadyAccount => 'Tu as déjà un compte ? ';
+
+  @override
+  String get onboardingSignIn => 'Se connecter';
 
   @override
   String get onboardingAppyPrivacyTitle =>

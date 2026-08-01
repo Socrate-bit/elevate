@@ -435,6 +435,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingGetStarted => 'Get started';
 
   @override
+  String get languageSelectTitle => 'Choose your language';
+
+  @override
   String get onboardingWelcomeTitle => 'Welcome to Skeleton';
 
   @override
@@ -1472,6 +1475,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shopCtaColor => 'Change color';
+
+  @override
+  String get onboardingAppyStartBadge => 'PRIVATE & JUDGMENT-FREE';
+
+  @override
+  String get onboardingAppyStartTitle => 'Meet Appy,\nyour pocket companion';
+
+  @override
+  String get onboardingAppyStartSubtitle =>
+      'A caring space to think out loud, untangle your thoughts, and feel a little lighter.';
+
+  @override
+  String get onboardingAppyStartJoin => 'Trusted by thousands finding clarity';
+
+  @override
+  String get onboardingAppyAlreadyAccount => 'Already have an account? ';
+
+  @override
+  String get onboardingSignIn => 'Sign in';
 
   @override
   String get onboardingAppyPrivacyTitle =>

@@ -902,6 +902,12 @@ abstract class AppLocalizations {
   /// **'Get started'**
   String get onboardingGetStarted;
 
+  /// No description provided for @languageSelectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your language'**
+  String get languageSelectTitle;
+
   /// No description provided for @onboardingWelcomeTitle.
   ///
   /// In en, this message translates to:
@@ -2785,6 +2791,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change color'**
   String get shopCtaColor;
+
+  /// No description provided for @onboardingAppyStartBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'PRIVATE & JUDGMENT-FREE'**
+  String get onboardingAppyStartBadge;
+
+  /// No description provided for @onboardingAppyStartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Meet Appy,\nyour pocket companion'**
+  String get onboardingAppyStartTitle;
+
+  /// No description provided for @onboardingAppyStartSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A caring space to think out loud, untangle your thoughts, and feel a little lighter.'**
+  String get onboardingAppyStartSubtitle;
+
+  /// No description provided for @onboardingAppyStartJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted by thousands finding clarity'**
+  String get onboardingAppyStartJoin;
+
+  /// No description provided for @onboardingAppyAlreadyAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? '**
+  String get onboardingAppyAlreadyAccount;
+
+  /// No description provided for @onboardingSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get onboardingSignIn;
 
   /// No description provided for @onboardingAppyPrivacyTitle.
   ///

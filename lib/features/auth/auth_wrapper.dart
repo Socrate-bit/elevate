@@ -8,6 +8,7 @@ import '../memory/cubit/memory_cubit.dart';
 import '../onboarding/cubit/onboarding_cubit.dart';
 import '../onboarding/cubit/onboarding_state.dart';
 import '../onboarding/screens/onboarding_screen_v2.dart';
+import '../onboarding/screens/onboarding_start_screen.dart';
 import '../settings/cubit/settings_cubit.dart';
 import '../subscription/cubit/subscription_cubit.dart';
 import '../subscription/screens/app_gate_wrapper.dart';
@@ -52,7 +53,13 @@ class AuthWrapper extends StatelessWidget {
                 context.read<MemoryCubit>().clear();
                 // hook: cancel any other user-scoped resources here
               });
-              return const OnboardingScreenV2();
+              // Fresh, signed-out user: show the welcome start screen first;
+              // once they tap "Get started" (startOnboarding) or resume an
+              // in-progress funnel, swap to the funnel itself.
+              if (ob.isInProgress) return const OnboardingScreenV2();
+              return OnboardingStartScreen(
+                onStart: () => context.read<OnboardingCubit>().startOnboarding(),
+              );
             }
             context.read<SubscriptionCubit>().identifyUser(snap.data!.uid);
             WidgetsBinding.instance.addPostFrameCallback((_) {
