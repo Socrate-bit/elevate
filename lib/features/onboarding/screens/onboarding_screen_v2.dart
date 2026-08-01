@@ -9,6 +9,7 @@ import '../../subscription/cubit/subscription_cubit.dart';
 import '../cubit/onboarding_cubit.dart';
 import '../cubit/onboarding_state.dart';
 import '../widgets/education_step.dart';
+import '../widgets/language_selector.dart';
 import '../widgets/life_rating_step.dart';
 import '../widgets/multi_select_step.dart';
 import '../widgets/name_input_step.dart';
@@ -19,19 +20,21 @@ import '../widgets/survey_step.dart';
 /// personalizes Appy, then hands off to the app (the first conversation happens
 /// in the chat). Reuses the shared [OnboardingCubit] for routing + persistence.
 ///
+/// The returning-user sign-in lives on the [OnboardingStartScreen] before this
+/// funnel; here we only run the personalization steps and the final sign-up.
+///
 /// Pages:
 ///  0  Privacy education (Main PCD)
-///  1  Sign in (returning users)         — owns nav
-///  2  Age
-///  3  What do you identify with (multi)
-///  4  How do you feel lately (multi)
-///  5  Rate dimensions of your life (1–5)
-///  6  Problem (education)
-///  7  Solution (education)
-///  8  Present Appy (education)
-///  9  Name
-/// 10  How should Appy talk to you (tone)
-/// 11  Sign up → complete                — owns nav
+///  1  Age
+///  2  What do you identify with (multi)
+///  3  How do you feel lately (multi)
+///  4  Rate dimensions of your life (1–5)
+///  5  Problem (education)
+///  6  Solution (education)
+///  7  Present Appy (education)
+///  8  Name
+///  9  How should Appy talk to you (tone)
+/// 10  Sign up → complete                — owns nav
 class OnboardingScreenV2 extends StatefulWidget {
   const OnboardingScreenV2({super.key});
 
@@ -40,7 +43,7 @@ class OnboardingScreenV2 extends StatefulWidget {
 }
 
 class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
-  static const _totalPages = 12;
+  static const _totalPages = 11;
 
   final _pageController = PageController();
   int _currentPage = 0;
@@ -66,21 +69,21 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
   void _back() => _goToPage(_currentPage - 1);
 
   // Pages that render their own primary action (no shared Continue button).
-  bool _ownsNav(int page) => page == 1 || page == 11;
+  bool _ownsNav(int page) => page == 10;
 
   bool _canContinue(OnboardingState s) {
     switch (_currentPage) {
-      case 2:
+      case 1:
         return s.ageRange != null;
-      case 3:
+      case 2:
         return s.identities.isNotEmpty;
-      case 4:
+      case 3:
         return s.feelings.isNotEmpty;
-      case 5:
+      case 4:
         return s.lifeRatings.length >= _lifeDimensions(context).length;
-      case 9:
+      case 8:
         return (s.name ?? '').trim().isNotEmpty;
-      case 10:
+      case 9:
         return s.tone != null;
       default:
         return true;
@@ -90,9 +93,9 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
   // Education pages carry their own CTA label; everything else says "Continue".
   String _continueLabel(AppLocalizations l10n) {
     switch (_currentPage) {
-      case 6:
+      case 5:
         return l10n.onboardingAppyProblemCta;
-      case 7:
+      case 6:
         return l10n.onboardingAppySolutionCta;
       default:
         return l10n.onboardingContinue;
@@ -100,24 +103,6 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
   }
 
   // --- Auth routing -------------------------------------------------------
-
-  Future<void> _handleEarlySignIn() async {
-    final cubit = context.read<OnboardingCubit>();
-    final completed = await cubit.hasCompletedOnboarding();
-    if (!mounted) return;
-    if (completed) {
-      // Returning user — skip the funnel and drop into the app.
-      cubit.finishOnboarding();
-    } else {
-      cubit.startOnboarding();
-      _next();
-    }
-  }
-
-  void _startAsNewUser() {
-    context.read<OnboardingCubit>().startOnboarding();
-    _next();
-  }
 
   Future<void> _completeFlow() async {
     final cubit = context.read<OnboardingCubit>();
@@ -158,16 +143,7 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
         title: l10n.onboardingAppyPrivacyTitle,
         footnote: l10n.onboardingAppyPrivacyFootnote,
       ),
-      // 1: sign in (returning users)
-      OnboardingAuthStep(
-        mode: OnboardingAuthMode.signIn,
-        title: l10n.onboardingAppySignInTitle,
-        subtitle: l10n.onboardingAppySignInSubtitle,
-        onAuthenticated: _handleEarlySignIn,
-        onSecondary: _startAsNewUser,
-        secondaryLabel: l10n.onboardingAppyImNew,
-      ),
-      // 2: age
+      // 1: age
       SurveyStep(
         question: l10n.onboardingAppyAgeQuestion,
         options: [
@@ -181,7 +157,7 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
         selectedOption: state.ageRange,
         onSelected: cubit.setAge,
       ),
-      // 3: identity (multi-select)
+      // 2: identity (multi-select)
       MultiSelectStep(
         question: l10n.onboardingAppyIdentityQuestion,
         subtitle: l10n.onboardingAppyMultiSelectHint,
@@ -208,7 +184,7 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
               value: 'other', emoji: '✨', label: l10n.onboardingAppyIdentityOther),
         ],
       ),
-      // 4: feelings (multi-select)
+      // 3: feelings (multi-select)
       MultiSelectStep(
         question: l10n.onboardingAppyFeelingsQuestion,
         subtitle: l10n.onboardingAppyMultiSelectHint,
@@ -239,7 +215,7 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
               value: 'other', emoji: '✨', label: l10n.onboardingAppyFeelingOther),
         ],
       ),
-      // 5: rate life dimensions
+      // 4: rate life dimensions
       LifeRatingStep(
         title: l10n.onboardingAppyLifeTitle,
         subtitle: l10n.onboardingAppyLifeSubtitle,
@@ -247,33 +223,33 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
         ratings: state.lifeRatings,
         onRate: cubit.setRating,
       ),
-      // 6: problem (education)
+      // 5: problem (education)
       EducationStep(
         emoji: '🌫️',
         title: l10n.onboardingAppyProblemTitle,
         body: l10n.onboardingAppyProblemBody,
       ),
-      // 7: solution (education)
+      // 6: solution (education)
       EducationStep(
         emoji: '💬',
         title: l10n.onboardingAppySolutionTitle,
         body: l10n.onboardingAppySolutionBody,
       ),
-      // 8: present Appy (education)
+      // 7: present Appy (education)
       EducationStep(
         emoji: '👋',
         title: l10n.onboardingAppyPresentTitle,
         body: l10n.onboardingAppyPresentBody,
         footnote: l10n.onboardingAppyPresentFootnote,
       ),
-      // 9: name
+      // 8: name
       NameInputStep(
         title: l10n.onboardingAppyNameQuestion,
         hint: l10n.onboardingAppyNameHint,
         initialValue: state.name,
         onChanged: cubit.setName,
       ),
-      // 10: tone
+      // 9: tone
       SurveyStep(
         question: l10n.onboardingAppyToneQuestion,
         options: [
@@ -285,7 +261,7 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
         selectedOption: state.tone,
         onSelected: cubit.setTone,
       ),
-      // 11: sign up → complete
+      // 10: sign up → complete
       OnboardingAuthStep(
         mode: OnboardingAuthMode.signUp,
         title: l10n.onboardingAppySignUpTitle,
@@ -311,36 +287,68 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
           body: Stack(
             children: [
               SafeArea(
+                bottom: false,
                 child: Column(
                   children: [
-                    // Header: back button (left) + progress bar.
+                    // Header: a centered progress bar with equal side zones so
+                    // its position never shifts, the circular back button on
+                    // the left, and the language selector pinned to the right.
                     Padding(
-                      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
+                      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 4.h),
                       child: Row(
                         children: [
+                          // Left zone mirrors the right zone to keep the bar
+                          // centered; holds the back button when available.
                           SizedBox(
-                            width: 36.w,
-                            child: _currentPage > 0 && !_ownsNav(_currentPage)
-                                ? GestureDetector(
-                                    onTap: withHaptic(_back),
-                                    child: Icon(Icons.arrow_back_ios_new,
-                                        size: 20.sp, color: c.textPrimary),
-                                  )
-                                : const SizedBox.shrink(),
+                            width: 52.w,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: (_currentPage > 0 &&
+                                      !_ownsNav(_currentPage))
+                                  ? GestureDetector(
+                                      onTap: withHaptic(_back),
+                                      child: Container(
+                                        width: 50.w,
+                                        height: 50.h,
+                                        decoration: BoxDecoration(
+                                          color: c.card,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                            Icons.chevron_left_rounded,
+                                            size: 30.sp,
+                                            color: c.textPrimary),
+                                      ),
+                                    )
+                                  : null,
+                            ),
                           ),
+                          SizedBox(width: 24.w),
                           Expanded(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(4.r),
                               child: LinearProgressIndicator(
                                 value: fraction,
-                                minHeight: 4.h,
+                                minHeight: 6,
                                 backgroundColor: c.separator,
                                 valueColor:
                                     AlwaysStoppedAnimation<Color>(c.primary),
                               ),
                             ),
                           ),
-                          SizedBox(width: 36.w),
+                          SizedBox(width: 24.w),
+                          // Right zone: language selector, always available.
+                          SizedBox(
+                            width: 52.w,
+                            child: const Align(
+                              alignment: Alignment.centerRight,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerRight,
+                                child: LanguageFlagButton(),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -352,29 +360,32 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
                       ),
                     ),
                     if (!_ownsNav(_currentPage))
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 54.h,
-                          child: ElevatedButton(
-                            onPressed: _canContinue(state)
-                                ? withHaptic(_next)
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: c.primary,
-                              foregroundColor: Colors.white,
-                              disabledBackgroundColor: c.separator,
-                              disabledForegroundColor: c.textSecondary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14.r),
+                      SafeArea(
+                        top: false,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 16.h),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 56.h,
+                            child: ElevatedButton(
+                              onPressed: _canContinue(state)
+                                  ? withHaptic(_next)
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: c.textPrimary,
+                                foregroundColor: c.card,
+                                disabledBackgroundColor: c.separator,
+                                disabledForegroundColor: c.textSecondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28.r),
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              _continueLabel(l10n),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                              child: Text(
+                                _continueLabel(l10n),
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
