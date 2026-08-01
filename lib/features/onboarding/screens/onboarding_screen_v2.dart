@@ -66,7 +66,16 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
   }
 
   void _next() => _goToPage(_currentPage + 1);
-  void _back() => _goToPage(_currentPage - 1);
+
+  // Back is always available: from the first page it exits to the start screen,
+  // otherwise it steps back one page.
+  void _back() {
+    if (_currentPage == 0) {
+      context.read<OnboardingCubit>().backToStart();
+      return;
+    }
+    _goToPage(_currentPage - 1);
+  }
 
   // Pages that render their own primary action (no shared Continue button).
   bool _ownsNav(int page) => page == 10;
@@ -123,14 +132,14 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
   static List<LifeDimension> _lifeDimensions(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return [
-      LifeDimension('health', l10n.onboardingAppyLifeHealth),
-      LifeDimension('support', l10n.onboardingAppyLifeSupport),
-      LifeDimension('safety', l10n.onboardingAppyLifeSafety),
-      LifeDimension('environment', l10n.onboardingAppyLifeEnvironment),
-      LifeDimension('selfCare', l10n.onboardingAppyLifeSelfCare),
-      LifeDimension('enjoyment', l10n.onboardingAppyLifeEnjoyment),
-      LifeDimension('job', l10n.onboardingAppyLifeJob),
-      LifeDimension('meaning', l10n.onboardingAppyLifeMeaning),
+      LifeDimension('health', '💪 ${l10n.onboardingAppyLifeHealth}'),
+      LifeDimension('support', '🤝 ${l10n.onboardingAppyLifeSupport}'),
+      LifeDimension('safety', '🛡️ ${l10n.onboardingAppyLifeSafety}'),
+      LifeDimension('environment', '🏡 ${l10n.onboardingAppyLifeEnvironment}'),
+      LifeDimension('selfCare', '💗 ${l10n.onboardingAppyLifeSelfCare}'),
+      LifeDimension('enjoyment', '🎉 ${l10n.onboardingAppyLifeEnjoyment}'),
+      LifeDimension('job', '💼 ${l10n.onboardingAppyLifeJob}'),
+      LifeDimension('meaning', '🧭 ${l10n.onboardingAppyLifeMeaning}'),
     ];
   }
 
@@ -157,10 +166,10 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
         selectedOption: state.ageRange,
         onSelected: cubit.setAge,
       ),
-      // 2: identity (multi-select)
+      // 2: identity (single-select)
       MultiSelectStep(
         question: l10n.onboardingAppyIdentityQuestion,
-        subtitle: l10n.onboardingAppyMultiSelectHint,
+        subtitle: l10n.onboardingAppyChooseOne,
         selected: state.identities,
         onToggle: cubit.toggleIdentity,
         options: [
@@ -235,9 +244,13 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
         title: l10n.onboardingAppySolutionTitle,
         body: l10n.onboardingAppySolutionBody,
       ),
-      // 7: present Appy (education)
+      // 7: present Appy (education) — the mascot waves hello.
       EducationStep(
-        emoji: '👋',
+        illustration: Image.asset(
+          'assets/onboarding/pet_hello.jpg',
+          height: 180.h,
+          fit: BoxFit.contain,
+        ),
         title: l10n.onboardingAppyPresentTitle,
         body: l10n.onboardingAppyPresentBody,
         footnote: l10n.onboardingAppyPresentFootnote,
@@ -292,35 +305,33 @@ class _OnboardingScreenV2State extends State<OnboardingScreenV2> {
                   children: [
                     // Header: a centered progress bar with equal side zones so
                     // its position never shifts, the circular back button on
-                    // the left, and the language selector pinned to the right.
+                    // the left (always shown — the first page exits to start),
+                    // and the language selector pinned to the right.
                     Padding(
                       padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 4.h),
                       child: Row(
                         children: [
                           // Left zone mirrors the right zone to keep the bar
-                          // centered; holds the back button when available.
+                          // centered; holds the always-available back button.
                           SizedBox(
                             width: 52.w,
                             child: Align(
                               alignment: Alignment.centerLeft,
-                              child: (_currentPage > 0 &&
-                                      !_ownsNav(_currentPage))
-                                  ? GestureDetector(
-                                      onTap: withHaptic(_back),
-                                      child: Container(
-                                        width: 50.w,
-                                        height: 50.h,
-                                        decoration: BoxDecoration(
-                                          color: c.card,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                            Icons.chevron_left_rounded,
-                                            size: 30.sp,
-                                            color: c.textPrimary),
-                                      ),
-                                    )
-                                  : null,
+                              child: GestureDetector(
+                                onTap: withHaptic(_back),
+                                child: Container(
+                                  width: 50.w,
+                                  height: 50.h,
+                                  decoration: BoxDecoration(
+                                    color: c.card,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                      Icons.chevron_left_rounded,
+                                      size: 30.sp,
+                                      color: c.textPrimary),
+                                ),
+                              ),
                             ),
                           ),
                           SizedBox(width: 24.w),

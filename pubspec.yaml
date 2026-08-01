@@ -91,6 +91,7 @@ flutter:
     - shorebird.yaml
     - assets/home/
     - assets/home_page/
+    - assets/onboarding/
     - assets/activities/
     - assets/chat/
     - assets/journal/

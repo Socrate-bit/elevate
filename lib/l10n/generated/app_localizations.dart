@@ -2795,25 +2795,25 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingAppyStartBadge.
   ///
   /// In en, this message translates to:
-  /// **'PRIVATE & JUDGMENT-FREE'**
+  /// **'YOUR AI GROWTH COACH'**
   String get onboardingAppyStartBadge;
 
   /// No description provided for @onboardingAppyStartTitle.
   ///
   /// In en, this message translates to:
-  /// **'Meet Appy,\nyour pocket companion'**
+  /// **'Welcome to Appy,\nyour self-growth coach'**
   String get onboardingAppyStartTitle;
 
   /// No description provided for @onboardingAppyStartSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'A caring space to think out loud, untangle your thoughts, and feel a little lighter.'**
+  /// **'Understand yourself, heal old patterns, and take aligned action. A gamified AI coach to grow into the life you want.'**
   String get onboardingAppyStartSubtitle;
 
   /// No description provided for @onboardingAppyStartJoin.
   ///
   /// In en, this message translates to:
-  /// **'Trusted by thousands finding clarity'**
+  /// **'Thousands growing with Appy every day'**
   String get onboardingAppyStartJoin;
 
   /// No description provided for @onboardingAppyAlreadyAccount.
@@ -2828,10 +2828,16 @@ abstract class AppLocalizations {
   /// **'Sign in'**
   String get onboardingSignIn;
 
+  /// No description provided for @onboardingAppyChooseOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the one that fits best.'**
+  String get onboardingAppyChooseOne;
+
   /// No description provided for @onboardingAppyPrivacyTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your mental health is personal and private'**
+  /// **'Your conversations are private'**
   String get onboardingAppyPrivacyTitle;
 
   /// No description provided for @onboardingAppyPrivacyFootnote.
