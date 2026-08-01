@@ -1489,18 +1489,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get shopCtaColor => 'Changer la couleur';
 
   @override
-  String get onboardingAppyStartBadge => 'PRIVÉ & SANS JUGEMENT';
+  String get onboardingAppyStartBadge => 'TON COACH DE CROISSANCE IA';
 
   @override
-  String get onboardingAppyStartTitle => 'Voici Appy,\nton compagnon de poche';
+  String get onboardingAppyStartTitle =>
+      'Bienvenue sur Appy,\nton coach de développement personnel';
 
   @override
   String get onboardingAppyStartSubtitle =>
-      'Un espace bienveillant pour penser à voix haute, démêler tes pensées et te sentir un peu plus léger.';
+      'Comprends-toi, guéris tes vieux schémas et passe à l\'action alignée. Un coach IA gamifié pour bâtir la vie que tu veux.';
 
   @override
   String get onboardingAppyStartJoin =>
-      'Adopté par des milliers de personnes en quête de clarté';
+      'Des milliers de personnes grandissent avec Appy chaque jour';
 
   @override
   String get onboardingAppyAlreadyAccount => 'Tu as déjà un compte ? ';
@@ -1509,8 +1510,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get onboardingSignIn => 'Se connecter';
 
   @override
-  String get onboardingAppyPrivacyTitle =>
-      'Ta santé mentale est personnelle et privée';
+  String get onboardingAppyChooseOne =>
+      'Choisis celui qui te correspond le mieux.';
+
+  @override
+  String get onboardingAppyPrivacyTitle => 'Tes conversations sont privées';
 
   @override
   String get onboardingAppyPrivacyFootnote =>

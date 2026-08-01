@@ -22,6 +22,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     );
   }
 
+  /// Exits the funnel back to the start screen without completing it.
+  /// AuthWrapper shows [OnboardingStartScreen] again while progress is false.
+  void backToStart() {
+    if (!state.isInProgress) return;
+    emit(state.copyWith(isInProgress: false));
+    debugPrint('[OnboardingCubit] back to start screen');
+  }
+
   /// Marks the onboarding flow as finished. AuthWrapper then routes to
   /// AppGateWrapper.
   void finishOnboarding() {
@@ -50,8 +58,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   }
 
   void toggleIdentity(String value) {
-    final next = {...state.identities};
-    next.contains(value) ? next.remove(value) : next.add(value);
+    // Single selection: tapping a new value replaces the current one; tapping
+    // the selected value again clears it.
+    final next = state.identities.contains(value) ? <String>{} : {value};
     emit(state.copyWith(identities: next));
     _captureAnswer('identities', next.join(', '));
   }
