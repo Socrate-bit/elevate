@@ -59,10 +59,21 @@ class HomePageCubit extends Cubit<HomePageState> {
         .whereType<String>()
         .toSet();
 
-    // Today's plan: habits scheduled today + actions due today or undated.
+    // Non-recurrent actions validated on an earlier day are one-off tasks that
+    // are finished for good: they stay visible (checked) the day they're
+    // validated, then drop off. Habits recur, so this never hides them.
+    final completedBeforeTodayIds = _activities
+        .where((a) => a.completed && !_isSameDay(a.timestamp, today))
+        .map((a) => a.sourceId)
+        .whereType<String>()
+        .toSet();
+
+    // Today's plan: habits scheduled today + actions due today or undated,
+    // minus one-off actions already validated on a previous day.
     final todayRoutines =
         _routines.where((r) {
           if (r.type == RoutineType.habit) return r.isScheduledToday;
+          if (completedBeforeTodayIds.contains(r.id)) return false;
           return r.scheduledDate == null || _isSameDay(r.scheduledDate!, today);
         }).toList()
           ..sort((a, b) => a.createdAt.compareTo(b.createdAt));

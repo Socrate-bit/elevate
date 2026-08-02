@@ -424,6 +424,9 @@ class _TaskCard extends StatelessWidget {
     final opensSession = tool != null && tool.hasSession;
     // An undone activity starts its session straight from the trailing button.
     final startable = opensSession && !done;
+    // A validated one-off action is finished for good (it drops off tomorrow),
+    // so its check is locked — it can't be un-validated. Habits stay toggleable.
+    final locked = done && routine.type == RoutineType.action;
     return GestureDetector(
       // Tapping the card always opens the read-only detail page.
       onTap: withHaptic(onOpen),
@@ -499,10 +502,11 @@ class _TaskCard extends StatelessWidget {
             _CheckButton(
               done: done,
               hasObjectCheck: routine.objectCheck != null,
-              // Undone activities play straight into their session; everything
-              // else toggles its validated state.
+              // Undone activities play straight into their session; a locked
+              // one-off action can't be toggled; everything else toggles its
+              // validated state.
               showPlay: startable,
-              onTap: startable ? onStartSession : onToggle,
+              onTap: startable ? onStartSession : (locked ? null : onToggle),
             ),
           ],
         ),
@@ -560,7 +564,8 @@ class _CheckButton extends StatelessWidget {
   final bool done;
   final bool hasObjectCheck;
   final bool showPlay;
-  final VoidCallback onTap;
+  /// Null disables the tap (e.g. a locked, validated one-off action).
+  final VoidCallback? onTap;
 
   const _CheckButton({
     required this.done,
