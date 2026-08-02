@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../home/services/heart_service.dart';
 import '../models/game_profile.dart';
 
 /// UI state for the coin / strike / adventure system.
@@ -22,6 +23,10 @@ class AdventureState extends Equatable {
 
   bool get isReady => profile.isReady;
   bool get isWalking => profile.isWalking;
+
+  /// Live hearts, settled against the clock (decays as [nowMs] advances).
+  int get hearts =>
+      HeartService.settle(profile.hearts, profile.heartsUpdatedAt, nowMs).hearts;
 
   /// True once the walking window has elapsed — the surprise is ready.
   bool get isArrived {

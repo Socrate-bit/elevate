@@ -14,10 +14,17 @@ class AdventureCubit extends Cubit<AdventureState> {
   AdventureCubit()
     : super(AdventureState(nowMs: DateTime.now().millisecondsSinceEpoch)) {
     _subscribe();
+    // Slow always-on tick: re-renders settled hearts and records the
+    // zero-crossing (streak reset) even when the pet isn't walking.
+    _heartTicker = Timer.periodic(
+      const Duration(minutes: 5),
+      (_) => _settleHearts(),
+    );
   }
 
   StreamSubscription<GameProfile>? _sub;
   Timer? _ticker;
+  Timer? _heartTicker;
 
   void _subscribe() {
     _sub = AdventureService.watchProfile().listen((profile) {
@@ -29,7 +36,17 @@ class AdventureCubit extends Cubit<AdventureState> {
         ),
       );
       _syncTicker();
+      // Handle a cold-start crossing (hearts died while the app was closed).
+      _settleHearts();
     });
+  }
+
+  /// Refreshes [AdventureState.nowMs] so settled hearts re-render, and persists
+  /// the streak reset if hearts have just hit zero (guarded / idempotent).
+  void _settleHearts() {
+    if (isClosed) return;
+    emit(state.copyWith(nowMs: DateTime.now().millisecondsSinceEpoch));
+    AdventureService.settleHeartsToZero(DateTime.now());
   }
 
   /// Runs a 1s clock only while walking (and not yet arrived) so the bar and
@@ -85,6 +102,7 @@ class AdventureCubit extends Cubit<AdventureState> {
   Future<void> close() {
     _sub?.cancel();
     _ticker?.cancel();
+    _heartTicker?.cancel();
     return super.close();
   }
 }

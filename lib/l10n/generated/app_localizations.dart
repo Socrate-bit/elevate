@@ -2453,7 +2453,7 @@ abstract class AppLocalizations {
   /// No description provided for @defaultTaskIntrospectionName.
   ///
   /// In en, this message translates to:
-  /// **'Quick introspection'**
+  /// **'Daily input'**
   String get defaultTaskIntrospectionName;
 
   /// No description provided for @defaultTaskIntrospectionSubtitle.
@@ -2489,8 +2489,14 @@ abstract class AppLocalizations {
   /// No description provided for @adventureStrikeProgress.
   ///
   /// In en, this message translates to:
-  /// **'{done} / {total} sprouts'**
+  /// **'{done} / {total} leaves'**
   String adventureStrikeProgress(int done, int total);
+
+  /// No description provided for @adventureLevelProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done}/{total}'**
+  String adventureLevelProgress(int done, int total);
 
   /// No description provided for @adventureStartButton.
   ///

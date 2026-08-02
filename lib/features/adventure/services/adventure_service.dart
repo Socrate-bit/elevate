@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../auth/auth_service.dart';
+import '../../home/services/heart_service.dart';
 import '../../subscription/services/analytics_service.dart';
 import '../models/game_profile.dart';
 
@@ -67,10 +68,19 @@ class AdventureService {
           }
         }
 
+        // A completed action also restores hearts (+2, capped).
+        final hs = HeartService.restore(
+          profile.hearts,
+          profile.heartsUpdatedAt,
+          now.millisecondsSinceEpoch,
+        );
+
         final updated = profile.copyWith(
           coins: profile.coins + coins,
           strikes: newStrikes,
           adventureEndMs: endMs,
+          hearts: hs.hearts,
+          heartsUpdatedAt: hs.anchorMs,
         );
         tx.set(_gameDoc, updated.toMap());
       });
@@ -141,29 +151,53 @@ class AdventureService {
     }
   }
 
-  /// Forfeits the current level-bar accumulation (strikes → 0) when the user
-  /// lets their hearts hit zero. No-op while walking or if there is nothing to
-  /// lose, so it's safe to call on every heart recompute.
-  static Future<void> forfeitStrikes() async {
+  /// Settles heart decay and, on the zero-crossing, records the loss: pins
+  /// [GameProfile.heartsUpdatedAt]/[GameProfile.streakAnchorMs] to the exact
+  /// moment hearts died (so the streak run is bounded there) and forfeits any
+  /// charging leaves. Writes ONLY when hearts newly reach zero — idempotent and
+  /// cheap to call on every tick (mirrors the old `forfeitStrikes` guard).
+  static Future<void> settleHeartsToZero(DateTime now) async {
     try {
       await _db.runTransaction((tx) async {
         final snap = await tx.get(_gameDoc);
         if (!snap.exists || snap.data() == null) return;
         final profile = GameProfile.fromMap(snap.data()!);
-        if (profile.phase != AdventurePhase.charging || profile.strikes == 0) {
-          return;
-        }
-        tx.set(_gameDoc, profile.copyWith(strikes: 0).toMap());
+        if (profile.hearts <= 0) return; // already dead → nothing to record.
+        final nowMs = now.millisecondsSinceEpoch;
+        final settled = HeartService.settle(
+          profile.hearts,
+          profile.heartsUpdatedAt,
+          nowMs,
+        );
+        if (settled.hearts > 0) return; // not crossing yet → no write.
+
+        // Exact moment hearts hit zero: anchor + (hearts * decay interval).
+        final zeroAt = (profile.heartsUpdatedAt ?? nowMs) +
+            profile.hearts * kHeartDecayInterval.inMilliseconds;
+        tx.set(
+          _gameDoc,
+          profile
+              .copyWith(
+                hearts: 0,
+                heartsUpdatedAt: zeroAt,
+                streakAnchorMs: zeroAt,
+                // Forfeit unspent charging leaves (walking leaves are locked in).
+                strikes: profile.phase == AdventurePhase.charging
+                    ? 0
+                    : profile.strikes,
+              )
+              .toMap(),
+        );
       });
-      debugPrint('[AdventureService] strikes forfeited (hearts depleted)');
+      debugPrint('[AdventureService] hearts depleted → streak reset');
     } catch (e) {
-      debugPrint('[AdventureService] forfeitStrikes failed: $e');
+      debugPrint('[AdventureService] settleHeartsToZero failed: $e');
     }
   }
 
-  /// Claims the reward: records the earned trophy [trophyId], advances to the
-  /// next level (raising the next bar's strike goal), and resets to a fresh
-  /// charging bar.
+  /// Claims the reward: records the earned trophy [trophyId], increments the
+  /// adventure count (which may advance the level once enough adventures are
+  /// banked), and resets to a fresh charging bar.
   static Future<void> completeAdventure(String trophyId) async {
     try {
       await _db.runTransaction((tx) async {
@@ -172,14 +206,15 @@ class AdventureService {
             ? GameProfile.fromMap(snap.data()!)
             : const GameProfile();
 
-        final newLevel = profile.level + 1;
+        final newAdventures = profile.adventures + 1;
         tx.set(
           _gameDoc,
           profile
               .copyWith(
                 phase: AdventurePhase.charging,
                 strikes: 0,
-                level: newLevel,
+                adventures: newAdventures,
+                level: levelForAdventures(newAdventures),
                 trophies: [...profile.trophies, trophyId],
                 clearWindow: true,
               )
