@@ -157,13 +157,10 @@ class ChatCubit extends Cubit<ChatState> {
       createdAt: now,
     );
 
-    // Clear stale rapid answers as soon as the user sends.
+    // Appending the user message also hides stale rapid answers (they are
+    // derived from the latest message).
     emit(
-      state.copyWith(
-        messages: [...state.messages, userMsg],
-        isSending: true,
-        proposedAnswers: const [],
-      ),
+      state.copyWith(messages: [...state.messages, userMsg], isSending: true),
     );
 
     try {
@@ -417,9 +414,6 @@ class ChatCubit extends Cubit<ChatState> {
       }
     }
 
-    // Store the rapid answers regardless of whether a bubble is persisted.
-    emit(state.copyWith(proposedAnswers: reply.proposedAnswers));
-
     // Never persist an empty bubble: no text and no interactive payload.
     final hasPayload = form != null ||
         missionSuggestion != null ||
@@ -430,6 +424,7 @@ class ChatCubit extends Cubit<ChatState> {
       return null;
     }
 
+    // Rapid answers ride on the message so they survive leaving the chat.
     final modelMsg = ChatMessage(
       id: _uuid.v4(),
       conversationId: state.conversationId,
@@ -439,6 +434,7 @@ class ChatCubit extends Cubit<ChatState> {
       missionSuggestion: missionSuggestion,
       moodCheckIn: moodCheckIn,
       routineMutation: mutation,
+      proposedAnswers: reply.proposedAnswers,
       createdAt: DateTime.now(),
     );
 

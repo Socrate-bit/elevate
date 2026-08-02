@@ -19,8 +19,8 @@ import '../cubit/chat_list_cubit.dart';
 import '../cubit/chat_list_state.dart';
 import '../cubit/chat_state.dart';
 import '../services/chat_message.dart';
-import '../services/voice_service.dart';
 import '../widgets/chat_composer_bar.dart';
+import '../widgets/chat_proposed_answers_panel.dart';
 import '../widgets/chat_message_list.dart';
 import '../widgets/chat_suggestions_card.dart';
 import '../widgets/chat_top_bar.dart';
@@ -260,6 +260,9 @@ class _ChatViewState extends State<_ChatView> with WidgetsBindingObserver {
   final _scrollController = ScrollController();
   bool _suggestionsDismissed = false;
 
+  /// Whether the inline rapid-answers panel is unfolded above the composer.
+  bool _proposalsOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -367,6 +370,29 @@ class _ChatViewState extends State<_ChatView> with WidgetsBindingObserver {
         // ),
         // Hairline separating the conversation from the composer.
         Divider(height: 1, thickness: 1, color: ChatPalette.cardBorder),
+        // Inline rapid-answers panel — rendered in the column (not a modal
+        // route) so unfolding it never dismisses the keyboard.
+        BlocBuilder<ChatCubit, ChatState>(
+          buildWhen: (a, b) => a.proposedAnswers != b.proposedAnswers,
+          builder: (context, state) {
+            if (!_proposalsOpen || state.proposedAnswers.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: EdgeInsets.fromLTRB(24.w, 10.h, 24.w, 0),
+              child: ChatProposedAnswersPanel(
+                answers: state.proposedAnswers,
+                onPick: (text) {
+                  setState(() => _proposalsOpen = false);
+                  AnalyticsService.capture(
+                    AnalyticsService.chatProposedAnswerTapped,
+                  );
+                  _send(context, text);
+                },
+              ),
+            );
+          },
+        ),
         // Composer: snug above the keyboard when open, clear of the floating nav
         // bar when closed (padding grows smoothly to 96 as the keyboard retracts).
         Padding(
@@ -377,25 +403,15 @@ class _ChatViewState extends State<_ChatView> with WidgetsBindingObserver {
             (24.h - MediaQuery.viewInsetsOf(context).bottom).clamp(8.h, 96.h),
           ),
           child: BlocBuilder<ChatCubit, ChatState>(
-            buildWhen: (a, b) =>
-                a.isListening != b.isListening ||
-                a.proposedAnswers != b.proposedAnswers,
+            buildWhen: (a, b) => a.proposedAnswers != b.proposedAnswers,
             builder: (context, state) => ChatComposerBar(
               controller: _composer,
               focusNode: _composerFocus,
-              hint: state.isListening
-                  ? l10n.chatVoiceListening
-                  : l10n.chatPageComposerHint,
-              isListening: state.isListening,
+              hint: l10n.chatPageComposerHint,
               onSend: () => _send(context, _composer.text),
-              onMic: () => _toggleMic(context),
               proposedAnswers: state.proposedAnswers,
-              onProposedTap: (text) {
-                AnalyticsService.capture(
-                  AnalyticsService.chatProposedAnswerTapped,
-                );
-                _send(context, text);
-              },
+              onToggleProposed: () =>
+                  setState(() => _proposalsOpen = !_proposalsOpen),
             ),
           ),
         ),
@@ -417,43 +433,6 @@ class _ChatViewState extends State<_ChatView> with WidgetsBindingObserver {
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.chatSendFailed)));
     }
-  }
-
-  Future<void> _toggleMic(BuildContext context) async {
-    final cubit = context.read<ChatCubit>();
-    final l10n = AppLocalizations.of(context)!;
-    if (cubit.state.isListening) {
-      final transcript = await cubit.stopListening();
-      if (transcript.trim().isNotEmpty) _composer.text = transcript;
-      return;
-    }
-    try {
-      await cubit.startListening();
-      _bindPartialUpdates(cubit);
-    } on VoiceUnavailableException {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.chatVoiceUnavailable)));
-    } catch (_) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.chatVoicePermissionDenied)));
-    }
-  }
-
-  /// Mirrors live partial transcripts into the composer while listening.
-  void _bindPartialUpdates(ChatCubit cubit) {
-    final sub = cubit.stream.listen((s) {
-      if (s.voicePartial.isNotEmpty && s.voicePartial != _composer.text) {
-        _composer.text = s.voicePartial;
-        _composer.selection = TextSelection.collapsed(
-          offset: _composer.text.length,
-        );
-      }
-    });
-    cubit.stream.firstWhere((s) => !s.isListening).then((_) => sub.cancel());
   }
 
   void _scrollToBottom() {

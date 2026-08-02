@@ -3,49 +3,42 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
-import 'chat_proposed_answers_sheet.dart';
 
 /// Minimalist composer: a white pill (matching the page background) holding the
-/// text field and a trailing action. The trailing icon is a mic while the field
-/// is empty (tap → [onMic]) and a send arrow once there is text (tap → [onSend]).
-/// When the AI attaches rapid replies, a sparkle button appears that unfolds
-/// them ([proposedAnswers] / [onProposedTap]). The field grows from one to three
-/// lines. Controlled by the parent, which owns [controller].
+/// text field and a trailing send arrow (dimmed until there is text). When the
+/// AI attaches rapid replies, a sparkle button appears that toggles the inline
+/// proposals panel via [onToggleProposed] (kept out of a modal route so the
+/// keyboard stays up). The field grows from one to three lines. Controlled by
+/// the parent, which owns [controller].
 class ChatComposerBar extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
   final String hint;
-  final bool isListening;
   final VoidCallback onSend;
-  final VoidCallback onMic;
 
   /// AI-suggested rapid replies; the sparkle button is hidden when empty.
   final List<String> proposedAnswers;
 
-  /// Called with the tapped rapid reply (which the parent sends instantly).
-  final ValueChanged<String> onProposedTap;
+  /// Toggles the inline proposals panel rendered by the parent.
+  final VoidCallback onToggleProposed;
 
   const ChatComposerBar({
     super.key,
     required this.controller,
     this.focusNode,
     required this.hint,
-    required this.isListening,
     required this.onSend,
-    required this.onMic,
     this.proposedAnswers = const [],
-    required this.onProposedTap,
+    required this.onToggleProposed,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Rebuild the trailing icon as the text changes (empty → mic, text → send).
+    // Rebuild the trailing area as the text changes (empty ⇄ has text).
     return AnimatedBuilder(
       animation: controller,
       builder: (context, _) {
         final hasText = controller.text.trim().isNotEmpty;
-        // White pill holding the text field + trailing action. Bottom-aligned so
-        // the action stays anchored as the field grows from one to three lines.
         return Container(
           padding: EdgeInsets.only(left: 18.w, right: 8.w),
           decoration: BoxDecoration(
@@ -89,13 +82,7 @@ class ChatComposerBar extends StatelessWidget {
               // field is empty and suggestions exist).
               if (!hasText && proposedAnswers.isNotEmpty)
                 GestureDetector(
-                  onTap: withHaptic(
-                    () => showProposedAnswersSheet(
-                      context,
-                      proposedAnswers,
-                      onProposedTap,
-                    ),
-                  ),
+                  onTap: withHaptic(onToggleProposed),
                   child: Padding(
                     padding: EdgeInsets.all(6.w),
                     child: Icon(
@@ -107,16 +94,12 @@ class ChatComposerBar extends StatelessWidget {
                 ),
               SizedBox(width: 6.w),
               GestureDetector(
-                onTap: withHaptic(hasText ? onSend : onMic),
+                onTap: hasText ? withHaptic(onSend) : null,
                 child: Padding(
                   padding: EdgeInsets.all(6.w),
                   child: Icon(
-                    hasText
-                        ? Icons.arrow_upward_rounded
-                        : (isListening
-                              ? Icons.stop_rounded
-                              : Icons.mic_rounded),
-                    color: hasText || isListening
+                    Icons.arrow_upward_rounded,
+                    color: hasText
                         ? ChatPalette.accent
                         : ChatPalette.headerSubtitle,
                     size: 30.sp,

@@ -26,6 +26,11 @@ class ChatMessage extends Equatable {
   /// True once the user has opened this insight for the first time (only ever
   /// set on insight messages). Gates the one-time open reward + win page.
   final bool insightOpened;
+
+  /// AI-suggested rapid replies attached to a model turn (0–4). Persisted on
+  /// the message so they survive leaving/reopening the chat; surfaced by the
+  /// composer only while this is the latest message.
+  final List<String> proposedAnswers;
   final DateTime createdAt;
 
   const ChatMessage({
@@ -40,6 +45,7 @@ class ChatMessage extends Equatable {
     this.routineMutation,
     this.insight,
     this.insightOpened = false,
+    this.proposedAnswers = const [],
   });
 
   ChatMessage copyWith({
@@ -53,6 +59,7 @@ class ChatMessage extends Equatable {
     ChatRoutineMutation? routineMutation,
     ChatInsight? insight,
     bool? insightOpened,
+    List<String>? proposedAnswers,
     DateTime? createdAt,
   }) => ChatMessage(
     id: id ?? this.id,
@@ -65,6 +72,7 @@ class ChatMessage extends Equatable {
     routineMutation: routineMutation ?? this.routineMutation,
     insight: insight ?? this.insight,
     insightOpened: insightOpened ?? this.insightOpened,
+    proposedAnswers: proposedAnswers ?? this.proposedAnswers,
     createdAt: createdAt ?? this.createdAt,
   );
 
@@ -77,6 +85,7 @@ class ChatMessage extends Equatable {
     'routineMutation': routineMutation?.toMap(),
     'insight': insight?.toMap(),
     'insightOpened': insightOpened,
+    if (proposedAnswers.isNotEmpty) 'proposedAnswers': proposedAnswers,
     'createdAtMs': createdAt.millisecondsSinceEpoch,
   };
 
@@ -106,6 +115,10 @@ class ChatMessage extends Equatable {
           : ChatRoutineMutation.fromMap(routineMap),
       insight: insightMap == null ? null : ChatInsight.fromMap(insightMap),
       insightOpened: m['insightOpened'] as bool? ?? false,
+      proposedAnswers: (m['proposedAnswers'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         m['createdAtMs'] as int? ?? 0,
       ),
@@ -124,6 +137,7 @@ class ChatMessage extends Equatable {
     routineMutation,
     insight,
     insightOpened,
+    proposedAnswers,
     createdAt,
   ];
 }

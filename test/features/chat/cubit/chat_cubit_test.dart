@@ -201,7 +201,8 @@ void main() {
       expect(window.last.text, 'hello');
     });
 
-    test('surfaces proposed answers from the reply into state', () async {
+    test('persists proposed answers on the model message so they survive '
+        'reopening the chat', () async {
       _stubAnswer(
         gemini,
         const AnswerResult(
@@ -211,14 +212,35 @@ void main() {
       );
       final cubit = buildCubit();
       await cubit.sendText('hello');
-      expect(cubit.state.proposedAnswers, ['Yeah', 'Not really', 'Tell me more']);
+
+      final saved = verify(() => repo.saveMessage(captureAny())).captured;
+      final modelMsg = saved[1] as ChatMessage;
+      expect(modelMsg.proposedAnswers, ['Yeah', 'Not really', 'Tell me more']);
+
+      // Once the stream delivers it (as on a fresh open), state surfaces them.
+      messages.add([saved[0] as ChatMessage, modelMsg]);
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        cubit.state.proposedAnswers,
+        ['Yeah', 'Not really', 'Tell me more'],
+      );
     });
 
-    test('clears proposed answers when the next message is sent', () async {
-      final cubit = buildCubit(ids: ['u1', 'm1', 'u2', 'm2']);
-      cubit.emit(cubit.state.copyWith(proposedAnswers: const ['stale']));
+    test('hides proposed answers as soon as the user sends', () async {
+      final cubit = buildCubit(ids: ['u1', 'm1']);
+      final stale = ChatMessage(
+        id: 'prev',
+        conversationId: 'c1',
+        role: ChatRole.model,
+        text: 'earlier reply',
+        proposedAnswers: const ['stale'],
+        createdAt: DateTime.fromMillisecondsSinceEpoch(0),
+      );
+      cubit.emit(cubit.state.copyWith(messages: [stale]));
+      expect(cubit.state.proposedAnswers, ['stale']);
+
       await cubit.sendText('hello');
-      // The stub returns no proposed answers, so they end up empty.
+      // Latest message is now the user's turn, so the derived list is empty.
       expect(cubit.state.proposedAnswers, isEmpty);
     });
 
