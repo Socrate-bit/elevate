@@ -17,10 +17,6 @@ class ChatState extends Equatable {
   /// True while an insight is being generated (drives the forming animation).
   final bool isGeneratingInsight;
 
-  /// AI-suggested rapid replies for the latest assistant turn (0–4). Surfaced
-  /// by the composer's rapid-answer button; cleared when the user sends.
-  final List<String> proposedAnswers;
-
   /// Model-assessed readiness of the conversation to yield an insight, [0,1].
   /// Mirrored from the memory builder's state.
   final double insightProgress;
@@ -37,7 +33,6 @@ class ChatState extends Equatable {
     this.isListening = false,
     this.voicePartial = '',
     this.isGeneratingInsight = false,
-    this.proposedAnswers = const [],
     this.insightProgress = 0.0,
     this.insightBoundaryMs = 0,
   });
@@ -50,7 +45,6 @@ class ChatState extends Equatable {
     bool? isListening,
     String? voicePartial,
     bool? isGeneratingInsight,
-    List<String>? proposedAnswers,
     double? insightProgress,
     int? insightBoundaryMs,
   }) => ChatState(
@@ -61,10 +55,19 @@ class ChatState extends Equatable {
     isListening: isListening ?? this.isListening,
     voicePartial: voicePartial ?? this.voicePartial,
     isGeneratingInsight: isGeneratingInsight ?? this.isGeneratingInsight,
-    proposedAnswers: proposedAnswers ?? this.proposedAnswers,
     insightProgress: insightProgress ?? this.insightProgress,
     insightBoundaryMs: insightBoundaryMs ?? this.insightBoundaryMs,
   );
+
+  /// Rapid replies for the current moment: the ones stored on the latest
+  /// message when it's a model turn. Derived from [messages], so they survive
+  /// leaving/reopening the chat and hide as soon as the user answers.
+  List<String> get proposedAnswers {
+    if (messages.isEmpty) return const [];
+    final last = messages.last;
+    if (last.role != ChatRole.model) return const [];
+    return last.proposedAnswers;
+  }
 
   /// Number of user turns since the most recent insight (by the memory
   /// builder's boundary). Drives the auto-generate trigger.
@@ -91,7 +94,6 @@ class ChatState extends Equatable {
     isListening,
     voicePartial,
     isGeneratingInsight,
-    proposedAnswers,
     insightProgress,
     insightBoundaryMs,
   ];
