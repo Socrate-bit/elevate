@@ -115,17 +115,20 @@ class GameProfile extends Equatable {
   factory GameProfile.fromMap(Map<String, dynamic> data) {
     // Parse trophies first so `adventures` can fall back to its length.
     final trophies = List<String>.from(data['trophies'] as List? ?? const []);
+    final adventures = (data['adventures'] as int?) ?? trophies.length;
     return GameProfile(
       coins: (data['coins'] as int?) ?? 0,
       strikes: (data['strikes'] as int?) ?? 0,
-      level: (data['level'] as int?) ?? 1,
+      // Level is a pure function of adventures; derive it so legacy docs (which
+      // persist an old-scheme `level`) migrate instead of desyncing.
+      level: levelForAdventures(adventures),
       phase: (data['phase'] as String?) == 'walking'
           ? AdventurePhase.walking
           : AdventurePhase.charging,
       adventureStartMs: data['adventureStartMs'] as int?,
       adventureEndMs: data['adventureEndMs'] as int?,
       trophies: trophies,
-      adventures: (data['adventures'] as int?) ?? trophies.length,
+      adventures: adventures,
       hearts: (data['hearts'] as int?) ?? kHeartMax,
       heartsUpdatedAt: data['heartsUpdatedAt'] as int?,
       streakAnchorMs: data['streakAnchorMs'] as int?,
