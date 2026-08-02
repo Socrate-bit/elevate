@@ -383,7 +383,6 @@ class _ChatViewState extends State<_ChatView> with WidgetsBindingObserver {
               child: ChatProposedAnswersPanel(
                 answers: state.proposedAnswers,
                 onPick: (text) {
-                  setState(() => _proposalsOpen = false);
                   AnalyticsService.capture(
                     AnalyticsService.chatProposedAnswerTapped,
                   );
@@ -424,6 +423,9 @@ class _ChatViewState extends State<_ChatView> with WidgetsBindingObserver {
     final text = raw.trim();
     if (text.isEmpty) return;
     _composer.clear();
+    // Fold the rapid-answers panel so it stays collapsed by default rather than
+    // auto-unfolding on the next AI turn.
+    if (_proposalsOpen) setState(() => _proposalsOpen = false);
     final l10n = AppLocalizations.of(context)!;
     try {
       await context.read<ChatCubit>().sendText(text);
