@@ -7,6 +7,7 @@ import '../../../shared/theme/app_theme.dart';
 import '../../../shared/utils/haptic_utils.dart';
 import '../../adventure/cubit/adventure_cubit.dart';
 import '../../adventure/cubit/adventure_state.dart';
+import '../../adventure/models/game_profile.dart';
 import '../../trophy/cubit/trophy_reveal_cubit.dart';
 import '../../trophy/screens/trophy_reveal_screen.dart';
 import '../../shop/cubit/shop_cubit.dart';
@@ -43,11 +44,13 @@ class QuestBanner extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Current level — sits opposite the streak + shop icons.
+                  // Current level — sits opposite the shop icon.
                   const _LevelBadge(),
                   const Spacer(),
-                  const _StreakCounter(),
-                  SizedBox(width: 24.w),
+                  // Streak counter hidden this iteration (noise; Finch omits it).
+                  // The streak still runs and resets when hearts hit zero.
+                  // const _StreakCounter(),
+                  // SizedBox(width: 24.w),
                   _PerchIcon(
                     asset: 'assets/home_page/shop_icon.png',
                     onTap: () => showShopSheet(context),
@@ -213,8 +216,9 @@ class _PerchIcon extends StatelessWidget {
   }
 }
 
-/// Current adventure level, shown above the level-progression (adventure) bar.
-/// Rebuilds only when the level changes.
+/// Current level plus progress toward the next one (adventures banked in the
+/// current level over the number it takes to clear it). Rebuilds when the level
+/// or the adventure count changes.
 class _LevelBadge extends StatelessWidget {
   const _LevelBadge();
 
@@ -222,21 +226,42 @@ class _LevelBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<AdventureCubit, AdventureState>(
-      buildWhen: (a, b) => a.profile.level != b.profile.level,
-      builder: (context, adv) => Text(
-        l10n.levelLabel(adv.profile.level),
-        style: TextStyle(
-          fontSize: 24.sp,
-          fontWeight: FontWeight.w800,
-          color: Colors.white,
-        ),
+      buildWhen: (a, b) =>
+          a.profile.level != b.profile.level ||
+          a.profile.adventures != b.profile.adventures,
+      builder: (context, adv) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.levelLabel(adv.profile.level),
+            style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+          Text(
+            l10n.adventureLevelProgress(
+              adventuresIntoCurrentLevel(adv.profile.adventures),
+              adventuresForNextLevel(adv.profile.adventures),
+            ),
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.white.withValues(alpha: 0.8),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 /// Live daily-streak count perched on the banner (consecutive days with a
-/// completed activity).
+/// completed activity). Currently hidden on home (see [QuestBanner]) but kept
+/// so it can be re-enabled without rewiring.
+// ignore: unused_element
 class _StreakCounter extends StatelessWidget {
   const _StreakCounter();
 

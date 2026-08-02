@@ -59,10 +59,11 @@ const DefaultTask kIntrospectionTask = DefaultTask(
   xp: 10,
 );
 
-/// The default tasks, in display order.
+/// The default tasks, in display order. Breathing was removed from the daily
+/// routine (to nudge introspection) — [kBreathingTask] and its screens are kept
+/// but no longer surfaced here, so the routine grows exactly 20 leaves.
 const List<DefaultTask> kDefaultTasks = [
   kMoodTask,
-  kBreathingTask,
   kIntrospectionTask,
 ];
 

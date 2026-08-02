@@ -1288,7 +1288,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get defaultTaskBreathingSubtitle => 'Take a mindful moment';
 
   @override
-  String get defaultTaskIntrospectionName => 'Quick introspection';
+  String get defaultTaskIntrospectionName => 'Daily input';
 
   @override
   String get defaultTaskIntrospectionSubtitle => 'Open up with Appy';
@@ -1311,7 +1311,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String adventureStrikeProgress(int done, int total) {
-    return '$done / $total sprouts';
+    return '$done / $total leaves';
+  }
+
+  @override
+  String adventureLevelProgress(int done, int total) {
+    return '$done/$total';
   }
 
   @override

@@ -1299,7 +1299,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Prends un instant en pleine conscience';
 
   @override
-  String get defaultTaskIntrospectionName => 'Petite introspection';
+  String get defaultTaskIntrospectionName => 'Entrée quotidienne';
 
   @override
   String get defaultTaskIntrospectionSubtitle => 'Confie-toi à Appy';
@@ -1322,7 +1322,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String adventureStrikeProgress(int done, int total) {
-    return '$done / $total pousses';
+    return '$done / $total feuilles';
+  }
+
+  @override
+  String adventureLevelProgress(int done, int total) {
+    return '$done/$total';
   }
 
   @override

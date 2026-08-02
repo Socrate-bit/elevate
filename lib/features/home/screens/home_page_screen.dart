@@ -13,8 +13,6 @@ import '../../adventure/cubit/adventure_state.dart';
 import '../../routines/cubit/routine_cubit.dart';
 import '../../shop/cubit/shop_cubit.dart';
 import '../../shop/cubit/shop_state.dart';
-import '../cubit/streak_cubit.dart';
-import '../cubit/streak_state.dart';
 import '../cubit/home_page_cubit.dart';
 import '../cubit/home_page_state.dart';
 import '../services/heart_service.dart';
@@ -205,7 +203,7 @@ class _HomeViewState extends State<_HomeView> {
                               gaplessPlayback: true,
                             );
                           }
-                          return BlocBuilder<StreakCubit, StreakState>(
+                          return BlocBuilder<AdventureCubit, AdventureState>(
                             buildWhen: (a, b) => a.hearts != b.hearts,
                             builder: (context, state) => Image.asset(
                               HeartService.petAssetForHearts(state.hearts),

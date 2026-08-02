@@ -112,24 +112,56 @@ void main() {
     });
   });
 
-  group('Heart ↔ streak alignment', () {
-    test('hearts decay one per 12h from the last activity', () {
-      expect(HeartService.computeHearts(null, now: now), kHeartMax);
-      expect(HeartService.computeHearts(now, now: now), kHeartMax);
-      expect(
-        HeartService.computeHearts(now.subtract(const Duration(hours: 12)), now: now),
-        3,
-      );
-      expect(
-        HeartService.computeHearts(now.subtract(const Duration(hours: 24)), now: now),
-        2,
-      );
+  group('HeartService.settle (persisted decay)', () {
+    final nowMs = now.millisecondsSinceEpoch;
+    int msAgo(Duration d) => now.subtract(d).millisecondsSinceEpoch;
+
+    test('null anchor (legacy doc) → no decay this read', () {
+      final s = HeartService.settle(kHeartMax, null, nowMs);
+      expect(s.hearts, kHeartMax);
+      expect(s.anchorMs, nowMs);
     });
 
-    test('streak breaks exactly when the last heart is lost (48h)', () {
-      final lastActivity = now.subtract(const Duration(hours: 48));
-      expect(HeartService.computeHearts(lastActivity, now: now), 0);
-      expect(StreakService.computeStreak([at(lastActivity)], now: now), 0);
+    test('decays one heart per 12h, preserving the remainder', () {
+      expect(HeartService.settle(4, msAgo(const Duration(hours: 12)), nowMs).hearts, 3);
+      expect(HeartService.settle(4, msAgo(const Duration(hours: 24)), nowMs).hearts, 2);
+      // 13h = one whole step; the anchor advances by exactly 12h (keeps 1h).
+      final s = HeartService.settle(4, msAgo(const Duration(hours: 13)), nowMs);
+      expect(s.hearts, 3);
+      expect(s.anchorMs, msAgo(const Duration(hours: 1)));
+    });
+
+    test('48h without action → 0 hearts, anchor re-based to now', () {
+      final s = HeartService.settle(4, msAgo(const Duration(hours: 48)), nowMs);
+      expect(s.hearts, 0);
+      expect(s.anchorMs, nowMs);
+    });
+
+    test('already zero stays zero', () {
+      expect(HeartService.settle(0, msAgo(const Duration(hours: 5)), nowMs).hearts, 0);
+    });
+  });
+
+  group('HeartService.restore (+2 per action)', () {
+    final nowMs = now.millisecondsSinceEpoch;
+    int msAgo(Duration d) => now.subtract(d).millisecondsSinceEpoch;
+
+    test('adds two, capped at max, and re-bases the anchor', () {
+      final s = HeartService.restore(1, nowMs, nowMs);
+      expect(s.hearts, 3);
+      expect(s.anchorMs, nowMs);
+    });
+
+    test('caps at kHeartMax', () {
+      expect(HeartService.restore(3, nowMs, nowMs).hearts, kHeartMax);
+      expect(HeartService.restore(kHeartMax, nowMs, nowMs).hearts, kHeartMax);
+    });
+
+    test('settles decay first, then restores', () {
+      // 24h ago → 4 decays to 2, then +2 back to 4.
+      expect(HeartService.restore(4, msAgo(const Duration(hours: 24)), nowMs).hearts, 4);
+      // 36h ago → 4 decays to 1, then +2 to 3.
+      expect(HeartService.restore(4, msAgo(const Duration(hours: 36)), nowMs).hearts, 3);
     });
   });
 }
